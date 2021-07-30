@@ -1,0 +1,12 @@
+main: wbs.quake.WbsQuake
+name: WbsQuake
+version: 0.0.1
+api-version: 1.14
+author: Weber588
+description: Quake! Because I wanted more customizability lol
+depend: [WbsUtils]
+commands:
+  wbsquake:
+    aliases: [wq, q]
+    permission: 'wbsquake.command'
+    description: The main command to interact with the plugin.

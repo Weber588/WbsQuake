@@ -1,0 +1,81 @@
+# This will appear before many messages from the plugin.
+message-prefix: '&8[&cWbsQuake&8]'
+
+# Use a minecraft colour code here to pick the message colour
+message-colour: '7'
+
+# The highlight colour (to complement the above colour)
+highlight-colour: 'b'
+
+# Errors will be this colour.
+error-colour: 'c'
+
+# Error highlights
+error-highlight: '7'
+
+
+options:
+  # When true, players will respawn at the spawnpoint furthest from
+  # any other player in the arena. When false, it's completely random.
+  # With only 2 players, this uses a random spawnpoint except the closest one
+  # (to prevent spawning at the same places every time on symmetrical maps)
+  furthest-spawnpoint: true
+
+  # When true, the scoreboard in game will show the players with the top 3 points.
+  show-leaderboard-in-game: true
+
+power-ups:
+  rapid_fire: # You reference these in game to add to arenas
+    type: rapid_fire # Types are: rapid_fire, multishot, bounceshot, and potion
+    item: diamond_hoe # The item players see at power-ups in game.
+    display: 'Rapid Fire' # The name here is what shows in game when activated by a player
+    multiplier: 2
+    duration: 300 # in ticks
+    cooldown: 600 # How long until the next powerup regenerates
+
+  speed:
+    # Leaving out the display: fields will use the section name, auto-capitalized. This will show as "Speed"
+    type: potion
+    # Leaving out item uses a default. For potions, it's a speed potion.
+    potion: speed
+    amplifier: 3
+    duration: 200
+    target: player
+    cooldown: 600
+
+  invisibility:
+    type: potion
+    potion: invisibility
+    item: phantom_membrane
+    duration: 300
+    cooldown: 600
+    # You can leave out some variables and they'll use a default value.
+    # Default target is player
+    # Default amplifier is 1
+
+  multishot:
+    type: multishot
+    duration: 100
+    item: crossbow
+    cooldown: 600
+
+  bounceshot:
+    type: bounceshot
+    duration: 300
+    item: slime_ball
+    bounces: 2 # How many times can the quake ray bounce off blocks before expiring
+    cooldown: 600
+
+  glow_others:
+    type: potion
+    potion: glowing
+    item: spectral_arrow
+    duration: 60
+    cooldown: 600
+    # You can choose different targets: player, all, random, all_not_player, random_not_player, closest
+    target: not_player # Everyone except the player who activates it
+  # target: all # Every player, including the one who activates it
+  # target: random # A random player in the arena, including the player who activates it
+  # target: random_not_player # A random player in the arena, excluding the player who activates it
+  # target: player # The player who activates it
+  # target: closest # The closest player to the player who activates it
