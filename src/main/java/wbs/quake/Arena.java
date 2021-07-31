@@ -194,6 +194,7 @@ public class Arena {
         QuakePlayer closest = null;
         for (QuakePlayer player : QuakeLobby.getInstance().getPlayers()) {
             if (player == quakePlayer) continue;
+            if (!player.getPlayer().getWorld().equals(quakePlayer.getPlayer().getWorld())) continue;
 
             double thisDistance = player.getPlayer().getLocation().distanceSquared(quakePlayer.getPlayer().getLocation());
 
@@ -210,6 +211,7 @@ public class Arena {
         double distance = Double.MAX_VALUE;
         QuakePlayer closest = null;
         for (QuakePlayer player : QuakeLobby.getInstance().getPlayers()) {
+            if (!player.getPlayer().getWorld().equals(location.getWorld())) continue;
             double thisDistance = player.getPlayer().getLocation().distanceSquared(location);
 
             if (thisDistance < distance) {
