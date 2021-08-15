@@ -3,16 +3,14 @@ package wbs.quake.powerups;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 import wbs.quake.*;
+import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.WbsEnums;
-import wbs.utils.util.WbsMath;
 import wbs.utils.util.configuration.WbsConfigReader;
 import wbs.utils.util.string.WbsStrings;
 

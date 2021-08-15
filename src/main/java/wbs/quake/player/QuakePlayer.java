@@ -1,13 +1,12 @@
-package wbs.quake;
+package wbs.quake.player;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import wbs.quake.Gun;
 import wbs.utils.util.WbsMath;
 
-import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -37,7 +36,7 @@ public class QuakePlayer {
         kills = section.getInt("kills");
         deaths = section.getInt("deaths");
 
-        currentGun = new Gun(section, uuid + ".gun");
+        currentGun = new Gun(section, "gun");
     }
 
     public void writeToConfig(ConfigurationSection section) {
@@ -67,14 +66,6 @@ public class QuakePlayer {
 
     public void teleport(Location loc) {
         player.teleport(loc);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        QuakePlayer that = (QuakePlayer) o;
-        return uuid.equals(that.uuid);
     }
 
     public Player getPlayer() {
@@ -147,10 +138,6 @@ public class QuakePlayer {
         return statsLines;
     }
 
-    public void playDeathEffect() {
-        // TODO: Add death effects
-    }
-
     public String getName() {
         if (name == null && player != null) {
             name = player.getName();
@@ -167,7 +154,21 @@ public class QuakePlayer {
     }
 
     @Override
-    public int hashCode() {
-        return uuid.hashCode();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof QuakePlayer)) return false;
+        QuakePlayer that = (QuakePlayer) o;
+        return Objects.equals(uuid, that.uuid);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid);
+    }
+
+    public void onKill(QuakePlayer victim) {
+        // TODO
+    }
+
+
 }

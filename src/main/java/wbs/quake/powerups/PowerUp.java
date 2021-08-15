@@ -3,7 +3,6 @@ package wbs.quake.powerups;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -11,13 +10,13 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import wbs.quake.*;
+import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
 import wbs.utils.util.string.WbsStringify;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public abstract class PowerUp {
     public static final NamespacedKey POWER_UP_KEY = new NamespacedKey(WbsQuake.getInstance(), "power_up");
@@ -82,39 +81,37 @@ public abstract class PowerUp {
     protected String display;
     protected Material item;
 
-    private Item itemEntity;
-    private int respawnRunnableId = -1;
-
-    public void disable() {
-        if (itemEntity != null) {
-            itemEntity.remove();
-            itemEntity = null;
-        }
-        if (respawnRunnableId != -1) {
-            Bukkit.getScheduler().cancelTask(respawnRunnableId);
-            respawnRunnableId = -1;
-        }
-    }
+    private final Map<Location, Item> itemEntities = new HashMap<>();
+    private final Map<Location, Integer> runnables = new HashMap<>();
 
     protected abstract Material getDefaultItem();
     protected abstract String getDefaultDisplay();
+
+    public boolean remove(Location location) {
+        Item checkItem = itemEntities.remove(location);
+        Integer id = runnables.remove(location);
+
+        return checkItem != null || id != null;
+    }
 
     public final boolean apply(Location location, QuakePlayer player) {
         if (!active) return false;
 
         active = false;
-        itemEntity = null;
+        itemEntities.remove(location);
         runOn(player);
 
         QuakeLobby.getInstance().sendActionBars("&e" + player.getName() + " used &b" + getDisplay() + "&e!");
 
-        respawnRunnableId = new BukkitRunnable() {
+        int respawnRunnableId = new BukkitRunnable() {
             @Override
             public void run() {
                 spawnAt(location);
-                respawnRunnableId = -1;
+                runnables.remove(location);
             }
         }.runTaskLater(plugin, cooldown).getTaskId();
+
+        runnables.put(location, respawnRunnableId);
 
         new BukkitRunnable() {
             @Override
@@ -140,10 +137,12 @@ public abstract class PowerUp {
         World world = location.getWorld();
         assert world != null;
 
-        itemEntity = location.getWorld().dropItem(location, itemStack);
+        Item itemEntity = location.getWorld().dropItem(location, itemStack);
         itemEntity.setGravity(false);
         itemEntity.setPickupDelay(0);
         itemEntity.setVelocity(new Vector(0, 0, 0));
+
+        itemEntities.put(location, itemEntity);
 
         active = true;
     }

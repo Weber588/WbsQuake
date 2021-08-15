@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import wbs.quake.player.QuakePlayer;
 import wbs.quake.powerups.PowerUp;
 
 import java.util.*;
@@ -169,12 +170,6 @@ public class Arena {
                             + Objects.requireNonNull(location.getWorld()).getName());
             section.set(name + ".power-ups." + i + ".type", powerups.get(location).getId());
             i++;
-        }
-    }
-
-    public void start() {
-        for (Location loc : powerups.keySet()) {
-            powerups.get(loc).spawnAt(loc);
         }
     }
 
@@ -411,5 +406,17 @@ public class Arena {
             }
         }
         return null;
+    }
+
+    public void start() {
+        for (Location loc : powerups.keySet()) {
+            powerups.get(loc).spawnAt(loc);
+        }
+    }
+
+    public void finish() {
+        for (Location loc : powerups.keySet()) {
+            powerups.get(loc).remove(loc);
+        }
     }
 }

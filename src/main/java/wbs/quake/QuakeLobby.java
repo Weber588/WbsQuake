@@ -14,6 +14,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import wbs.quake.player.QuakePlayer;
+import wbs.utils.util.WbsScoreboard;
 import wbs.utils.util.plugin.WbsMessenger;
 
 import java.util.*;
@@ -67,6 +69,8 @@ public class QuakeLobby extends WbsMessenger {
 
     // Join/leave listeners to trigger the start of voting, or revert to prior state on leave
 
+    private final Map<QuakePlayer, WbsScoreboard> scoreboards = new HashMap<>();
+
     /**
      * Make a player join this arena.
      * @param player The player to join
@@ -84,6 +88,9 @@ public class QuakeLobby extends WbsMessenger {
         messagePlayers("&h" + player.getName() + "&r joined the lobby! &h(" + (players.size() + 1) + ")");
 
         players.add(player);
+        WbsScoreboard scoreboard = getScoreboardFor(player);
+        scoreboard.showToPlayer(player.getPlayer());
+        scoreboards.put(player, scoreboard);
 
         sendMessage("Joined the lobby!", player.getPlayer());
 
@@ -109,6 +116,7 @@ public class QuakeLobby extends WbsMessenger {
 
         plugin.sendMessage("Left the lobby!", player.getPlayer());
         players.remove(player);
+        scoreboards.get(player).clear();
 
         messagePlayers(player.getPlayer().getName() + "&r left. &w(" + players.size() + ")");
 
@@ -129,7 +137,7 @@ public class QuakeLobby extends WbsMessenger {
                     break;
                 case GAMEPLAY:
                     assert round != null;
-                    round.roundWon();
+                    round.roundOver();
                     break;
                 case ROUND_OVER:
                     break;
@@ -139,6 +147,31 @@ public class QuakeLobby extends WbsMessenger {
         }
 
         return true;
+    }
+
+    private static final String BORDER = "&r===============";
+
+    private WbsScoreboard getScoreboardFor(QuakePlayer player) {
+        String namespace = player.getPlayer().getUniqueId().toString();
+        namespace = namespace.substring(namespace.length() - 16);
+
+        WbsScoreboard playersScoreboard = new WbsScoreboard(plugin, namespace, "&c&lQuake");
+
+        configureScoreboard(playersScoreboard, player);
+
+        return playersScoreboard;
+    }
+
+    private WbsScoreboard configureScoreboard(WbsScoreboard scoreboard, QuakePlayer player) {
+        scoreboard.addLine(BORDER);
+        scoreboard.addLine("");
+        for (String line : player.getStatsDisplay()) {
+            scoreboard.addLine("&r" + line);
+        }
+        scoreboard.addLine("&r");
+        scoreboard.addLine(BORDER + "&r");
+
+        return scoreboard;
     }
 
     public void kickAll() {
@@ -170,11 +203,15 @@ public class QuakeLobby extends WbsMessenger {
 
     }
 
+    public GameState getState() {
+        return state;
+    }
+
     // ============================= //
     //          State Machine        //
     // ============================= //
 
-    private enum GameState {
+    public enum GameState {
         WAITING_FOR_PLAYERS, PAUSED_BEFORE_VOTING, VOTING, COUNTDOWN, GAMEPLAY, ROUND_OVER
     }
 
@@ -337,7 +374,7 @@ public class QuakeLobby extends WbsMessenger {
     private void cancelVoting() {
         cancelRunnable();
         messagePlayers("Not enough players! Voting cancelled.");
-        waitForPlayers();
+        state = GameState.WAITING_FOR_PLAYERS;
     }
 
     // Countdown
@@ -416,7 +453,10 @@ public class QuakeLobby extends WbsMessenger {
         for (QuakePlayer lobbyPlayer : players) {
             teleportToLobby(lobbyPlayer);
             lobbyPlayer.getPlayer().getInventory().setContents(lobbyInventory);
-            // TODO: Show players their personal scoreboard with stats
+            WbsScoreboard scoreboard = scoreboards.get(lobbyPlayer);
+            scoreboard.clear();
+            configureScoreboard(scoreboard, lobbyPlayer);
+            scoreboard.showToPlayer(lobbyPlayer.getPlayer());
         }
 
         if (autoStart && players.size() >= PLAYERS_TO_START) {
@@ -432,7 +472,7 @@ public class QuakeLobby extends WbsMessenger {
     private final Map<QuakePlayer, ItemStack[]> inventories = new HashMap<>();
     private final Map<QuakePlayer, Location> oldLocations = new HashMap<>();
     private final Map<QuakePlayer, GameMode> gamemodes = new HashMap<>();
-    private final Map<QuakePlayer, Scoreboard> scoreboards = new HashMap<>();
+    private final Map<QuakePlayer, Scoreboard> vanillaScoreboards = new HashMap<>();
 
     private void savePlayerState(QuakePlayer player) {
         Player bukkitPlayer = player.getPlayer();
@@ -445,7 +485,7 @@ public class QuakeLobby extends WbsMessenger {
 
         oldLocations.put(player, bukkitPlayer.getLocation());
 
-        scoreboards.put(player, player.getPlayer().getScoreboard());
+        vanillaScoreboards.put(player, player.getPlayer().getScoreboard());
     }
 
     private void restorePlayerState(QuakePlayer player) {
@@ -458,7 +498,7 @@ public class QuakeLobby extends WbsMessenger {
 
         bukkitPlayer.teleport(oldLocations.get(player));
 
-        player.getPlayer().setScoreboard(scoreboards.get(player));
+        player.getPlayer().setScoreboard(vanillaScoreboards.get(player));
     }
 
     public void messagePlayers(String message) {

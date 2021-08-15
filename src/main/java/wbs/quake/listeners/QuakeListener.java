@@ -16,6 +16,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import wbs.quake.*;
+import wbs.quake.player.PlayerManager;
+import wbs.quake.player.QuakePlayer;
 import wbs.quake.powerups.PowerUp;
 import wbs.utils.util.plugin.WbsMessenger;
 import wbs.utils.util.string.WbsStringify;
@@ -79,7 +81,9 @@ public class QuakeListener extends WbsMessenger implements Listener {
                 return;
             }
 
-            powerUp.apply(itemEntity.getLocation(), quakePlayer);
+            if (!powerUp.apply(itemEntity.getLocation(), quakePlayer)) {
+                System.out.println("Powerup failed to apply: " + powerUpId);
+            }
         }
     }
 

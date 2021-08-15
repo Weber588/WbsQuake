@@ -5,7 +5,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.WbsScoreboard;
+import wbs.utils.util.pluginhooks.VaultWrapper;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,10 +30,13 @@ public class QuakeRound {
     private int scoreboardSize = 8;
 
     private final WbsQuake plugin;
+    private final QuakeSettings settings;
     public QuakeRound(Arena arena) {
         this.arena = arena;
         lobby = QuakeLobby.getInstance();
         plugin = WbsQuake.getInstance();
+        settings = plugin.settings;
+
         scoreboard = new WbsScoreboard(plugin, "WbsQuake", "&c&lQuake");
 
         scoreboard.addLine(BORDER);
@@ -42,7 +47,7 @@ public class QuakeRound {
         // TODO: Find a way to not need this lol
         scoreboard.addLine("&r");
 
-        if (plugin.settings.showLeaderboardInGame) {
+        if (settings.showLeaderboardInGame) {
             scoreboard.addLine("&r1: ");
             scoreboard.addLine("&r2: ");
             if (lobby.getPlayers().size() >= 3) {
@@ -64,7 +69,7 @@ public class QuakeRound {
         points.put(attacker, current);
 
         if (current >= arena.getKillsToWin()) {
-            roundWon();
+            roundOver();
         }
     }
 
@@ -76,7 +81,7 @@ public class QuakeRound {
 
         scoreboard.setLine(timeLeftLine, timeLeftString);
 
-        if (plugin.settings.showLeaderboardInGame) {
+        if (settings.showLeaderboardInGame) {
             List<Map.Entry<QuakePlayer, Integer>> leaderboard = getLeaderboard();
 
             int extraWidthNeeded = 0;
@@ -150,7 +155,7 @@ public class QuakeRound {
                 }
 
                 if (secondsRemaining == 0) {
-                    roundWon();
+                    roundOver();
                     cancel();
                 }
             }
@@ -164,12 +169,17 @@ public class QuakeRound {
         return arena;
     }
 
-    public void roundWon() {
+    public void roundOver() {
         List<Map.Entry<QuakePlayer, Integer>> winners = getLeaderboard();
 
-        winners.get(0).getKey().addWin();
+        int winnerPoints = winners.get(0).getValue();
 
-        winners.forEach(entry -> entry.getKey().addPlayed());
+        points.forEach((player, points) -> {
+            player.addPlayed();
+            if (points == winnerPoints) {
+                player.addWin();
+            }
+        });
 
         String endMessage =  "&hRound over!&r"
                 + "\n==============================="
@@ -188,6 +198,8 @@ public class QuakeRound {
 
         scoreboard.clear();
 
+        arena.finish();
+
         lobby.roundOver(endMessage);
     }
 
@@ -205,14 +217,34 @@ public class QuakeRound {
         return getLeaderboard().stream().map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
-    public void registerKill(QuakePlayer victim, QuakePlayer attacker) {
+    public void registerKill(QuakePlayer victim, QuakePlayer attacker, boolean headshot) {
+
+        attacker.onKill(victim);
+
         victim.addDeath();
         attacker.addKill();
 
-        victim.playDeathEffect();
+        double moneyToGive = settings.moneyPerKill;
+        if (headshot) moneyToGive += settings.headshotBonus;
 
-        // TODO: Make format configurable
-        lobby.messagePlayersNoPrefix(attacker.getName() + " killed " + victim.getName() + "!");
+        VaultWrapper.giveMoney(attacker.getPlayer(), moneyToGive);
+
+        String format;
+        if (headshot) {
+            format = settings.headshotFormat;
+            attacker.addHeadshot();
+
+            if (settings.headshotsGiveBonusPoints) {
+                givePoint(attacker);
+            }
+        } else {
+            format = settings.killFormat;
+        }
+
+        format = format.replace("%attacker%", attacker.getName());
+        format = format.replace("%victim%", victim.getName());
+
+        lobby.messagePlayersNoPrefix(format);
 
         givePoint(attacker);
         arena.respawn(victim);

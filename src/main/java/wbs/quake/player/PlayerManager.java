@@ -1,7 +1,8 @@
-package wbs.quake;
+package wbs.quake.player;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import wbs.quake.WbsQuake;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,8 @@ import java.util.UUID;
 
 public final class PlayerManager {
     private PlayerManager() {}
+
+    public static void initialize() {}
 
     private static final Map<UUID, QuakePlayer> players = new HashMap<>();
 
@@ -33,6 +36,7 @@ public final class PlayerManager {
             QuakePlayer quakePlayer = new QuakePlayer(playerSection);
 
             players.put(quakePlayer.getUUID(), quakePlayer);
+            i++;
         }
 
         return i;

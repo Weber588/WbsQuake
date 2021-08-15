@@ -2,10 +2,9 @@ package wbs.quake;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
-import wbs.quake.command.arena.ArenaSubcommand;
-import wbs.quake.command.JoinSubcommand;
 import wbs.quake.command.QuakeCommand;
 import wbs.quake.listeners.QuakeListener;
+import wbs.quake.player.PlayerManager;
 import wbs.utils.util.plugin.WbsPlugin;
 
 public class WbsQuake extends WbsPlugin {
@@ -29,6 +28,7 @@ public class WbsQuake extends WbsPlugin {
 
         // To initialize the class in case it's never called before the plugin disables
         QuakeLobby.getInstance();
+        PlayerManager.initialize();
 
         settings.loadArenas();
         settings.loadPlayers();
@@ -42,7 +42,9 @@ public class WbsQuake extends WbsPlugin {
     @Override
     public void onDisable() {
         QuakeLobby.getInstance().kickAll();
-        settings.saveArenas();
         settings.savePlayers();
+        settings.saveArenas();
+
+        ArenaManager.getAllArenas().forEach(Arena::finish);
     }
 }

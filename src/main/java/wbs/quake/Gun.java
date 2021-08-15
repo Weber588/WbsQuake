@@ -1,6 +1,8 @@
 package wbs.quake;
 
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
@@ -13,6 +15,10 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import wbs.quake.player.PlayerManager;
+import wbs.quake.player.QuakePlayer;
+import wbs.quake.upgrades.UpgradeableOption;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsMath;
@@ -34,20 +40,26 @@ public class Gun {
     // TODO: Make this configurable?
     public String gunName = "&9&lRailgun";
 
-    private int cooldown = 20;
+    @NotNull
+    private UpgradeableOption cooldown; // 20
+    @NotNull
+    private UpgradeableOption leapSpeed; // 1.5
+    @NotNull
+    private UpgradeableOption leapCooldown; // 50
+    @NotNull
+    private UpgradeableOption speed;
+
     private double width = 0.2;
-    private LocalDateTime lastUsed;
-
-    private Material skin = Material.WOODEN_HOE;
-    private boolean shiny;
-
-    private double leapSpeed = 1.5;
-    private int leapCooldown = 50;
-    private LocalDateTime lastLeap;
 
     private int bounces = 0;
     private double multishotChance = 0f;
     private double cooldownModifier = 1;
+
+    private Material skin = Material.WOODEN_HOE;
+    private boolean shiny;
+
+    private LocalDateTime lastShot;
+    private LocalDateTime lastLeap;
 
     private final LineParticleEffect line;
 
@@ -59,29 +71,45 @@ public class Gun {
         line.setOptions(options);
         line.setScaleAmount(true);
         line.setAmount(3);
+
+        QuakeSettings settings = WbsQuake.getInstance().settings;
+
+        cooldown = settings.getOption("cooldown", 0);
+        leapSpeed = settings.getOption("leap-speed", 0);
+        leapCooldown = settings.getOption("leap-cooldown", 0);
+        speed = settings.getOption("speed", 0);
     }
 
     public Gun(ConfigurationSection section, String path) {
         this();
-        cooldown = section.getInt(path + ".cooldown");
+        int cooldownProgress = section.getInt(path + ".cooldown", 0);
+        int leapSpeedProgress = section.getInt(path + ".leap-speed", 0);
+        int leapCooldownProgress = section.getInt(path + ".leap-cooldown", 0);
+        int speedProgress = section.getInt(path + ".speed", 0);
+
+        QuakeSettings settings = WbsQuake.getInstance().settings;
+        cooldown = settings.getOption("cooldown", cooldownProgress);
+        leapSpeed = settings.getOption("leap-speed", leapSpeedProgress);
+        leapCooldown = settings.getOption("leap-cooldown", leapCooldownProgress);
+        speed = settings.getOption("speed", speedProgress);
+
         skin = WbsEnums.materialFromString(section.getString(path + ".skin"), Material.WOODEN_HOE);
-        shiny = section.getBoolean(path + ".shiny");
-        leapSpeed = section.getDouble(path + ".leap-speed");
-        leapCooldown = section.getInt(path + ".leap-cooldown");
-        bounces = section.getInt(path + ".bounces");
-        multishotChance = section.getDouble(path + ".multishot-chance");
+        shiny = section.getBoolean(path + ".shiny", shiny);
+        bounces = section.getInt(path + ".bounces", bounces);
+        multishotChance = section.getDouble(path + ".multishot-chance", multishotChance);
     }
 
     public void writeToConfig(ConfigurationSection section, String path) {
-        section.set(path + ".cooldown", cooldown);
+        section.set(path + ".cooldown", cooldown.getCurrentProgress());
+        section.set(path + ".leap-speed", leapSpeed.getCurrentProgress());
+        section.set(path + ".leap-cooldown", leapCooldown.getCurrentProgress());
+        section.set(path + ".speed", speed.getCurrentProgress());
+
         section.set(path + ".skin", skin.toString());
         section.set(path + ".shiny", shiny);
-        section.set(path + ".leap-speed", leapSpeed);
-        section.set(path + ".leap-cooldown", leapCooldown);
         section.set(path + ".bounces", bounces);
         section.set(path + ".multishot-chance", multishotChance);
     }
-
 
     public ItemStack buildGun() {
         ItemStack gunItem = new ItemStack(skin);
@@ -95,7 +123,23 @@ public class Gun {
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
+        List<String> lore = new LinkedList<>();
+        lore.add("&6Cooldown: &h" + cooldown.formattedValue());
+        lore.add("&6Leap Speed: &h" + leapSpeed.formattedValue());
+        lore.add("&6Leap Cooldown: &h" + leapCooldown.formattedValue());
+        lore.add("&6Speed: &h" + speed.formattedValue());
+
+        meta.setLore(lore);
+
         meta.getPersistentDataContainer().set(GUN_KEY, PersistentDataType.STRING, "true");
+
+        AttributeModifier speedModifier =
+                new AttributeModifier(
+                        Attribute.GENERIC_MOVEMENT_SPEED.name(),
+                        speed.val() / 100,
+                        AttributeModifier.Operation.MULTIPLY_SCALAR_1
+                );
+        meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, speedModifier);
 
         gunItem.setItemMeta(meta);
 
@@ -107,12 +151,12 @@ public class Gun {
     }
 
     private boolean offCooldown() {
-        if (lastUsed == null) return true;
-        return Math.abs(Duration.between(lastUsed, LocalDateTime.now()).toMillis() / 1000.0) > getCooldown() / 20.0;
+        if (lastShot == null) return true;
+        return Math.abs(Duration.between(lastShot, LocalDateTime.now()).toMillis() / 1000.0) > getCooldown() / 20.0;
     }
 
-    private double getCooldown() {
-        return cooldown / cooldownModifier;
+    public double getCooldown() {
+        return cooldown.intVal() / cooldownModifier;
     }
 
     public void addCooldownModifier(double modifier) {
@@ -130,8 +174,9 @@ public class Gun {
      * @param player The player who fired
      */
     public boolean fire(QuakePlayer player) {
+        if (QuakeLobby.getInstance().getState() != QuakeLobby.GameState.GAMEPLAY) return false;
         if (!offCooldown()) return false;
-        lastUsed = LocalDateTime.now();
+        lastShot = LocalDateTime.now();
 
         startXPTimer(player);
 
@@ -194,8 +239,13 @@ public class Gun {
 
                     QuakePlayer victim = PlayerManager.getPlayer(hitPlayer);
 
+                    Location hitLoc = result.getHitPosition().toLocation(hitPlayer.getWorld());
+
+                    double distanceToEyes = hitLoc.distance(hitPlayer.getEyeLocation());
+                    boolean headshot = distanceToEyes < WbsQuake.getInstance().settings.headshotThreshold;
+
                     QuakeRound round = QuakeLobby.getInstance().getCurrentRound();
-                    round.registerKill(victim, player);
+                    round.registerKill(victim, player, headshot);
                 }
             } else {
                 running = false;
@@ -228,12 +278,12 @@ public class Gun {
 
     private boolean offLeapCooldown() {
         if (lastLeap == null) return true;
-        return Math.abs(Duration.between(lastLeap, LocalDateTime.now()).toMillis() / 1000.0) > leapCooldown / 20.0;
+        return Math.abs(Duration.between(lastLeap, LocalDateTime.now()).toMillis() / 1000.0) > leapCooldown.intVal() / 20.0;
     }
 
     public void leap(QuakePlayer player) {
         if (!offLeapCooldown()) {
-            Duration timeLeft = WbsTime.timeLeft(lastLeap, Duration.ofNanos((long) (leapCooldown / 20.0 * 1000000000)));
+            Duration timeLeft = WbsTime.timeLeft(lastLeap, Duration.ofNanos((long) (leapCooldown.intVal() / 20.0 * 1000000000)));
 
             WbsQuake.getInstance().sendActionBar("&wYou can use that again in &h"
                     + WbsStringify.toString(timeLeft, false)
@@ -242,7 +292,7 @@ public class Gun {
         }
         lastLeap = LocalDateTime.now();
 
-        WbsEntities.push(player.getPlayer(), leapSpeed);
+        WbsEntities.push(player.getPlayer(), leapSpeed.val());
     }
 
     public Material getSkin() {
@@ -257,8 +307,8 @@ public class Gun {
         this.shiny = shiny;
     }
 
-    public void setCooldown(int cooldown) {
-        this.cooldown = cooldown;
+    public int setCooldownProgress(int progress) {
+        return cooldown.setCurrentProgress(progress);
     }
 
     public void setBounces(int bounces) {
@@ -274,19 +324,19 @@ public class Gun {
     }
 
     public double getLeapSpeed() {
-        return leapSpeed;
+        return leapSpeed.val();
     }
 
-    public void setLeapSpeed(double leapSpeed) {
-        this.leapSpeed = leapSpeed;
+    public int setLeapSpeedProgress(int progress) {
+        return leapSpeed.setCurrentProgress(progress);
     }
 
     public int getLeapCooldown() {
-        return leapCooldown;
+        return leapCooldown.intVal();
     }
 
-    public void setLeapCooldown(int leapCooldown) {
-        this.leapCooldown = leapCooldown;
+    public int setLeapCooldownProgress(int progress) {
+        return leapCooldown.setCurrentProgress(progress);
     }
 
     public int getBounces() {
@@ -295,5 +345,23 @@ public class Gun {
 
     public double getMultishotChance() {
         return multishotChance;
+    }
+
+    public boolean getShiny() {
+        return shiny;
+    }
+
+    public UpgradeableOption getCooldownOption() {
+        return cooldown;
+    }
+    public UpgradeableOption getLeapCooldownOption() {
+        return leapCooldown;
+    }
+    public UpgradeableOption getLeapSpeedOption() {
+        return leapSpeed;
+    }
+
+    public UpgradeableOption getSpeedOption() {
+        return speed;
     }
 }

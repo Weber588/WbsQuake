@@ -1,0 +1,39 @@
+# In the shop config, you can customize the shop itself, and
+# decide prices, maximum upgradeable values, and configure perks.
+
+# Represents something a player can pay to upgrade that affects them in game.
+# Each option is a path the player moves through; they can't buy the next one
+# until they've bought all previous upgrades in that list.
+#
+# A player's progress through that path is tracked by the position in the list:
+# if someone buys the 3rd upgrade and then you change it, they'll get the new value
+# in the 3rd pair, even if you change the price.
+upgradeable-options:
+  # An option is an ordered list of pairs of value to price. The first option is always free.
+  cooldown: # The number of ticks between gun shots.
+    - 20:$0   # 20 ticks = 1 second
+    - 18:$500 # This represents 0.9 seconds, and it costs $500 to upgrade to it
+    - 16:$1000 # 0.8 seconds, costing $1000 to upgrade
+    - 14:$2500
+    - 12:$5000
+    - 10:$10000 # 0.5 seconds.
+  leap-cooldown: # How many ticks between leaps
+    - 50:$0 # 50 ticks = 2.5 seconds
+    - 45:$250 # 2.25 seconds for $250
+    - 40:$500
+    - 35:$500 # Prices don't have to increase: they need to buy previous ones first anyway.
+    - 30:$500
+    - 25:$1000
+    - 20:$1000
+  leap-speed: # How fast a leap throws the player
+    - 1.5:0
+    # If you don't specify values here, this option will be considered disabled and won't
+    # appear in the shop, acting as a fixed value.
+  speed: # The speed modifier in percent increase. 100 = 2x speed
+    - 0:$0
+    - 10:$500
+    - 25:$750
+    - 50:$1000
+    - 75:$2500
+    - 100:$5000
+

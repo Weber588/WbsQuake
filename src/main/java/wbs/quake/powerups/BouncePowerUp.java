@@ -3,7 +3,7 @@ package wbs.quake.powerups;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import wbs.quake.Gun;
-import wbs.quake.QuakePlayer;
+import wbs.quake.player.QuakePlayer;
 import wbs.quake.WbsQuake;
 
 import java.util.Objects;

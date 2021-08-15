@@ -3,7 +3,7 @@ package wbs.quake.powerups;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
-import wbs.quake.QuakePlayer;
+import wbs.quake.player.QuakePlayer;
 import wbs.quake.WbsQuake;
 import wbs.utils.exceptions.InvalidConfigurationException;
 import wbs.utils.util.configuration.WbsConfigReader;

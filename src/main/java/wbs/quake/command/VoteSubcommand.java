@@ -4,9 +4,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.Arena;
-import wbs.quake.PlayerManager;
+import wbs.quake.player.PlayerManager;
 import wbs.quake.QuakeLobby;
-import wbs.quake.QuakePlayer;
+import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.plugin.WbsPlugin;
 
@@ -22,6 +22,11 @@ public class VoteSubcommand extends WbsSubcommand {
             return true;
         }
 
+        if (args.length < 2) {
+            sendMessage("Choose an arena. Usage: &h/" + label + " vote <id>", sender);
+            return true;
+        }
+
         int id;
         try {
             id = Integer.parseInt(args[1]);
@@ -33,10 +38,22 @@ public class VoteSubcommand extends WbsSubcommand {
         Player player = (Player) sender;
         QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
 
-        Arena chosen = QuakeLobby.getInstance().playerVote(quakePlayer, id);
+        QuakeLobby lobby = QuakeLobby.getInstance();
+
+        if (!lobby.getPlayers().contains(quakePlayer)) {
+            sendMessage("You must be in the lobby to vote!", sender);
+            return true;
+        }
+
+        if (lobby.getState() != QuakeLobby.GameState.VOTING) {
+            sendMessage("Not in voting! Wait for voting to begin.", sender);
+            return true;
+        }
+
+        Arena chosen = lobby.playerVote(quakePlayer, id);
 
         if (chosen != null) {
-            QuakeLobby.getInstance().messagePlayers("&h" + player.getName() + "&r voted for &h" + chosen.getName());
+            lobby.messagePlayers("&h" + player.getName() + "&r voted for &h" + chosen.getName());
         } else {
             sendMessage("&wInvalid ID!", sender);
         }
