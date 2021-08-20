@@ -416,7 +416,7 @@ public class Arena {
 
     public void finish() {
         for (Location loc : powerups.keySet()) {
-            powerups.get(loc).remove(loc);
+            powerups.get(loc).removeAndCancel(loc);
         }
     }
 }

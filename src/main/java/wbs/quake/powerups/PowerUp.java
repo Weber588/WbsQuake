@@ -12,6 +12,7 @@ import org.bukkit.util.Vector;
 import wbs.quake.*;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.WbsEnums;
+import wbs.utils.util.WbsMath;
 import wbs.utils.util.configuration.WbsConfigReader;
 import wbs.utils.util.string.WbsStringify;
 
@@ -20,6 +21,8 @@ import java.util.Map;
 
 public abstract class PowerUp {
     public static final NamespacedKey POWER_UP_KEY = new NamespacedKey(WbsQuake.getInstance(), "power_up");
+
+    public static final int DIGITS_TO_ROUND = 2;
 
     public static PowerUp createPowerUp(ConfigurationSection section, String directory) {
         PowerUpType type = WbsEnums.getEnumFromString(PowerUpType.class, section.getString("type", "POTION"));
@@ -87,27 +90,49 @@ public abstract class PowerUp {
     protected abstract Material getDefaultItem();
     protected abstract String getDefaultDisplay();
 
-    public boolean remove(Location location) {
+    protected Location roundLocation(Location location, int digitsToRound) {
+        return new Location(
+                location.getWorld(),
+                WbsMath.roundTo(location.getX(), digitsToRound),
+                WbsMath.roundTo(location.getY(), digitsToRound),
+                WbsMath.roundTo(location.getZ(), digitsToRound)
+                );
+    }
+
+    public boolean removeAndCancel(Location location) {
+        location = roundLocation(location, DIGITS_TO_ROUND);
         Item checkItem = itemEntities.remove(location);
+        if (checkItem != null) {
+            checkItem.remove();
+        }
         Integer id = runnables.remove(location);
+        if (id != null) {
+            Bukkit.getScheduler().cancelTask(id);
+        }
 
         return checkItem != null || id != null;
     }
 
     public final boolean apply(Location location, QuakePlayer player) {
         if (!active) return false;
+        location = roundLocation(location, DIGITS_TO_ROUND);
 
         active = false;
-        itemEntities.remove(location);
+        Item oldEntity = itemEntities.remove(location);
+        if (oldEntity == null) {
+            plugin.logger.warning("No item found at "
+                    + location.getX() + " " + location.getY() + " " + location.getZ());
+        }
         runOn(player);
 
         QuakeLobby.getInstance().sendActionBars("&e" + player.getName() + " used &b" + getDisplay() + "&e!");
 
+        Location finalLocation = location;
         int respawnRunnableId = new BukkitRunnable() {
             @Override
             public void run() {
-                spawnAt(location);
-                runnables.remove(location);
+                spawnAt(finalLocation);
+                runnables.remove(finalLocation);
             }
         }.runTaskLater(plugin, cooldown).getTaskId();
 
@@ -124,6 +149,7 @@ public abstract class PowerUp {
     }
 
     public final void spawnAt(Location location) {
+        location = roundLocation(location, DIGITS_TO_ROUND);
         ItemStack itemStack = getItem();
 
         ItemMeta meta = itemStack.getItemMeta();
