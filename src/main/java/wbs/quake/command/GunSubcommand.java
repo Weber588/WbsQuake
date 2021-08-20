@@ -23,7 +23,7 @@ public class GunSubcommand extends WbsSubcommand {
     }
 
     private enum GunArg {
-        BOUNCES, COOLDOWN, SKIN, SHINY, LEAP_COOLDOWN, LEAP_SPEED, GET
+        BOUNCES, COOLDOWN, SKIN, SHINY, LEAP_COOLDOWN, LEAP_SPEED, SPEED, PIERCING, GET
     }
 
     private void sendGunUsage(CommandSender sender, String label, String[] args) {
@@ -76,6 +76,12 @@ public class GunSubcommand extends WbsSubcommand {
                         sendMessage("Given gun.", sender);
                         player.getInventory().addItem(gun.buildGun());
                         break;
+                    case SPEED:
+                        sendMessage("Speed: " + gun.getSpeedOption().formattedValue(), sender);
+                        break;
+                    case PIERCING:
+                        sendMessage("Speed: " + gun.getPiercingOption().formattedValue(), sender);
+                        break;
                     default:
                         sendGunUsage(sender, label, args);
                         break;
@@ -112,6 +118,14 @@ public class GunSubcommand extends WbsSubcommand {
                     case GET:
                         sendMessage("Given gun.", sender);
                         player.getInventory().addItem(gun.buildGun());
+                        break;
+                    case SPEED:
+                        sendMessage("Setting speed progress to &h"
+                                + (gun.setSpeedProgress(Integer.parseInt(args[2]) - 1) + 1), sender);
+                        break;
+                    case PIERCING:
+                        sendMessage("Setting piercing progress to &h"
+                                + (gun.setPiercingProgress(Integer.parseInt(args[2]) - 1) + 1), sender);
                         break;
                     default:
                         sendGunUsage(sender, label, args);

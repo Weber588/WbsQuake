@@ -23,16 +23,6 @@ public class WbsQuake extends WbsPlugin {
         settings = new QuakeSettings(this);
         settings.reload();
 
-        ArenaManager.setPlugin(this);
-        Arena.setPlugin(this);
-
-        // To initialize the class in case it's never called before the plugin disables
-        QuakeLobby.getInstance();
-        PlayerManager.initialize();
-
-        settings.loadArenas();
-        settings.loadPlayers();
-
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(new QuakeListener(this), this);
 

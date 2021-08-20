@@ -17,6 +17,7 @@ public class UpgradeableOption {
         int newProgress = currentProgress;
 
         if (newProgress >= path.length()) newProgress = path.length() - 1;
+        if (newProgress < 0) newProgress = 0;
 
         this.currentProgress = newProgress;
         return newProgress;

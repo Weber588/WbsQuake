@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffectType;
 import wbs.quake.Gun;
+import wbs.quake.WbsQuake;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.upgrades.UpgradeableOption;
 import wbs.utils.util.menus.MenuSlot;
@@ -13,11 +14,11 @@ import wbs.utils.util.plugin.WbsPlugin;
 
 import java.util.Objects;
 
-public class UpgradesMenu extends PlayerSpecifiMenu {
+public class UpgradesMenu extends PlayerSpecificMenu {
 
     public static final int BAL_SLOT = 8;
 
-    public UpgradesMenu(WbsPlugin plugin, QuakePlayer player) {
+    public UpgradesMenu(WbsQuake plugin, QuakePlayer player) {
         super(plugin, player, "&9&lUpgrades", 6, "upgrade:" + player.getName());
         MenuSlot borderItem = new MenuSlot(plugin, Material.CYAN_STAINED_GLASS_PANE, "&r");
         setOutline(borderItem);
@@ -75,6 +76,16 @@ public class UpgradesMenu extends PlayerSpecifiMenu {
                             speedPotion,
                             speedOption,
                             "&9Speed: &h%value%");
+            setNextFreeSlot(slot);
+        }
+
+        UpgradeableOption piercingCooldownOption = gun.getPiercingOption();
+        if (piercingCooldownOption.getPath().length() > 1) {
+            UpgradePathSlot slot =
+                    new UpgradePathSlot(plugin,
+                            piercingCooldownOption,
+                            Material.ARROW,
+                            "&2Piercing: &h%value%");
             setNextFreeSlot(slot);
         }
     }

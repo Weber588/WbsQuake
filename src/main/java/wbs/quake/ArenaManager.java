@@ -34,6 +34,8 @@ public final class ArenaManager {
     }
 
     public static void loadArenas(YamlConfiguration arenaConfig) {
+        arenas.clear();
+
         for (String key : arenaConfig.getKeys(false)) {
             ConfigurationSection section = arenaConfig.getConfigurationSection(key);
 

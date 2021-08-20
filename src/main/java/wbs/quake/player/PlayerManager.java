@@ -24,6 +24,7 @@ public final class PlayerManager {
     }
 
     public static int loadPlayers(ConfigurationSection section) {
+        players.clear();
         int i = 0;
 
         for (String key : section.getKeys(false)) {

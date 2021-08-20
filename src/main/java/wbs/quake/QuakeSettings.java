@@ -1,19 +1,26 @@
 package wbs.quake;
 
+import org.bukkit.Color;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
+import wbs.quake.cosmetics.CosmeticsStore;
+import wbs.quake.cosmetics.SelectableCosmetic;
+import wbs.quake.cosmetics.trails.StandardTrail;
+import wbs.quake.cosmetics.trails.Trail;
 import wbs.quake.player.PlayerManager;
 import wbs.quake.upgrades.UpgradePath;
 import wbs.quake.upgrades.UpgradePathType;
 import wbs.quake.upgrades.UpgradeableOption;
 import wbs.quake.powerups.PowerUp;
+import wbs.utils.util.particles.LineParticleEffect;
 import wbs.utils.util.plugin.WbsSettings;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class QuakeSettings extends WbsSettings {
 
@@ -29,7 +36,6 @@ public class QuakeSettings extends WbsSettings {
     private YamlConfiguration arenaConfig = null;
     private YamlConfiguration playersConfig = null;
     private YamlConfiguration config = null;
-    private YamlConfiguration itemsConfig = null;
     private YamlConfiguration shopConfig = null;
 
     private final String arenaFileName = "arenas.yml";
@@ -39,12 +45,12 @@ public class QuakeSettings extends WbsSettings {
     public void reload() {
         errors.clear();
         config = loadDefaultConfig("config.yml");
-   //    itemsConfig = loadConfigSafely(genConfig("items.yml"));
         shopConfig = loadConfigSafely(genConfig("shop.yml"));
 
-        loadItems();
+        QuakeLobby.reload();
+
         loadPowerUps();
-        loadUpgradePaths();
+        setupShop();
 
         File arenaFile = new File(plugin.getDataFolder(), arenaFileName);
         if (arenaFile.exists()) {
@@ -84,6 +90,16 @@ public class QuakeSettings extends WbsSettings {
         if (config.contains("options.headshot-money-bonus")) {
             headshotBonus = config.getDouble("options.headshot-money-bonus", headshotBonus);
         }
+
+        ArenaManager.setPlugin(plugin);
+        Arena.setPlugin(plugin);
+
+        // To initialize the class in case it's never called before the plugin disables
+        QuakeLobby.getInstance();
+        PlayerManager.initialize();
+
+        loadArenas();
+        loadPlayers();
     }
 
     public boolean findFurthestSpawnpoint;
@@ -96,25 +112,6 @@ public class QuakeSettings extends WbsSettings {
     public Map<String, ItemStack> items = new HashMap<>();
 
     public final Map<String, PowerUp> powerUps = new HashMap<>();
-
-    public void loadItems() {
-        items.clear();
-
-        if (itemsConfig == null) {
-            logError("Items config missing! Regenerate your config, or re-add the power ups section!", "items.yml");
-            return;
-        }
-
-        int i = 0;
-        for (String key : itemsConfig.getKeys(false)) {
-            ItemStack item = itemsConfig.getItemStack(key);
-
-            items.put(key, item);
-            i++;
-        }
-        
-        plugin.logger.info(i + " items loaded!");
-    }
 
     public void loadPowerUps() {
         powerUps.clear();
@@ -135,6 +132,25 @@ public class QuakeSettings extends WbsSettings {
             i++;
         }
         plugin.logger.info(i + " power ups loaded!");
+    }
+
+    /* ============================ */
+    //            SHOP              //
+    /* ============================ */
+
+    private void setupShop() {
+        CosmeticsStore cosmetics = CosmeticsStore.getInstance();
+
+        ConfigurationSection cosmeticsSection = shopConfig.getConfigurationSection("cosmetics");
+
+        String directory = "shop.yml/cosmetics";
+        if (cosmeticsSection == null) {
+            logError("Cosmetics section missing!", directory);
+        } else {
+            cosmetics.loadCosmetics(cosmeticsSection, directory);
+        }
+
+        loadUpgradePaths();
     }
 
     private final Map<String, UpgradePath> paths = new HashMap<>();
@@ -159,6 +175,7 @@ public class QuakeSettings extends WbsSettings {
         configurePath(upgradePaths, "cooldown", UpgradePathType.TICKS);
         configurePath(upgradePaths, "leap-cooldown", UpgradePathType.TICKS);
         configurePath(upgradePaths, "leap-speed", UpgradePathType.NUMBER);
+        configurePath(upgradePaths, "piercing", UpgradePathType.NUMBER);
         configurePath(upgradePaths, "speed", UpgradePathType.PERCENT);
     }
 
@@ -208,6 +225,10 @@ public class QuakeSettings extends WbsSettings {
 
         paths.put(id, path);
     }
+
+    /* ============================ */
+    //            MISc              //
+    /* ============================ */
 
     public void loadPlayers() {
         if (playersConfig != null) {

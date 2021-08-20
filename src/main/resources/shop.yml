@@ -31,9 +31,66 @@ upgradeable-options:
     # appear in the shop, acting as a fixed value.
   speed: # The speed modifier in percent increase. 100 = 2x speed
     - 0:$0
-    - 10:$500
-    - 25:$750
-    - 50:$1000
-    - 75:$2500
-    - 100:$5000
+    - 25:$500
+    - 50:$750
+    - 100:$1000
+    - 150:$2500
+    - 200:$5000
+  piercing: # How many players each shot can kill before stopping
+    - 1:$0
+    - 2:$200
+    - 3:$600
+    - 5:$1500
 
+cosmetics:
+
+  # This determines what item a player gets given as their gun.
+  # Traditionally quake uses hoes for guns, but any items work!
+  gun-skins:
+    # The default skin players get when they join.
+    default-skin: wooden_hoe
+    # When true, the shop will require items listed higher to be
+    # purchased before lower ones
+    require-previous: true
+    shop:
+      # Wooden hoe is default, so no need to list it here too
+      stone_hoe: 100
+      iron_hoe: 250
+      golden_hoe: 500
+      diamond_hoe: 1000
+      netherite_hoe: 2500
+
+  # Trails are the lines that appear when a player shoots. Everyone gets and uses
+  # the trail called "default" by default, but can buy others in the shop!
+  # If default is the only trail in this section, the Trail shop won't appear.
+  trails:
+    default:
+      type: STANDARD # Standard is a simple line.
+      item: STICK # The item to show in the shop
+      display: '&c&lDefault'
+      price: 0
+      description: # The description appears in lore of the item in the shop
+        - 'A simple red line.'
+        - 'The default trail.'
+      particle: REDSTONE
+      # For redstone, you can choose the size of the particle. 1 = default
+      size: 0.85
+      # Use a hex colour for colourable particles. Default is ff0000 = red.
+      # You may also use dye colours.
+      colour: ff0000
+      # How many particles are spawned every block along the trail
+      amount-per-block: 5
+    example-spiral:
+      type: SPIRAL
+      item: STRING
+      display: '&b&lSpiral'
+      price: 5000 # How much should this trail cost in the shop?
+      description: # The description appears in lore of the item in the shop
+        - 'A light blue spiral!'
+      particle: REDSTONE
+      size: 0.6
+      colour: light_blue # Dye colours work too!
+      amount-per-block: 10
+      rotations-per-block: 0.5 # How many twists per block the trail has
+      radius: 0.2 # The radius of the spiral
+      amount: 1 # How many spirals appear (i.e. 2 is a helix)

@@ -1,6 +1,9 @@
 package wbs.quake.menus;
 
 import org.bukkit.Material;
+import wbs.quake.menus.cosmetics.ArmourMenu;
+import wbs.quake.menus.cosmetics.SkinMenu;
+import wbs.quake.menus.cosmetics.TrailMenu;
 import wbs.utils.util.menus.MenuSlot;
 import wbs.utils.util.menus.WbsMenu;
 import wbs.utils.util.plugin.WbsPlugin;
@@ -20,6 +23,9 @@ public class CosmeticsMenu extends WbsMenu {
                 "&7Choose what item your gun",
                 "&7appears as!"
         );
+        slot.setClickAction(inventoryClickEvent ->
+                MenuManager.openMenuFor(inventoryClickEvent.getWhoClicked(), SkinMenu.class)
+        );
         setNextFreeSlot(slot);
 
         slot = new MenuSlot(plugin, Material.FIREWORK_ROCKET,
@@ -27,12 +33,18 @@ public class CosmeticsMenu extends WbsMenu {
                 "&7Choose what particle appears",
                 "&7when you shoot!"
         );
+        slot.setClickAction(inventoryClickEvent ->
+                MenuManager.openMenuFor(inventoryClickEvent.getWhoClicked(), TrailMenu.class)
+        );
         setNextFreeSlot(slot);
 
         slot = new MenuSlot(plugin, Material.DIAMOND_CHESTPLATE,
                 "&dArmour",
                 "&7Choose what armour you get",
                 "&7in rounds!"
+        );
+        slot.setClickAction(inventoryClickEvent ->
+                MenuManager.openMenuFor(inventoryClickEvent.getWhoClicked(), ArmourMenu.class)
         );
         setNextFreeSlot(slot);
 

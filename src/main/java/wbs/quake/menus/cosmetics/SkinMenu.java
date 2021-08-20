@@ -1,13 +1,12 @@
 package wbs.quake.menus.cosmetics;
 
-import wbs.quake.menus.PlayerSpecifiMenu;
+import wbs.quake.WbsQuake;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.plugin.WbsPlugin;
 
-public class SkinMenu extends PlayerSpecifiMenu {
+public class SkinMenu extends CosmeticsSubmenu {
 
-    public SkinMenu(WbsPlugin plugin, QuakePlayer player) {
-        super(plugin, player, "&9&lSkins", 6, "skins");
-
+    public SkinMenu(WbsQuake plugin, QuakePlayer player) {
+        super(plugin, player, "&9&lSkins", "skins");
     }
 }

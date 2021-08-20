@@ -24,28 +24,28 @@ public final class MenuManager {
 
     // Menus
 
-    private static final Map<QuakePlayer, ShopMenu> shopMenus = new HashMap<>();
-    public static ShopMenu getShopMenu(HumanEntity player) {
-        return getShopMenu(PlayerManager.getPlayer((Player) player));
-    }
-    public static ShopMenu getShopMenu(QuakePlayer player) {
-        if (shopMenus.containsKey(player)) return shopMenus.get(player);
+    private static final Map<Class<? extends PlayerSpecificMenu>, PlayerMenuManager<PlayerSpecificMenu>> managers = new HashMap<>();
 
-        ShopMenu playerShopMenu = new ShopMenu(getPlugin(), player);
-        shopMenus.put(player, playerShopMenu);
-        return playerShopMenu;
+    public static <T extends PlayerSpecificMenu> T getMenu(HumanEntity player, Class<T> clazz) {
+        return getMenu(PlayerManager.getPlayer((Player) player), clazz);
+    }
+    @SuppressWarnings("unchecked")
+    public static <T extends PlayerSpecificMenu> T getMenu(QuakePlayer player, Class<T> clazz) {
+        if (!managers.containsKey(clazz)) {
+            PlayerMenuManager<T> manager = new PlayerMenuManager<>();
+            managers.put(clazz, (PlayerMenuManager<PlayerSpecificMenu>) manager);
+        }
+        return clazz.cast(managers.get(clazz).getMenu(player, (Class<PlayerSpecificMenu>) clazz));
     }
 
-    private static final Map<QuakePlayer, UpgradesMenu> upgradesMenus = new HashMap<>();
-    public static UpgradesMenu getUpgradesMenu(HumanEntity player) {
-        return getUpgradesMenu(PlayerManager.getPlayer((Player) player));
-    }
-    public static UpgradesMenu getUpgradesMenu(QuakePlayer player) {
-        if (upgradesMenus.containsKey(player)) return upgradesMenus.get(player);
 
-        UpgradesMenu playerUpgradesMenu = new UpgradesMenu(getPlugin(), player);
-        upgradesMenus.put(player, playerUpgradesMenu);
-        return playerUpgradesMenu;
+
+    public static void openMenuFor(HumanEntity player, Class<? extends PlayerSpecificMenu> clazz) {
+        openMenuFor(PlayerManager.getPlayer((Player) player), clazz);
+    }
+
+    public static void openMenuFor(QuakePlayer player, Class<? extends PlayerSpecificMenu> clazz) {
+        getMenu(player, clazz).showTo(player.getPlayer());
     }
 
     private static CosmeticsMenu cosmeticMenu;
@@ -68,7 +68,7 @@ public final class MenuManager {
         backToShopSlot.setClickAction(inventoryClickEvent ->
                 {
                     Player player = (Player) inventoryClickEvent.getWhoClicked();
-                    getShopMenu(player).showTo(player);
+                    getMenu(player, ShopMenu.class).showTo(player);
                 }
         );
 
@@ -79,7 +79,7 @@ public final class MenuManager {
     public static MenuSlot getBalSlot() {
         if (balSlot != null) return balSlot;
 
-        MenuSlot balSlot = new MenuSlot(plugin, Material.SUNFLOWER,
+        MenuSlot balSlot = new MenuSlot(getPlugin(), Material.SUNFLOWER,
                 "&6&lBalance",
                 "&e$%vault_eco_balance_commas%");
         balSlot.setFillPlaceholders(true);

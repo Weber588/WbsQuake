@@ -5,12 +5,10 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import wbs.quake.Gun;
+import wbs.quake.cosmetics.SelectableCosmetic;
 import wbs.utils.util.WbsMath;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class QuakePlayer {
 
@@ -27,6 +25,8 @@ public class QuakePlayer {
 
     private final Gun currentGun;
 
+    private final PlayerCosmetics cosmetics;
+
     public QuakePlayer(ConfigurationSection section) {
         uuid = UUID.fromString(section.getName());
 
@@ -36,6 +36,12 @@ public class QuakePlayer {
         kills = section.getInt("kills");
         deaths = section.getInt("deaths");
 
+        ConfigurationSection cosmeticsSection = section.getConfigurationSection("cosmetics");
+        if (cosmeticsSection != null) {
+            cosmetics = new PlayerCosmetics(cosmeticsSection);
+        } else {
+            cosmetics = new PlayerCosmetics();
+        }
         currentGun = new Gun(section, "gun");
     }
 
@@ -49,6 +55,7 @@ public class QuakePlayer {
         section.set(uuid + ".deaths", deaths);
 
         currentGun.writeToConfig(section, uuid + ".gun");
+        cosmetics.writeToConfig(section, uuid + ".cosmetics");
     }
 
     public QuakePlayer(UUID uuid) {
@@ -58,10 +65,15 @@ public class QuakePlayer {
         if (player != null) {
             name = player.getName();
         }
+        cosmetics = new PlayerCosmetics();
     }
 
     public Gun getCurrentGun() {
         return currentGun;
+    }
+
+    public PlayerCosmetics getCosmetics() {
+        return cosmetics;
     }
 
     public void teleport(Location loc) {
@@ -170,5 +182,7 @@ public class QuakePlayer {
         // TODO
     }
 
-
+    public void updateTrail() {
+        currentGun.setTrail(cosmetics.trail);
+    }
 }

@@ -4,6 +4,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.menus.MenuManager;
+import wbs.quake.menus.ShopMenu;
+import wbs.quake.menus.UpgradesMenu;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.menus.WbsMenu;
 import wbs.utils.util.plugin.WbsPlugin;
@@ -30,7 +32,7 @@ public class ShopSubcommand extends WbsSubcommand {
             switch (args[1].toLowerCase()) {
                 case "upgrade":
                 case "upgrades":
-                    menu = MenuManager.getUpgradesMenu(player);
+                    menu = MenuManager.getMenu(player, UpgradesMenu.class);
                     break;
                 case "cosmetics":
                     menu = MenuManager.getCosmeticMenu();
@@ -39,7 +41,7 @@ public class ShopSubcommand extends WbsSubcommand {
         }
 
         if (menu == null) {
-            menu = MenuManager.getShopMenu(player);
+            menu = MenuManager.getMenu(player, ShopMenu.class);
         }
 
         menu.showTo(player);

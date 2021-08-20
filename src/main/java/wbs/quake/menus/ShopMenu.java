@@ -3,16 +3,16 @@ package wbs.quake.menus;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import wbs.quake.WbsQuake;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.menus.MenuSlot;
-import wbs.utils.util.plugin.WbsPlugin;
 
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ShopMenu extends PlayerSpecifiMenu {
+public class ShopMenu extends PlayerSpecificMenu {
 
-    public ShopMenu(WbsPlugin plugin, QuakePlayer player) {
+    public ShopMenu(WbsQuake plugin, QuakePlayer player) {
         super(plugin, player, "&9&lShop", 5, "shop:" + player.getName());
 
         MenuSlot outlineSlot = new MenuSlot(plugin, Material.RED_STAINED_GLASS_PANE, "&r");
@@ -30,7 +30,7 @@ public class ShopMenu extends PlayerSpecifiMenu {
                 "&3gameplay here!"
         );
         upgradesMenu.setClickAction(inventoryClickEvent ->
-                MenuManager.getUpgradesMenu(player).showTo(player.getPlayer())
+                MenuManager.getMenu(player, UpgradesMenu.class).showTo(player.getPlayer())
         );
         setSlot(2, 2, upgradesMenu);
 

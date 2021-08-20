@@ -37,6 +37,12 @@ public class QuakeLobby extends WbsMessenger {
         return instance;
     }
 
+    public static void reload() {
+        getInstance().kickAll();
+
+        instance = null;
+    }
+
     private QuakeLobby(WbsQuake plugin) {
         super(plugin);
         this.plugin = plugin;
@@ -200,7 +206,20 @@ public class QuakeLobby extends WbsMessenger {
     }
 
     public void forceStart() {
+        switch (state) {
+            case WAITING_FOR_PLAYERS:
+            case PAUSED_BEFORE_VOTING:
+                cancelRunnable();
+                startVoting();
+                break;
+            case VOTING:
+                cancelRunnable();
 
+                Arena chosenArena = getChosenArena();
+                messagePlayers("&h" + chosenArena.getName() + "&r won!");
+                startCountdown(chosenArena);
+                break;
+        }
     }
 
     public GameState getState() {
