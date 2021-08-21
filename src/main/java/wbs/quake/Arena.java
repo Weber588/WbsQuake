@@ -301,6 +301,25 @@ public class Arena {
         return mostRemote;
     }
 
+    public void distributePlayers() {
+        List<QuakePlayer> playersToDistribute = QuakeLobby.getInstance().getPlayers();
+        List<Location> unusedSpawnpoints = new LinkedList<>(spawnPoints);
+
+        while (!playersToDistribute.isEmpty()) {
+            QuakePlayer player = playersToDistribute.get(0);
+            Location spawnPoint = unusedSpawnpoints.get(0);
+
+            player.teleport(spawnPoint);
+
+            unusedSpawnpoints.remove(0);
+            playersToDistribute.remove(0);
+
+            if (unusedSpawnpoints.isEmpty()) {
+                unusedSpawnpoints.addAll(spawnPoints);
+            }
+        }
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -412,6 +431,8 @@ public class Arena {
         for (Location loc : powerups.keySet()) {
             powerups.get(loc).spawnAt(loc);
         }
+
+        distributePlayers();
     }
 
     public void finish() {

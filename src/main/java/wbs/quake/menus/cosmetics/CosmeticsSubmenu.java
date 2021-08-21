@@ -5,7 +5,7 @@ import wbs.quake.WbsQuake;
 import wbs.quake.cosmetics.SelectableCosmetic;
 import wbs.quake.menus.MenuManager;
 import wbs.quake.menus.PlayerSpecificMenu;
-import wbs.quake.menus.SelectableSlot;
+import wbs.quake.cosmetics.SelectableSlot;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.menus.MenuSlot;
 
@@ -32,6 +32,10 @@ public class CosmeticsSubmenu<T extends SelectableCosmetic<T>> extends PlayerSpe
         SelectableSlot<T> slot = new SelectableSlot<>(this, cosmetic);
 
         setNextFreeSlot(slot);
+    }
+
+    protected void addCosmetic(SelectableSlot<T> cosmeticSlot) {
+        setNextFreeSlot(cosmeticSlot);
     }
 
     public void updateSelected(SelectableSlot<T> slot) {

@@ -4,6 +4,8 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import wbs.quake.QuakeSettings;
 import wbs.quake.WbsQuake;
+import wbs.quake.player.PlayerCosmetics;
+import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
 
@@ -33,7 +35,7 @@ public abstract class SelectableCosmetic<T extends SelectableCosmetic<T>> {
         id = section.getName();
         this.material = WbsEnums.materialFromString(section.getString("item"), Material.BARRIER);
         this.display = section.getString("display");
-        this.permission = section.getString("permission", "wbsquake.cosmetics." + getClass().getSimpleName().toLowerCase() + "." + id);
+        this.permission = section.getString("permission", "wbsquake.cosmetics." + getCosmeticType().name().toLowerCase() + "." + id);
         this.description.addAll(section.getStringList("description"));
         this.price = section.getDouble("price");
 
@@ -56,4 +58,10 @@ public abstract class SelectableCosmetic<T extends SelectableCosmetic<T>> {
     }
 
     public abstract CosmeticType getCosmeticType();
+
+    /**
+     * Called when the cosmetic is selected by the given player
+     * @param player The player who selected this cosmetic
+     */
+    public abstract void onSelect(QuakePlayer player, PlayerCosmetics cosmetics);
 }

@@ -1,8 +1,10 @@
 package wbs.quake.menus;
 
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
@@ -60,10 +62,10 @@ public class UpgradePathSlot extends MenuSlot {
             menu.update(event.getSlot());
             menu.update(UpgradesMenu.BAL_SLOT);
 
-            plugin.sendMessage("Bought upgrade for &h$" + cost + "&r! New: " + path.format(nextVal), player);
+            plugin.sendMessage("Bought upgrade for &h" + VaultWrapper.formatMoney(cost) + "&r! New: " + path.format(nextVal), player);
         } else {
-            plugin.sendMessage("Not enough money! Balance: &h$"
-                    + VaultWrapper.getMoney(player) + "&r. Cost: &h$" + cost, player);
+            plugin.sendMessage("Not enough money! Balance: &h"
+                    + VaultWrapper.formatMoneyFor(player) + "&r. Cost: &h" + VaultWrapper.formatMoney(cost), player);
         }
     }
 
@@ -83,12 +85,14 @@ public class UpgradePathSlot extends MenuSlot {
 
         if (current >= path.length() - 1) {
             lore.add(plugin.dynamicColourise("&bFully upgraded!"));
+            meta.addEnchant(Enchantment.LOYALTY, 0, true);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         } else {
             double nextVal = path.getValue(current + 1);
             double nextPrice = path.getPrice(current + 1);
 
             lore.add(plugin.dynamicColourise("&6Next tier: &h" + path.format(nextVal)));
-            lore.add(plugin.dynamicColourise("&6Cost: &h$" + nextPrice));
+            lore.add(plugin.dynamicColourise("&6Cost: &h" + VaultWrapper.formatMoney(nextPrice)));
             lore.add(plugin.dynamicColourise("&7Click to upgrade!"));
         }
 

@@ -95,7 +95,6 @@ public class QuakeSettings extends WbsSettings {
         Arena.setPlugin(plugin);
 
         // To initialize the class in case it's never called before the plugin disables
-        QuakeLobby.getInstance();
         PlayerManager.initialize();
 
         loadArenas();

@@ -49,16 +49,28 @@ cosmetics:
   gun-skins:
     # The default skin players get when they join.
     default-skin: wooden_hoe
-    # When true, the shop will require items listed higher to be
-    # purchased before lower ones
+    # When true, the shop will require all previous skins to be
+    # purchased before the next.
+    # Disable this if you want to just use random items players
+    # can pick individually, without a specific order.
     require-previous: true
     shop:
       # Wooden hoe is default, so no need to list it here too
-      stone_hoe: 100
-      iron_hoe: 250
-      golden_hoe: 500
-      diamond_hoe: 1000
-      netherite_hoe: 2500
+      '1':
+        item: stone_hoe
+        price: 100
+      '2':
+        item: iron_hoe
+        price: 250
+      '3':
+        item: golden_hoe
+        price: 500
+      '4':
+        item: diamond_hoe
+        price: 1000
+      '5':
+        item: netherite_hoe
+        price: 2500
 
   # Trails are the lines that appear when a player shoots. Everyone gets and uses
   # the trail called "default" by default, but can buy others in the shop!
@@ -94,3 +106,32 @@ cosmetics:
       rotations-per-block: 0.5 # How many twists per block the trail has
       radius: 0.2 # The radius of the spiral
       amount: 1 # How many spirals appear (i.e. 2 is a helix)
+
+  armour:
+    to: do
+
+  kill-messages:
+    default:
+      message: '%attacker% killed %victim%'
+      headshot: '%attacker% killed %victim%! &hHeadshot!'
+      item: OAK_SIGN
+      display: '&c&lDefault'
+      price: 0
+      # Description is automatically populated with the message and headshot message
+
+    # You can configure more message/headshots here, but when a cosmetics section is
+    # empty, it's simply omitted from the shop menus.
+
+  kill-effects:
+    to: do
+
+  shoot-sounds:
+    default:
+      sound:
+      volume: 1
+      pitch: 1
+
+  kill-soundsd:
+    default:
+      sound: 'entity.arrow.hit_player'
+

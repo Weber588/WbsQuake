@@ -1,9 +1,10 @@
-package wbs.quake.menus;
+package wbs.quake.cosmetics;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,6 +16,8 @@ import wbs.quake.player.PlayerCosmetics;
 import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.menus.MenuSlot;
+import wbs.utils.util.pluginhooks.PlaceholderAPIWrapper;
+import wbs.utils.util.pluginhooks.VaultWrapper;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -27,19 +30,37 @@ public class SelectableSlot<T extends SelectableCosmetic<T>> extends MenuSlot {
 
     private final SelectableCosmetic<T> cosmetic;
 
-    @SuppressWarnings("unchecked")
     public SelectableSlot(CosmeticsSubmenu<T> menu, SelectableCosmetic<T> cosmetic) {
-        super(WbsQuake.getInstance(), cosmetic.material, cosmetic.display, cosmetic.description.toArray(new String[0]));
+        super(WbsQuake.getInstance(), cosmetic.material, cosmetic.display, cosmetic.description);
 
         this.cosmetic = cosmetic;
         plugin = WbsQuake.getInstance();
 
-        setClickAction(event -> {
-            menu.getPlayer().getCosmetics().setCosmetic(cosmetic);
-            menu.setCurrent((T) cosmetic);
+        setClickAction(event -> onClick(menu, event));
+    }
 
-            menu.updateSelected(this);
-        });
+    @SuppressWarnings("unchecked")
+    public void onClick(CosmeticsSubmenu<T> menu, InventoryClickEvent event) {
+        Player player = (Player) event.getWhoClicked();
+
+        if (!player.hasPermission(cosmetic.permission)) {
+            if (VaultWrapper.hasMoney(player, cosmetic.price)) {
+                VaultWrapper.takeMoney(player, cosmetic.price);
+
+                plugin.sendMessage("Bought upgrade for &h" + VaultWrapper.formatMoney(cosmetic.price) + "&r!", player);
+
+                VaultWrapper.givePermission(player, cosmetic.permission);
+            } else {
+                plugin.sendMessage("Not enough money! Balance: &h"
+                        + VaultWrapper.formatMoneyFor(player) + "&r. Cost: &h" + VaultWrapper.formatMoney(cosmetic.price), player);
+                return;
+            }
+        }
+
+        menu.getPlayer().getCosmetics().setCosmetic(cosmetic);
+        menu.setCurrent((T) cosmetic);
+
+        menu.updateSelected(this);
     }
 
     @Override

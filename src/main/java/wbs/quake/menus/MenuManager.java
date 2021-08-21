@@ -52,7 +52,7 @@ public final class MenuManager {
     public static CosmeticsMenu getCosmeticMenu() {
         if (cosmeticMenu != null) return cosmeticMenu;
 
-        cosmeticMenu = new CosmeticsMenu(plugin);
+        cosmeticMenu = new CosmeticsMenu(getPlugin());
         return cosmeticMenu;
     }
 
@@ -63,7 +63,7 @@ public final class MenuManager {
     public static MenuSlot getBackToShopSlot() {
         if (backToShopSlot != null) return backToShopSlot;
 
-        backToShopSlot = new MenuSlot(WbsQuake.getInstance(), Material.CLOCK, "&7Back to Shop");
+        backToShopSlot = new MenuSlot(getPlugin(), Material.CLOCK, "&7Back to Shop");
 
         backToShopSlot.setClickAction(inventoryClickEvent ->
                 {
@@ -79,7 +79,7 @@ public final class MenuManager {
     public static MenuSlot getBalSlot() {
         if (balSlot != null) return balSlot;
 
-        MenuSlot balSlot = new MenuSlot(getPlugin(), Material.SUNFLOWER,
+        balSlot = new MenuSlot(getPlugin(), Material.SUNFLOWER,
                 "&6&lBalance",
                 "&e$%vault_eco_balance_commas%");
         balSlot.setFillPlaceholders(true);

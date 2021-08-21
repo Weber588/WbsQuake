@@ -56,7 +56,7 @@ public class QuakeLobby extends WbsMessenger {
     // Misc
 
     public List<QuakePlayer> getPlayers() {
-        return players;
+        return new LinkedList<>(players);
     }
 
     private final ItemStack[] lobbyInventory = {

@@ -36,13 +36,14 @@ public class QuakePlayer {
         kills = section.getInt("kills");
         deaths = section.getInt("deaths");
 
+        currentGun = new Gun(section, "gun");
+
         ConfigurationSection cosmeticsSection = section.getConfigurationSection("cosmetics");
         if (cosmeticsSection != null) {
-            cosmetics = new PlayerCosmetics(cosmeticsSection);
+            cosmetics = new PlayerCosmetics(this, cosmeticsSection);
         } else {
-            cosmetics = new PlayerCosmetics();
+            cosmetics = new PlayerCosmetics(this);
         }
-        currentGun = new Gun(section, "gun");
     }
 
     public void writeToConfig(ConfigurationSection section) {
@@ -65,7 +66,7 @@ public class QuakePlayer {
         if (player != null) {
             name = player.getName();
         }
-        cosmetics = new PlayerCosmetics();
+        cosmetics = new PlayerCosmetics(this);
     }
 
     public Gun getCurrentGun() {
@@ -180,9 +181,5 @@ public class QuakePlayer {
 
     public void onKill(QuakePlayer victim) {
         // TODO
-    }
-
-    public void updateTrail() {
-        currentGun.setTrail(cosmetics.trail);
     }
 }

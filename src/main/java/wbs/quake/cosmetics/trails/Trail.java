@@ -9,6 +9,8 @@ import org.jetbrains.annotations.Nullable;
 import wbs.quake.WbsQuake;
 import wbs.quake.cosmetics.CosmeticType;
 import wbs.quake.cosmetics.SelectableCosmetic;
+import wbs.quake.player.PlayerCosmetics;
+import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.WbsColours;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
@@ -106,5 +108,11 @@ public abstract class Trail extends SelectableCosmetic<Trail> {
     @Override
     public CosmeticType getCosmeticType() {
         return CosmeticType.TRAIL;
+    }
+
+    @Override
+    public void onSelect(QuakePlayer player, PlayerCosmetics cosmetics) {
+        cosmetics.trail = this;
+        player.getCurrentGun().setTrail(this);
     }
 }

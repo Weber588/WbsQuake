@@ -3,10 +3,7 @@ package wbs.quake.player;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.WbsQuake;
-import wbs.quake.cosmetics.CosmeticType;
-import wbs.quake.cosmetics.CosmeticsStore;
-import wbs.quake.cosmetics.GunSkin;
-import wbs.quake.cosmetics.SelectableCosmetic;
+import wbs.quake.cosmetics.*;
 import wbs.quake.cosmetics.trails.Trail;
 
 import java.util.HashMap;
@@ -14,7 +11,10 @@ import java.util.Map;
 
 public class PlayerCosmetics {
 
-    public PlayerCosmetics() {
+    private final QuakePlayer player;
+
+    public PlayerCosmetics(QuakePlayer player) {
+        this.player = player;
         CosmeticsStore store = CosmeticsStore.getInstance();
 
         trail = store.getDefaultTrail();
@@ -24,7 +24,8 @@ public class PlayerCosmetics {
         setCosmetic(skin);
     }
 
-    public PlayerCosmetics(@NotNull ConfigurationSection section) {
+    public PlayerCosmetics(QuakePlayer player, @NotNull ConfigurationSection section) {
+        this.player = player;
         CosmeticsStore store = CosmeticsStore.getInstance();
 
         String trailId = section.getString("trail");
@@ -38,9 +39,12 @@ public class PlayerCosmetics {
 
     public Trail trail;
     public GunSkin skin;
+    public SelectableSound shootSound;
+    public SelectableSound killSound;
 
     public void writeToConfig(ConfigurationSection section, String path) {
         section.set(path + ".trail", trail.getId());
+        section.set(path + ".skin", skin.getId());
     }
 
     private final Map<CosmeticType, SelectableCosmetic<?>> cosmetics = new HashMap<>();
@@ -52,22 +56,6 @@ public class PlayerCosmetics {
     public <T extends SelectableCosmetic<T>> void setCosmetic(@NotNull SelectableCosmetic<T> cosmetic) {
         cosmetics.put(cosmetic.getCosmeticType(), cosmetic);
 
-        switch (cosmetic.getCosmeticType()) {
-            case TRAIL:
-                trail = (Trail) cosmetic;
-                break;
-            case SKIN:
-                break;
-            case ARMOUR:
-                break;
-            case KILL_MESSAGE:
-                break;
-            case KILL_EFFECT:
-                break;
-            case KILL_SOUND:
-                break;
-            case SHOOT_SOUND:
-                break;
-        }
+        cosmetic.onSelect(player, this);
     }
 }

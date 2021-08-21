@@ -15,6 +15,7 @@ import wbs.quake.player.PlayerCosmetics;
 import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.WbsEnums;
+import wbs.utils.util.configuration.WbsConfigReader;
 
 import java.util.*;
 
@@ -61,11 +62,32 @@ public class CosmeticsStore {
     }
 
     public boolean trailsEnabled;
-    private final Map<String, Trail> trails = new HashMap<>();
+    private final LinkedHashMap<String, Trail> trails = new LinkedHashMap<>();
 
     public boolean skinsEnabled;
     public boolean requirePreviousSkin;
-    private final Map<String, GunSkin> skins = new HashMap<>();
+    private final LinkedHashMap<String, GunSkin> skins = new LinkedHashMap<>();
+
+    public boolean armourEnabled;
+    private final LinkedHashMap<String, SelectableCosmetic<?>> armourSets = new LinkedHashMap<>();
+
+    public boolean killMessagesEnabled;
+    private final LinkedHashMap<String, SelectableCosmetic<?>> killMessages = new LinkedHashMap<>();
+
+    public boolean killEffectsEnabled;
+    private final LinkedHashMap<String, SelectableCosmetic<?>> killEffects = new LinkedHashMap<>();
+
+    public boolean shootSoundsEnabled;
+    private final LinkedHashMap<String, SelectableSound> shootSounds = new LinkedHashMap<>();
+
+    public boolean killSoundsEnabled;
+    private final LinkedHashMap<String, SelectableSound> killSounds = new LinkedHashMap<>();
+
+    private <T extends SelectableCosmetic<T>> void populateOrdered(List<T> unsorted, LinkedHashMap<String, T> map) {
+        unsorted.stream()
+                .sorted(Comparator.comparingDouble(a -> a.price))
+                .forEach(cosmetic -> map.put(cosmetic.getId(), cosmetic));
+    }
 
     /* ============================ */
     //            TRAILS            //
@@ -75,6 +97,7 @@ public class CosmeticsStore {
         trails.clear();
 
         int trailsAdded = 0;
+        List<Trail> unsortedTrails = new LinkedList<>();
         for (String key : section.getKeys(false)) {
             ConfigurationSection trailSection = section.getConfigurationSection(key);
             if (trailSection == null) {
@@ -85,7 +108,7 @@ public class CosmeticsStore {
             Trail trail = Trail.buildTrail(trailSection, directory + "/" + key);
 
             if (trail != null) {
-                trails.put(key, trail);
+                unsortedTrails.add(trail);
                 trailsAdded++;
             }
         }
@@ -95,6 +118,8 @@ public class CosmeticsStore {
         if (trails.get("default") == null) {
             trails.put("default", buildDefaultTrail());
         }
+
+        populateOrdered(unsortedTrails, trails);
     }
 
     public Collection<Trail> allTrails() {
@@ -139,23 +164,34 @@ public class CosmeticsStore {
 
         requirePreviousSkin = section.getBoolean("require-previous", true);
 
+        List<GunSkin> unsortedSkins = new LinkedList<>();
+
         ConfigurationSection shopSection = section.getConfigurationSection("shop");
         if (shopSection != null) {
             skinsEnabled = false;
 
             int skinsAdded = 0;
             for (String key : shopSection.getKeys(false)) {
-                double price = shopSection.getDouble(key);
-                Material material = WbsEnums.getEnumFromString(Material.class, key);
+                ConfigurationSection skinSection = WbsConfigReader.getRequiredSection(shopSection, key, settings, directory);
+
+                double price = skinSection.getDouble("price");
+
+                String itemString = skinSection.getString("item");
+                if (itemString == null) {
+                    settings.logError("Item is a required field for gun skins.", directory + "/" + key + "/item");
+                    continue;
+                }
+
+                Material material = WbsEnums.getEnumFromString(Material.class, itemString);
 
                 if (material == null) {
-                    settings.logError("Invalid material: " + key, directory + "/" + key);
+                    settings.logError("Invalid material: " + itemString, directory + "/" + key);
                     continue;
                 }
 
                 String permission = "wbsquake.cosmetics.gun-skin." + key;
 
-                skins.put(key, buildGunSkin(key, material, permission, price));
+                unsortedSkins.add(buildGunSkin(key, material, permission, price));
                 skinsAdded++;
             }
 
@@ -172,6 +208,8 @@ public class CosmeticsStore {
 
         GunSkin defaultSkin = buildGunSkin("default", defaultMaterial, "", 0);
         skins.put("default", defaultSkin);
+
+        populateOrdered(unsortedSkins, skins);
     }
 
     private GunSkin buildGunSkin(String key, Material material, String permission, double price) {

@@ -131,10 +131,6 @@ public class QuakeRound {
             inv.clear();
             inv.addItem(player.getCurrentGun().buildGun());
             inv.addItem(new ItemStack(Material.COMPASS));
-
-            player.updateTrail();
-
-            arena.respawn(player);
         }
 
         arena.start();
