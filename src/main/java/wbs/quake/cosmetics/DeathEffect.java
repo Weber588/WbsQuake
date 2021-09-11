@@ -7,7 +7,7 @@ import wbs.quake.player.QuakePlayer;
 
 import java.util.List;
 
-public class DeathEffect extends SelectableCosmetic<DeathEffect> {
+public class DeathEffect extends SelectableCosmetic {
 
     public DeathEffect(String id, Material material, String display, String permission, List<String> description, double price) {
         super(id, material, display, permission, description, price);

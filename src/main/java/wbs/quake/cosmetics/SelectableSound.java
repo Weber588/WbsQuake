@@ -4,9 +4,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
-import wbs.quake.WbsQuake;
-import wbs.utils.exceptions.InvalidConfigurationException;
-import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsKeyed;
 import wbs.utils.util.WbsSound;
 import wbs.utils.util.configuration.WbsConfigReader;
@@ -14,7 +11,7 @@ import wbs.utils.util.configuration.WbsConfigReader;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class SelectableSound<T extends SelectableSound<T>> extends SelectableCosmetic<T> {
+public abstract class SelectableSound<T extends SelectableSound<T>> extends SelectableCosmetic {
 
     private final WbsSound sound;
 

@@ -1,13 +1,12 @@
 package wbs.quake.cosmetics;
 
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import wbs.quake.player.PlayerCosmetics;
 import wbs.quake.player.QuakePlayer;
 
 import java.util.List;
 
-public class GunSkin extends SelectableCosmetic<GunSkin> {
+public class GunSkin extends SelectableCosmetic {
     public GunSkin(String id, Material material, String display, String permission, List<String> description, double price) {
         super(id, material, display, permission, description, price);
     }

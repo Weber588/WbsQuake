@@ -1,7 +1,5 @@
 package wbs.quake.cosmetics;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -10,21 +8,18 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 import wbs.quake.WbsQuake;
-import wbs.quake.cosmetics.SelectableCosmetic;
 import wbs.quake.menus.cosmetics.CosmeticsSubmenu;
 import wbs.quake.player.PlayerCosmetics;
 import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.menus.MenuSlot;
-import wbs.utils.util.pluginhooks.PlaceholderAPIWrapper;
 import wbs.utils.util.pluginhooks.VaultWrapper;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class SelectableSlot<T extends SelectableCosmetic<T>> extends MenuSlot {
+public class SelectableSlot<T extends SelectableCosmetic> extends MenuSlot {
 
     private final WbsQuake plugin;
 
@@ -39,7 +34,6 @@ public class SelectableSlot<T extends SelectableCosmetic<T>> extends MenuSlot {
         setClickAction(event -> onClick(menu, event));
     }
 
-//    @SuppressWarnings("unchecked")
     public void onClick(CosmeticsSubmenu<T> menu, InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
 
@@ -75,7 +69,7 @@ public class SelectableSlot<T extends SelectableCosmetic<T>> extends MenuSlot {
             QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
             PlayerCosmetics cosmetics = quakePlayer.getCosmetics();
 
-            SelectableCosmetic<?> current = cosmetics.getCosmetic(cosmetic.getCosmeticType());
+            SelectableCosmetic current = cosmetics.getCosmetic(cosmetic.getCosmeticType());
             if (current.equals(cosmetic)) {
                 lore.add("&aSelected.");
                 meta.addEnchant(Enchantment.LOYALTY, 1, true);

@@ -12,6 +12,7 @@ import wbs.quake.upgrades.UpgradeableOption;
 import wbs.utils.util.menus.MenuSlot;
 import wbs.utils.util.plugin.WbsPlugin;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class UpgradesMenu extends PlayerSpecificMenu {
@@ -26,6 +27,26 @@ public class UpgradesMenu extends PlayerSpecificMenu {
 
         setSlot(BAL_SLOT, MenuManager.getBalSlot());
         setSlot(5, 8, MenuManager.getBackToShopSlot());
+
+        MenuSlot modifiersLabel = new MenuSlot(
+                plugin,
+                Material.ENCHANTED_GOLDEN_APPLE,
+                "&b&lModifiers",
+                plugin.dynamicColourise("&7Upgrade your gun here!"));
+        setSlot(0, 4, modifiersLabel);
+
+        MenuSlot killPerksLabel = new MenuSlot(
+                plugin,
+                Material.DIAMOND_SWORD,
+                "&4&lKill Perks",
+                true,
+                plugin.colouriseAll(Arrays.asList(
+                        "&7Kill perks are bonuses",
+                        "&7that get applied when you",
+                        "&7kill another player!",
+                        "&7You can have 1 selected at a time."
+                )));
+        setSlot(3, 4, killPerksLabel);
 
         Gun gun = player.getCurrentGun();
 

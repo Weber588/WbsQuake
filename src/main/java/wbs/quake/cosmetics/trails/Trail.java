@@ -15,13 +15,11 @@ import wbs.utils.exceptions.InvalidConfigurationException;
 import wbs.utils.util.WbsColours;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
-import wbs.utils.util.particles.LineParticleEffect;
 import wbs.utils.util.particles.WbsParticleEffect;
 
 import java.util.List;
-import java.util.Objects;
 
-public abstract class Trail extends SelectableCosmetic<Trail> {
+public abstract class Trail extends SelectableCosmetic {
 
     public enum TrailType {
         STANDARD, SPIRAL

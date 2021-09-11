@@ -75,14 +75,14 @@ public class PlayerCosmetics {
         section.set(path, value.equalsIgnoreCase("default") ? null : value);
     }
 
-    private final Map<CosmeticType, SelectableCosmetic<?>> cosmetics = new HashMap<>();
+    private final Map<CosmeticType, SelectableCosmetic> cosmetics = new HashMap<>();
 
     @NotNull
-    public SelectableCosmetic<?> getCosmetic(CosmeticType type) {
+    public SelectableCosmetic getCosmetic(CosmeticType type) {
         return cosmetics.get(type);
     }
 
-    public <T extends SelectableCosmetic<T>> void setCosmetic(@NotNull SelectableCosmetic<T> cosmetic) {
+    public <T extends SelectableCosmetic> void setCosmetic(@NotNull SelectableCosmetic cosmetic) {
         cosmetics.put(cosmetic.getCosmeticType(), cosmetic);
 
         cosmetic.onSelect(player, this);

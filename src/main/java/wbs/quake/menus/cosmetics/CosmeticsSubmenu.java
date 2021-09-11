@@ -9,7 +9,7 @@ import wbs.quake.cosmetics.SelectableSlot;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.menus.MenuSlot;
 
-public class CosmeticsSubmenu<T extends SelectableCosmetic<T>> extends PlayerSpecificMenu {
+public class CosmeticsSubmenu<T extends SelectableCosmetic> extends PlayerSpecificMenu {
     public CosmeticsSubmenu(WbsQuake plugin, QuakePlayer player, String title, String id) {
         super(plugin, player, title, 6, id);
 

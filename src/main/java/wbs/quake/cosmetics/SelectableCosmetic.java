@@ -6,7 +6,6 @@ import wbs.quake.QuakeSettings;
 import wbs.quake.WbsQuake;
 import wbs.quake.player.PlayerCosmetics;
 import wbs.quake.player.QuakePlayer;
-import wbs.utils.exceptions.InvalidConfigurationException;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
 
@@ -14,7 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class SelectableCosmetic<T extends SelectableCosmetic<T>> {
+public abstract class SelectableCosmetic {
 
     public SelectableCosmetic(String id, Material material, String display, String permission, List<String> description, double price) {
         this.material = material;
@@ -73,7 +72,7 @@ public abstract class SelectableCosmetic<T extends SelectableCosmetic<T>> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SelectableCosmetic)) return false;
-        SelectableCosmetic<?> that = (SelectableCosmetic<?>) o;
+        SelectableCosmetic that = (SelectableCosmetic) o;
 
         return this.id.equalsIgnoreCase(that.id);
     }

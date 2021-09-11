@@ -2,15 +2,11 @@ package wbs.quake.cosmetics;
 
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.QuakeSettings;
 import wbs.quake.WbsQuake;
 import wbs.quake.cosmetics.trails.StandardTrail;
 import wbs.quake.cosmetics.trails.Trail;
-import wbs.quake.player.PlayerCosmetics;
-import wbs.quake.player.PlayerManager;
-import wbs.quake.player.QuakePlayer;
 import wbs.utils.exceptions.InvalidConfigurationException;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
@@ -102,13 +98,13 @@ public class CosmeticsStore {
     private final LinkedHashMap<String, GunSkin> skins = new LinkedHashMap<>();
 
     public boolean armourEnabled;
-    private final LinkedHashMap<String, SelectableCosmetic<?>> armourSets = new LinkedHashMap<>();
+    private final LinkedHashMap<String, SelectableCosmetic> armourSets = new LinkedHashMap<>();
 
     public boolean killMessagesEnabled;
-    private final LinkedHashMap<String, SelectableCosmetic<?>> killMessages = new LinkedHashMap<>();
+    private final LinkedHashMap<String, SelectableCosmetic> killMessages = new LinkedHashMap<>();
 
     public boolean deathEffectsEnabled;
-    private final LinkedHashMap<String, SelectableCosmetic<?>> deathEffects = new LinkedHashMap<>();
+    private final LinkedHashMap<String, SelectableCosmetic> deathEffects = new LinkedHashMap<>();
 
     public boolean shootSoundsEnabled;
     private final LinkedHashMap<String, ShootSound> shootSounds = new LinkedHashMap<>();
@@ -116,7 +112,7 @@ public class CosmeticsStore {
     public boolean deathSoundsEnabled;
     private final LinkedHashMap<String, DeathSound> deathSounds = new LinkedHashMap<>();
 
-    private <T extends SelectableCosmetic<T>> void populateOrdered(List<T> unsorted, LinkedHashMap<String, T> map) {
+    private <T extends SelectableCosmetic> void populateOrdered(List<T> unsorted, LinkedHashMap<String, T> map) {
         unsorted.stream()
                 .sorted(Comparator.comparingDouble(a -> a.price))
                 .forEach(cosmetic -> map.put(cosmetic.getId(), cosmetic));
