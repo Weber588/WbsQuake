@@ -4,23 +4,28 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.quake.player.QuakePlayer;
+import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsScoreboard;
 import wbs.utils.util.plugin.WbsMessenger;
+import wbs.utils.util.pluginhooks.VaultWrapper;
 
 import java.util.*;
 
 public class QuakeLobby extends WbsMessenger {
+
+    public static final NamespacedKey SHOP_ITEM_KEY = new NamespacedKey(WbsQuake.getInstance(), "lobby-shop");
+    public static final NamespacedKey LEAVE_ITEM_KEY = new NamespacedKey(WbsQuake.getInstance(), "lobby-leave");
 
     // Constants
     private static final int VOTING_DURATION = 30;
@@ -59,9 +64,77 @@ public class QuakeLobby extends WbsMessenger {
         return new LinkedList<>(players);
     }
 
-    private final ItemStack[] lobbyInventory = {
-            new ItemStack(Material.CLOCK)
-    };
+    private final ItemStack[] lobbyInventory = new ItemStack[36];
+
+    public void configureLobbyItems(ConfigurationSection section, String directory) {
+        ConfigurationSection leaveSection = section.getConfigurationSection("lobby-leave");
+        if (leaveSection == null) {
+            plugin.settings.logError("lobby-leave item missing. It is recommended that you regenerate your config.", directory + "/lobby-leave");
+        } else {
+            loadLeaveItem(leaveSection, directory + "/lobby-leave");
+        }
+
+        ConfigurationSection shopSection = section.getConfigurationSection("lobby-shop");
+        if (shopSection == null) {
+            plugin.settings.logError("lobby-shop item missing. It is recommended that you regenerate your config.", directory + "/lobby-shop");
+        } else {
+            loadShopItem(shopSection, directory + "/lobby-shop");
+        }
+    }
+
+    private void loadLeaveItem(ConfigurationSection section, String directory) {
+        String materialString = section.getString("item", "CLOCK");
+        Material type = WbsEnums.getEnumFromString(Material.class, materialString);
+
+        if (type == null) {
+            plugin.settings.logError("Invalid lobby-leave item: " + materialString, directory + "/lobby-leave/item");
+            type = Material.CLOCK;
+        }
+
+        String display = section.getString("display", "&c&lExit");
+        List<String> lore = section.getStringList("lore");
+
+        int slot = section.getInt("slot", 8);
+
+        ItemStack leaveItem = new ItemStack(type);
+        ItemMeta meta = Objects.requireNonNull(leaveItem.getItemMeta());
+
+        meta.setDisplayName(plugin.dynamicColourise(display));
+        meta.setLore(plugin.colouriseAll(lore));
+
+        meta.getPersistentDataContainer().set(LEAVE_ITEM_KEY, PersistentDataType.STRING, "true");
+
+        leaveItem.setItemMeta(meta);
+
+        lobbyInventory[slot] = leaveItem;
+    }
+
+    private void loadShopItem(ConfigurationSection section, String directory) {
+        String materialString = section.getString("item", "CLOCK");
+        Material type = WbsEnums.getEnumFromString(Material.class, materialString);
+
+        if (type == null) {
+            plugin.settings.logError("Invalid lobby-shop item: " + materialString, directory + "/lobby-shop/item");
+            type = Material.CLOCK;
+        }
+
+        String display = section.getString("display", "&b&lShop");
+        List<String> lore = section.getStringList("lore");
+
+        int slot = section.getInt("slot", 4);
+
+        ItemStack shopItem = new ItemStack(type);
+        ItemMeta meta = Objects.requireNonNull(shopItem.getItemMeta());
+
+        meta.setDisplayName(plugin.dynamicColourise(display));
+        meta.setLore(plugin.colouriseAll(lore));
+
+        meta.getPersistentDataContainer().set(SHOP_ITEM_KEY, PersistentDataType.STRING, "true");
+
+        shopItem.setItemMeta(meta);
+
+        lobbyInventory[slot] = shopItem;
+    }
 
     public void setLobbySpawn(Location lobbySpawn) {
         this.lobbySpawn = lobbySpawn;
@@ -172,16 +245,18 @@ public class QuakeLobby extends WbsMessenger {
         return playersScoreboard;
     }
 
-    private WbsScoreboard configureScoreboard(WbsScoreboard scoreboard, QuakePlayer player) {
+    private void configureScoreboard(WbsScoreboard scoreboard, QuakePlayer player) {
         scoreboard.addLine(BORDER);
         scoreboard.addLine("");
         for (String line : player.getStatsDisplay()) {
             scoreboard.addLine("&r" + line);
         }
         scoreboard.addLine("&r");
-        scoreboard.addLine(BORDER + "&r");
 
-        return scoreboard;
+        scoreboard.addLine("&rBalance: &h" + VaultWrapper.formatMoneyFor(player.getPlayer()));
+
+        scoreboard.addLine("&r&r");
+        scoreboard.addLine(BORDER + "&r");
     }
 
     public void kickAll() {
@@ -369,7 +444,6 @@ public class QuakeLobby extends WbsMessenger {
 
             sendArenaPrompt(arena, arenaID);
         }
-        // TODO: Make arenas votable via command and by clicking in chat
 
         registerRunnable(new BukkitRunnable() {
             int timeLeft = VOTING_DURATION;

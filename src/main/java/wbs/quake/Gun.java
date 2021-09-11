@@ -39,7 +39,7 @@ public class Gun {
 
     public static final NamespacedKey GUN_KEY = new NamespacedKey(WbsQuake.getInstance(), "isGun");
 
-    // TODO: Make this configurable?
+    // TODO: Make this read from misc.yml
     public String gunName = "&9&lRailgun";
 
     @NotNull
@@ -162,6 +162,12 @@ public class Gun {
         return Math.abs(Duration.between(lastShot, LocalDateTime.now()).toMillis() / 1000.0) > getCooldown() / 20.0;
     }
 
+    public void instantReload(QuakePlayer player) {
+        lastShot = null;
+
+        player.getPlayer().setExp(1);
+        Bukkit.getScheduler().cancelTask(xpTimerId);
+    }
 
     public void addCooldownModifier(double modifier) {
         this.cooldownModifier *= modifier;

@@ -8,6 +8,7 @@ import wbs.quake.PlayerTargeter;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
+import wbs.utils.util.string.WbsStrings;
 
 import java.util.List;
 
@@ -64,8 +65,11 @@ public class PotionKillPerk extends KillPerk {
 
     @Override
     protected void internalApply(QuakePlayer player, QuakePlayer victim) {
+        String display = "Got &h" + WbsStrings.capitalizeAll(effect.getType().getName().replace('_', ' ')) +
+                "&r from &h" + player.getName() + "&r's kill perk!";
         for (QuakePlayer target : PlayerTargeter.getTargets(player, targetType)) {
             target.getPlayer().addPotionEffect(effect);
+            plugin.sendActionBar(display, player.getPlayer());
         }
     }
 }

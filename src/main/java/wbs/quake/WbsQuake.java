@@ -3,8 +3,7 @@ package wbs.quake;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import wbs.quake.command.QuakeCommand;
-import wbs.quake.listeners.QuakeListener;
-import wbs.quake.player.PlayerManager;
+import wbs.quake.listeners.*;
 import wbs.utils.util.plugin.WbsPlugin;
 
 public class WbsQuake extends WbsPlugin {
@@ -25,6 +24,7 @@ public class WbsQuake extends WbsPlugin {
 
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(new QuakeListener(this), this);
+        pm.registerEvents(new ItemsListener(this), this);
 
         new QuakeCommand(this, getCommand("wbsquake"));
     }

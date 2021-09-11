@@ -136,7 +136,6 @@ public class CosmeticsStore {
     private void loadTrails(@NotNull ConfigurationSection section, String directory) {
         trails.clear();
 
-        int trailsAdded = 0;
         List<Trail> unsortedTrails = new LinkedList<>();
         for (String key : section.getKeys(false)) {
             ConfigurationSection trailSection = section.getConfigurationSection(key);
@@ -150,18 +149,17 @@ public class CosmeticsStore {
 
                 if (trail != null) {
                     unsortedTrails.add(trail);
-                    trailsAdded++;
                 }
             } catch (InvalidConfigurationException ignored) {}
         }
-
-        trailsEnabled = trailsAdded > 0;
 
         if (trails.get("default") == null) {
             trails.put("default", buildDefaultTrail());
         }
 
         populateOrdered(unsortedTrails, trails);
+
+        trailsEnabled = trails.size() > 1;
     }
 
     public Collection<Trail> allTrails() {
@@ -212,7 +210,6 @@ public class CosmeticsStore {
         if (shopSection != null) {
             skinsEnabled = false;
 
-            int skinsAdded = 0;
             for (String key : shopSection.getKeys(false)) {
                 ConfigurationSection skinSection = WbsConfigReader.getRequiredSection(shopSection, key, settings, directory);
 
@@ -234,10 +231,7 @@ public class CosmeticsStore {
                 String permission = "wbsquake.cosmetics.gun-skin." + key;
 
                 unsortedSkins.add(buildGunSkin(key, material, permission, price));
-                skinsAdded++;
             }
-
-            skinsEnabled = skinsAdded > 0;
         }
 
         String defaultMaterialString = section.getString("default-skin", Material.WOODEN_HOE.name());
@@ -252,6 +246,8 @@ public class CosmeticsStore {
         skins.put("default", defaultSkin);
 
         populateOrdered(unsortedSkins, skins);
+
+        skinsEnabled = skins.size() > 1;
     }
 
     private GunSkin buildGunSkin(String key, Material material, String permission, double price) {
@@ -295,7 +291,6 @@ public class CosmeticsStore {
     private void loadDeathSounds(@NotNull ConfigurationSection section, String directory) {
         deathSounds.clear();
 
-        int deathSoundsAdded = 0;
         List<DeathSound> unsortedDeathSounds = new LinkedList<>();
         for (String key : section.getKeys(false)) {
             ConfigurationSection deathSoundSection = section.getConfigurationSection(key);
@@ -308,15 +303,14 @@ public class CosmeticsStore {
                 DeathSound deathSound = new DeathSound(deathSoundSection, directory + "/" + key);
 
                 unsortedDeathSounds.add(deathSound);
-                deathSoundsAdded++;
             } catch (InvalidConfigurationException ignored) {}
         }
-
-        deathSoundsEnabled = deathSoundsAdded > 0;
 
         deathSounds.putIfAbsent("default", buildDefaultDeathSound());
 
         populateOrdered(unsortedDeathSounds, deathSounds);
+
+        deathSoundsEnabled = deathSounds.size() > 1;
     }
 
     public Collection<DeathSound> allDeathSounds() {
@@ -349,7 +343,6 @@ public class CosmeticsStore {
     private void loadShootSounds(@NotNull ConfigurationSection section, String directory) {
         shootSounds.clear();
 
-        int shootSoundsAdded = 0;
         List<ShootSound> unsortedShootSounds = new LinkedList<>();
         for (String key : section.getKeys(false)) {
             ConfigurationSection shootSoundSection = section.getConfigurationSection(key);
@@ -362,15 +355,14 @@ public class CosmeticsStore {
                 ShootSound shootSound = new ShootSound(shootSoundSection, directory + "/" + key);
 
                 unsortedShootSounds.add(shootSound);
-                shootSoundsAdded++;
             } catch (InvalidConfigurationException ignored) {}
         }
-
-        shootSoundsEnabled = shootSoundsAdded > 0;
 
         shootSounds.putIfAbsent("default", buildDefaultShootSound());
 
         populateOrdered(unsortedShootSounds, shootSounds);
+
+        shootSoundsEnabled = shootSounds.size() > 1;
     }
 
     public Collection<ShootSound> allShootSounds() {

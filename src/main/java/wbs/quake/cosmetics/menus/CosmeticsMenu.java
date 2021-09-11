@@ -66,7 +66,7 @@ public class CosmeticsMenu extends WbsMenu {
 
         if (false) {
             slot = new MenuSlot(plugin, Material.SKELETON_SKULL,
-                    "&5Kill Effects",
+                    "&5Death Effects",
                     "&7Choose what effect plays",
                     "&7when you die!"
             );

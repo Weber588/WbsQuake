@@ -292,6 +292,8 @@ public class QuakeSettings extends WbsSettings {
 
                 QuakeLobby.getInstance().setLobbySpawn(lobbySpawn);
             }
+
+            QuakeLobby.getInstance().configureLobbyItems(lobbySection, directory);
         }
 
         ConfigurationSection quakeSection = miscConfig.getConfigurationSection("quake");
