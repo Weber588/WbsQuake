@@ -1,0 +1,23 @@
+lobby:
+  lobby_leave:
+    item: clock
+    slot: 8
+    display: '&c&lExit'
+    lore:
+      - '&7Right click to leave'
+      - '&7the lobby!'
+  lobby_shop:
+    item: sunflower
+    slot: 4
+    display: '&b&lShop'
+quake:
+  quake_compass:
+    slot: 1
+    display: '&6Nearest Player'
+    lore:
+      - '&7Points towards the'
+      - '&7nearest player!'
+  quake_gun:
+    slot: 0
+    display: '&9&lRailgun'
+

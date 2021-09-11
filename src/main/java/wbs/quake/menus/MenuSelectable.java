@@ -4,11 +4,13 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import wbs.quake.QuakeSettings;
 import wbs.quake.WbsQuake;
+import wbs.quake.cosmetics.SelectableCosmetic;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class MenuSelectable {
 
@@ -58,4 +60,29 @@ public abstract class MenuSelectable {
         return id;
     }
     public abstract String getPermission();
+
+    /**
+     * Accepts the lore of the generated item, and
+     * modifies it before returning a new list to be
+     * used as the lore.
+     * @param lore The lore to modify
+     * @return The new lore to be shown on the item.
+     */
+    public List<String> updateLore(List<String> lore) {
+        return lore;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MenuSelectable)) return false;
+        MenuSelectable that = (MenuSelectable) o;
+
+        return this.id.equalsIgnoreCase(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

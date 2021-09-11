@@ -73,6 +73,10 @@ public class QuakeLobby extends WbsMessenger {
         }
     }
 
+    public Location getLobbySpawn() {
+        return lobbySpawn;
+    }
+
     // Join/leave listeners to trigger the start of voting, or revert to prior state on leave
 
     private final Map<QuakePlayer, WbsScoreboard> scoreboards = new HashMap<>();

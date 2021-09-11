@@ -1,4 +1,4 @@
-package wbs.quake.menus.cosmetics;
+package wbs.quake.cosmetics.menus;
 
 import org.bukkit.Material;
 import wbs.quake.WbsQuake;

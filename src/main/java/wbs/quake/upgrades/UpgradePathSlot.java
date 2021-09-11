@@ -1,4 +1,4 @@
-package wbs.quake.menus;
+package wbs.quake.upgrades;
 
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -9,9 +9,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import wbs.quake.menus.UpgradesMenu;
-import wbs.quake.upgrades.UpgradePath;
-import wbs.quake.upgrades.UpgradeableOption;
 import wbs.utils.util.menus.MenuSlot;
 import wbs.utils.util.menus.WbsMenu;
 import wbs.utils.util.plugin.WbsPlugin;

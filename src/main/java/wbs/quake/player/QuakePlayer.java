@@ -4,7 +4,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 import wbs.quake.Gun;
+import wbs.quake.QuakeSettings;
+import wbs.quake.WbsQuake;
+import wbs.quake.killperks.KillPerk;
+import wbs.quake.menus.SelectableSlot;
 import wbs.utils.util.WbsMath;
 
 import java.util.*;
@@ -35,6 +40,8 @@ public class QuakePlayer {
         kills = section.getInt("kills");
         deaths = section.getInt("deaths");
 
+        killPerk = WbsQuake.getInstance().settings.getKillPerk(section.getString("kill-perk"));
+
         currentGun = new Gun(section, "gun");
 
         ConfigurationSection cosmeticsSection = section.getConfigurationSection("cosmetics");
@@ -55,6 +62,9 @@ public class QuakePlayer {
         setIfNotZero(section, uuid + ".kills", kills);
         setIfNotZero(section, uuid + ".headshots", headshots);
         setIfNotZero(section, uuid + ".deaths", deaths);
+
+        if (killPerk != null)
+            section.set(uuid + ".kill-perk", killPerk.getId());
 
         currentGun.writeToConfig(section, uuid + ".gun");
         cosmetics.writeToConfig(section, uuid + ".cosmetics");
@@ -112,6 +122,9 @@ public class QuakePlayer {
         }
         return player;
     }
+
+    @Nullable
+    public KillPerk killPerk;
 
     public int getHeadshots() {
         return headshots;
@@ -199,9 +212,5 @@ public class QuakePlayer {
     @Override
     public int hashCode() {
         return Objects.hash(uuid);
-    }
-
-    public void onKill(QuakePlayer victim) {
-        // TODO
     }
 }

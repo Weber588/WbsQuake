@@ -34,6 +34,7 @@ public class WbsQuake extends WbsPlugin {
         QuakeLobby.getInstance().kickAll();
         settings.savePlayers();
         settings.saveArenas();
+        settings.saveLobbySpawn();
 
         ArenaManager.getAllArenas().forEach(Arena::finish);
     }

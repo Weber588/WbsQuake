@@ -6,8 +6,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.quake.WbsQuake;
+import wbs.quake.player.PlayerManager;
+import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.menus.MenuSlot;
 import wbs.utils.util.pluginhooks.VaultWrapper;
 
@@ -18,9 +21,10 @@ import java.util.stream.Collectors;
 public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot {
 
     protected final WbsQuake plugin;
+    @NotNull
     protected final T selectable;
 
-    public SelectableSlot(T selectable) {
+    public SelectableSlot(@NotNull T selectable) {
         super(WbsQuake.getInstance(), selectable.material, selectable.display, selectable.description);
 
         this.selectable = selectable;
@@ -58,7 +62,10 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
 
             List<String> lore = selectable.description.stream().map(line -> "&7" + line).collect(Collectors.toList());
 
-            if (isSelected(player, selectable)) {
+            lore = selectable.updateLore(lore);
+
+            QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
+            if (isSelected(quakePlayer, selectable)) {
                 lore.add("&aSelected.");
                 meta.addEnchant(Enchantment.LOYALTY, 1, true);
             } else {
@@ -86,5 +93,5 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
 
     }
 
-    protected abstract boolean isSelected(Player player, T selectable);
+    protected abstract boolean isSelected(QuakePlayer player, T selectable);
 }

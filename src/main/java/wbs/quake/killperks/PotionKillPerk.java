@@ -1,26 +1,25 @@
-package wbs.quake.powerups;
+package wbs.quake.killperks;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import wbs.quake.*;
+import wbs.quake.PlayerTargeter;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
-import wbs.utils.util.string.WbsStrings;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Random;
 
-public class PotionPowerUp extends PowerUp {
-    public PotionPowerUp(WbsQuake plugin, ConfigurationSection section, String directory) {
-        super(plugin, section, directory);
+public class PotionKillPerk extends KillPerk {
+    public PotionKillPerk(String id, Material material, String display, String permission, List<String> description, double price) {
+        super(id, material, display, permission, description, price);
+
+        effect = new PotionEffect(PotionEffectType.SPEED, 200, 0, false, false, true);
+    }
+
+    public PotionKillPerk(ConfigurationSection section, String directory) {
+        super(section, directory);
 
         WbsConfigReader.requireNotNull(section, "potion", settings, directory);
 
@@ -60,60 +59,13 @@ public class PotionPowerUp extends PowerUp {
         }
     }
 
-    private final PotionEffect effect;
-    private PlayerTargeter.TargetType targetType;
+    private PlayerTargeter.TargetType targetType = PlayerTargeter.TargetType.PLAYER;
+    protected final PotionEffect effect;
 
     @Override
-    public void runOn(QuakePlayer player) {
+    protected void internalApply(QuakePlayer player, QuakePlayer victim) {
         for (QuakePlayer target : PlayerTargeter.getTargets(player, targetType)) {
             target.getPlayer().addPotionEffect(effect);
         }
-    }
-
-    @Override
-    protected Material getDefaultItem() {
-        return Material.POTION;
-    }
-    @Override
-    protected String getDefaultDisplay() {
-        return "Potion";
-    }
-
-    @Override
-    public String getDisplay() {
-        return WbsStrings.capitalizeAll(effect.getType().getName());
-    }
-
-    @Override
-    protected ItemStack getItem() {
-        ItemStack itemStack = new ItemStack(item);
-
-        ItemMeta meta = Bukkit.getItemFactory().getItemMeta(item);
-        if (meta == null) {
-            return itemStack;
-        }
-
-        if (meta instanceof PotionMeta) {
-            PotionMeta potionMeta = (PotionMeta) meta;
-
-            potionMeta.setColor(effect.getType().getColor());
-        }
-
-        itemStack.setItemMeta(meta);
-        return itemStack;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PotionPowerUp)) return false;
-        if (!super.equals(o)) return false;
-        PotionPowerUp that = (PotionPowerUp) o;
-        return Objects.equals(effect, that.effect) && targetType == that.targetType;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), effect, targetType);
     }
 }

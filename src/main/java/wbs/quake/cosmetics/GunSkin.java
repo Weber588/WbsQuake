@@ -1,6 +1,7 @@
 package wbs.quake.cosmetics;
 
 import org.bukkit.Material;
+import wbs.quake.QuakeLobby;
 import wbs.quake.player.PlayerCosmetics;
 import wbs.quake.player.QuakePlayer;
 
@@ -19,6 +20,15 @@ public class GunSkin extends SelectableCosmetic {
     @Override
     public void onSelect(QuakePlayer player, PlayerCosmetics cosmetics) {
         cosmetics.skin = this;
+
+        if (QuakeLobby.getInstance().getState() == QuakeLobby.GameState.GAMEPLAY) {
+            player.getPlayer().getInventory().remove(player.getCurrentGun().buildGun());
+        }
+
         player.getCurrentGun().setSkin(this.material);
+
+        if (QuakeLobby.getInstance().getState() == QuakeLobby.GameState.GAMEPLAY) {
+            player.getPlayer().getInventory().addItem(player.getCurrentGun().buildGun());
+        }
     }
 }

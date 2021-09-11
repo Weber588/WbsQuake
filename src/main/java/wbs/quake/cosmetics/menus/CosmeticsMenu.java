@@ -1,8 +1,8 @@
-package wbs.quake.menus;
+package wbs.quake.cosmetics.menus;
 
 import org.bukkit.Material;
 import wbs.quake.cosmetics.CosmeticsStore;
-import wbs.quake.menus.cosmetics.*;
+import wbs.quake.menus.MenuManager;
 import wbs.utils.util.menus.MenuSlot;
 import wbs.utils.util.menus.WbsMenu;
 import wbs.utils.util.plugin.WbsPlugin;

@@ -3,6 +3,7 @@ package wbs.quake.menus;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import wbs.quake.cosmetics.menus.CosmeticsMenu;
 import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.WbsQuake;

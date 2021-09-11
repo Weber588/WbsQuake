@@ -3,7 +3,7 @@ package wbs.quake.cosmetics;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import wbs.quake.menus.SelectableSlot;
-import wbs.quake.menus.cosmetics.CosmeticsSubmenu;
+import wbs.quake.cosmetics.menus.CosmeticsSubmenu;
 import wbs.quake.player.PlayerCosmetics;
 import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
@@ -27,9 +27,8 @@ public class CosmeticSlot<T extends SelectableCosmetic> extends SelectableSlot<T
     }
 
     @Override
-    protected boolean isSelected(Player player, T cosmetic) {
-        QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
-        PlayerCosmetics cosmetics = quakePlayer.getCosmetics();
+    protected boolean isSelected(QuakePlayer player, T cosmetic) {
+        PlayerCosmetics cosmetics = player.getCosmetics();
 
         SelectableCosmetic current = cosmetics.getCosmetic(cosmetic.getCosmeticType());
 

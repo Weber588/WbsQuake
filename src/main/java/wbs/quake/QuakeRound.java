@@ -216,9 +216,6 @@ public class QuakeRound {
     }
 
     public void registerKill(QuakePlayer victim, QuakePlayer attacker, boolean headshot) {
-
-        attacker.onKill(victim);
-
         victim.addDeath();
         attacker.addKill();
 
@@ -248,5 +245,9 @@ public class QuakeRound {
 
         givePoint(attacker);
         arena.respawn(victim);
+
+        // Run kill perk after respawning to ensure "closest" target can work
+        if (attacker.killPerk != null)
+            attacker.killPerk.apply(attacker, victim);
     }
 }

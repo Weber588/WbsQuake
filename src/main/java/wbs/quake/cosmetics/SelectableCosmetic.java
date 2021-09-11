@@ -36,18 +36,4 @@ public abstract class SelectableCosmetic extends MenuSelectable {
      * @param player The player who selected this cosmetic
      */
     public abstract void onSelect(QuakePlayer player, PlayerCosmetics cosmetics);
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SelectableCosmetic)) return false;
-        SelectableCosmetic that = (SelectableCosmetic) o;
-
-        return this.id.equalsIgnoreCase(that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }

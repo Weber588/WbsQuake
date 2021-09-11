@@ -4,7 +4,10 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import wbs.quake.WbsQuake;
+import wbs.quake.cosmetics.CosmeticsStore;
+import wbs.quake.killperks.KillPerksMenu;
 import wbs.quake.player.QuakePlayer;
+import wbs.quake.upgrades.UpgradesMenu;
 import wbs.utils.util.menus.MenuSlot;
 
 import java.util.Objects;
@@ -27,18 +30,43 @@ public class ShopMenu extends PlayerSpecificMenu {
         MenuSlot upgradesMenu = new MenuSlot(plugin, Material.ANVIL,
                 "&9&lUpgrades",
                 "&3Buy upgrades that affect",
-                "&3gameplay here!"
+                "&3gameplay!"
         );
         upgradesMenu.setClickAction(inventoryClickEvent ->
                 MenuManager.getMenu(player, UpgradesMenu.class).showTo(player.getPlayer())
         );
         setSlot(2, 2, upgradesMenu);
 
-        MenuSlot cosmeticsMenu = new MenuSlot(plugin, Material.CAKE, "&5&lCosmetics", "&dExpress yourself here!");
-        cosmeticsMenu.setClickAction(inventoryClickEvent ->
-            MenuManager.getCosmeticMenu().showTo(player.getPlayer())
-        );
-        setSlot(2, 6, cosmeticsMenu);
+        MenuSlot cosmeticsMenu;
+        if (CosmeticsStore.getInstance().getCosmeticTypesLoaded() > 0) {
+            cosmeticsMenu = new MenuSlot(plugin, Material.CAKE, "&5&lCosmetics", "&dExpress yourself!");
+
+            cosmeticsMenu.setClickAction(inventoryClickEvent ->
+                    MenuManager.getCosmeticMenu().showTo(player.getPlayer())
+            );
+
+        } else {
+            cosmeticsMenu = new MenuSlot(plugin, Material.CAKE, "&8&lCosmetics", "&cCosmetics are disabled.");
+        }
+
+        setSlot(2, 4, cosmeticsMenu);
+
+        MenuSlot killPerkMenu;
+        if (plugin.settings.allKillPerks().size() > 0) {
+            killPerkMenu = new MenuSlot(plugin, Material.DIAMOND_SWORD,
+                    "&4&lKill Perks",
+                    "&cBuy perks for when you",
+                    "&cget a kill!"
+            );
+
+            killPerkMenu.setClickAction(inventoryClickEvent ->
+                    MenuManager.getMenu(player, KillPerksMenu.class).showTo(player.getPlayer())
+            );
+        } else {
+            killPerkMenu = new MenuSlot(plugin, Material.DIAMOND_SWORD, "&8&lKill Perks", "&cKill Perks are disabled.");
+        }
+
+        setSlot(2, 6, killPerkMenu);
     }
 
     private ItemStack getStatsItem() {

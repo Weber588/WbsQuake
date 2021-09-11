@@ -3,9 +3,10 @@ package wbs.quake.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import wbs.quake.killperks.KillPerksMenu;
 import wbs.quake.menus.MenuManager;
 import wbs.quake.menus.ShopMenu;
-import wbs.quake.menus.UpgradesMenu;
+import wbs.quake.upgrades.UpgradesMenu;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.menus.WbsMenu;
 import wbs.utils.util.plugin.WbsPlugin;
@@ -37,6 +38,9 @@ public class ShopSubcommand extends WbsSubcommand {
                 case "cosmetics":
                     menu = MenuManager.getCosmeticMenu();
                     break;
+                case "killperks":
+                    menu = MenuManager.getMenu(player, KillPerksMenu.class);
+                    break;
             }
         }
 
@@ -55,6 +59,7 @@ public class ShopSubcommand extends WbsSubcommand {
 
         choices.add("upgrades");
         choices.add("cosmetics");
+        choices.add("killperks");
 
         return choices;
     }

@@ -1,4 +1,4 @@
-package wbs.quake.menus;
+package wbs.quake.upgrades;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
@@ -7,48 +7,25 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffectType;
 import wbs.quake.Gun;
 import wbs.quake.WbsQuake;
-import wbs.quake.killperks.KillPerk;
-import wbs.quake.killperks.KillPerkSlot;
+import wbs.quake.menus.MenuManager;
+import wbs.quake.menus.PlayerSpecificMenu;
 import wbs.quake.player.QuakePlayer;
-import wbs.quake.upgrades.UpgradeableOption;
 import wbs.utils.util.menus.MenuSlot;
-import wbs.utils.util.plugin.WbsPlugin;
 
-import java.util.Arrays;
 import java.util.Objects;
 
-public class UpgradesMenu extends PlayerSelectionMenu<KillPerk> {
+public class UpgradesMenu extends PlayerSpecificMenu {
 
     public static final int BAL_SLOT = 8;
+    private static final int ROWS = 3;
 
     public UpgradesMenu(WbsQuake plugin, QuakePlayer player) {
-        super(plugin, player, "&9&lUpgrades", 6, "upgrade:" + player.getName());
+        super(plugin, player, "&9&lUpgrades", ROWS, "upgrade:" + player.getName());
         MenuSlot borderItem = new MenuSlot(plugin, Material.CYAN_STAINED_GLASS_PANE, "&r");
         setOutline(borderItem);
-        setRow(3, borderItem);
 
         setSlot(BAL_SLOT, MenuManager.getBalSlot());
-        setSlot(5, 8, MenuManager.getBackToShopSlot());
-
-        MenuSlot modifiersLabel = new MenuSlot(
-                plugin,
-                Material.ENCHANTED_GOLDEN_APPLE,
-                "&b&lModifiers",
-                plugin.dynamicColourise("&7Upgrade your gun here!"));
-        setSlot(0, 4, modifiersLabel);
-
-        MenuSlot killPerksLabel = new MenuSlot(
-                plugin,
-                Material.DIAMOND_SWORD,
-                "&4&lKill Perks",
-                true,
-                plugin.colouriseAll(Arrays.asList(
-                        "&7Kill perks are bonuses",
-                        "&7that get applied when you",
-                        "&7kill another player!",
-                        "&7You can have 1 selected at a time."
-                )));
-        setSlot(3, 4, killPerksLabel);
+        setSlot(ROWS - 1, 8, MenuManager.getBackToShopSlot());
 
         Gun gun = player.getCurrentGun();
 
@@ -111,15 +88,5 @@ public class UpgradesMenu extends PlayerSelectionMenu<KillPerk> {
                             "&2Piercing: &h%value%");
             setNextFreeSlot(slot);
         }
-    }
-
-    @Override
-    protected void setCurrent(SelectableSlot<KillPerk> slot) {
-
-    }
-
-    @Override
-    protected SelectableSlot<KillPerk> getSlotFor(KillPerk selected) {
-        return selected.buildSlot();
     }
 }

@@ -1,4 +1,4 @@
-package wbs.quake.menus.cosmetics;
+package wbs.quake.cosmetics.menus;
 
 import wbs.quake.WbsQuake;
 import wbs.quake.player.QuakePlayer;

@@ -42,6 +42,60 @@ upgradeable-options:
     - 3:$600
     - 5:$1500
 
+# Kill perks are rewards that get run when a player gets a kill
+# in game.
+# By default, no perk is equipped.
+kill-perks:
+  invisibility:
+    type: potion
+    chance: 33.33 # The chance of the kill perk being given, as a percentage.
+
+    # Shop details for the perk
+    item: potion # When item is potion, and so is type, it'll display as the correct colour
+    display: '&bInvisibility'
+    price: 2500
+    description:
+      - 'Gain invisibility for'
+      - '3 seconds!'
+
+    # Type-specific options.
+    potion: invisibility
+    level: 1
+    duration: 60 # In ticks (1 second = 20 ticks; 3 seconds = 60 ticks)
+    target: player # See the power-ups section of config.yml for possible targets.
+
+  speed:
+    type: potion
+    chance: 100
+
+    item: potion # When item is potion, and so is type, it'll display as the correct colour
+    display: '&bSpeed'
+    price: 500
+    description:
+      - 'Gain speed for'
+      - '5 seconds!'
+
+    potion: speed
+    level: 3
+    duration: 100
+    target: player
+
+  glow-closest:
+    type: potion
+    chance: 50
+
+    item: spectral_arrow
+    display: '&eGlow nearby player'
+    price: 1000
+    description:
+      - 'Makes the nearest player'
+      - 'glow for 10 seconds!'
+
+    potion: glowing
+    level: 1
+    duration: 200
+    target: closest # The closest player after the kill.
+
 cosmetics:
 
   # This determines what item a player gets given as their gun.

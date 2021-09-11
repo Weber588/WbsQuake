@@ -55,7 +55,7 @@ power-ups:
     # Leaving out item uses a default. For potions, it's a speed potion.
     potion: speed
     amplifier: 3
-    duration: 200
+    duration: 200 # in ticks
     target: player
     cooldown: 600
 

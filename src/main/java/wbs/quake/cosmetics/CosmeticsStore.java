@@ -33,9 +33,12 @@ public class CosmeticsStore {
         settings = plugin.settings;
     }
 
-    public void loadCosmetics(ConfigurationSection cosmeticsSection, String directory) {
+    private int cosmeticTypesLoaded = 0;
 
+    public void loadCosmetics(ConfigurationSection cosmeticsSection, String directory) {
         String key = "trails";
+
+        cosmeticTypesLoaded = 0;
 
         ConfigurationSection trailsSection = cosmeticsSection.getConfigurationSection(key);
         if (trailsSection == null) {
@@ -45,6 +48,8 @@ public class CosmeticsStore {
             loadTrails(trailsSection, directory + "/" + key);
             if (!trailsEnabled) {
                 plugin.logger.info("No valid trails found! Disabling trails in shop.");
+            } else {
+                cosmeticTypesLoaded++;
             }
         }
 
@@ -62,6 +67,8 @@ public class CosmeticsStore {
             loadSkins(skinsSection, directory + "/" + key);
             if (!skinsEnabled) {
                 plugin.logger.info("No valid gun skins found! Disabling gun skins in shop.");
+            } else {
+                cosmeticTypesLoaded++;
             }
         }
 
@@ -74,6 +81,8 @@ public class CosmeticsStore {
             loadDeathSounds(deathSoundsSection, directory + "/" + key);
             if (!deathSoundsEnabled) {
                 plugin.logger.info("No valid death sounds found! Disabling death sounds in shop.");
+            } else {
+                cosmeticTypesLoaded++;
             }
         }
 
@@ -86,6 +95,8 @@ public class CosmeticsStore {
             loadShootSounds(shootSoundsSection, directory + "/" + key);
             if (!shootSoundsEnabled) {
                 plugin.logger.info("No valid shoot sounds found! Disabling shoot sounds in shop.");
+            } else {
+                cosmeticTypesLoaded++;
             }
         }
     }
@@ -372,4 +383,7 @@ public class CosmeticsStore {
         return shootSound == null ? shootSounds.get("default") : shootSound;
     }
 
+    public int getCosmeticTypesLoaded() {
+        return cosmeticTypesLoaded;
+    }
 }
