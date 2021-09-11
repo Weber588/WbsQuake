@@ -12,6 +12,7 @@ import wbs.utils.util.configuration.WbsConfigReader;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class SelectableCosmetic<T extends SelectableCosmetic<T>> {
 
@@ -67,4 +68,18 @@ public abstract class SelectableCosmetic<T extends SelectableCosmetic<T>> {
      * @param player The player who selected this cosmetic
      */
     public abstract void onSelect(QuakePlayer player, PlayerCosmetics cosmetics);
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SelectableCosmetic)) return false;
+        SelectableCosmetic<?> that = (SelectableCosmetic<?>) o;
+
+        return this.id.equalsIgnoreCase(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

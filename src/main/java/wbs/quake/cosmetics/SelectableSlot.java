@@ -28,9 +28,9 @@ public class SelectableSlot<T extends SelectableCosmetic<T>> extends MenuSlot {
 
     private final WbsQuake plugin;
 
-    private final SelectableCosmetic<T> cosmetic;
+    private final T cosmetic;
 
-    public SelectableSlot(CosmeticsSubmenu<T> menu, SelectableCosmetic<T> cosmetic) {
+    public SelectableSlot(CosmeticsSubmenu<T> menu, T cosmetic) {
         super(WbsQuake.getInstance(), cosmetic.material, cosmetic.display, cosmetic.description);
 
         this.cosmetic = cosmetic;
@@ -39,7 +39,7 @@ public class SelectableSlot<T extends SelectableCosmetic<T>> extends MenuSlot {
         setClickAction(event -> onClick(menu, event));
     }
 
-    @SuppressWarnings("unchecked")
+//    @SuppressWarnings("unchecked")
     public void onClick(CosmeticsSubmenu<T> menu, InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
 
@@ -47,7 +47,7 @@ public class SelectableSlot<T extends SelectableCosmetic<T>> extends MenuSlot {
             if (VaultWrapper.hasMoney(player, cosmetic.price)) {
                 VaultWrapper.takeMoney(player, cosmetic.price);
 
-                plugin.sendMessage("Bought upgrade for &h" + VaultWrapper.formatMoney(cosmetic.price) + "&r!", player);
+                plugin.sendMessage("Bought cosmetic for &h" + VaultWrapper.formatMoney(cosmetic.price) + "&r!", player);
 
                 VaultWrapper.givePermission(player, cosmetic.permission);
             } else {
@@ -58,7 +58,7 @@ public class SelectableSlot<T extends SelectableCosmetic<T>> extends MenuSlot {
         }
 
         menu.getPlayer().getCosmetics().setCosmetic(cosmetic);
-        menu.setCurrent((T) cosmetic);
+        menu.setCurrent(cosmetic);
 
         menu.updateSelected(this);
     }
@@ -74,14 +74,16 @@ public class SelectableSlot<T extends SelectableCosmetic<T>> extends MenuSlot {
 
             QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
             PlayerCosmetics cosmetics = quakePlayer.getCosmetics();
-            if (cosmetics.getCosmetic(cosmetic.getCosmeticType()).equals(cosmetic)) {
+
+            SelectableCosmetic<?> current = cosmetics.getCosmetic(cosmetic.getCosmeticType());
+            if (current.equals(cosmetic)) {
                 lore.add("&aSelected.");
                 meta.addEnchant(Enchantment.LOYALTY, 1, true);
             } else {
                 if (quakePlayer.getPlayer().hasPermission(cosmetic.permission)) {
                     lore.add("&6Click to enable!");
                 } else {
-                    lore.add("&6Cost: &h$" + cosmetic.price);
+                    lore.add("&6Cost: &h" + VaultWrapper.formatMoney(cosmetic.price));
                 }
             }
 

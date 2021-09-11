@@ -2,7 +2,6 @@ package wbs.quake.player;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
-import wbs.quake.WbsQuake;
 import wbs.quake.cosmetics.*;
 import wbs.quake.cosmetics.trails.Trail;
 
@@ -51,9 +50,13 @@ public class PlayerCosmetics {
         setCosmetic(shootSound);
     }
 
+    @NotNull
     public Trail trail;
+    @NotNull
     public GunSkin skin;
+    @NotNull
     public DeathSound deathSound;
+    @NotNull
     public ShootSound shootSound;
 
     public void writeToConfig(ConfigurationSection section, String path) {
@@ -74,6 +77,7 @@ public class PlayerCosmetics {
 
     private final Map<CosmeticType, SelectableCosmetic<?>> cosmetics = new HashMap<>();
 
+    @NotNull
     public SelectableCosmetic<?> getCosmetic(CosmeticType type) {
         return cosmetics.get(type);
     }

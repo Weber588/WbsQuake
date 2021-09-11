@@ -75,6 +75,22 @@ public final class MenuManager {
         return backToShopSlot;
     }
 
+    private static MenuSlot backToCosmeticsSlot;
+    public static MenuSlot getBackToCosmeticsSlot() {
+        if (backToCosmeticsSlot != null) return backToCosmeticsSlot;
+
+        backToCosmeticsSlot = new MenuSlot(getPlugin(), Material.CLOCK, "&bBack to Cosmetics");
+
+        backToCosmeticsSlot.setClickAction(inventoryClickEvent ->
+                {
+                    Player player = (Player) inventoryClickEvent.getWhoClicked();
+                    getCosmeticMenu().showTo(player);
+                }
+        );
+
+        return backToCosmeticsSlot;
+    }
+
     private static MenuSlot balSlot;
     public static MenuSlot getBalSlot() {
         if (balSlot != null) return balSlot;

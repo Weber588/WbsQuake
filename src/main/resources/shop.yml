@@ -83,7 +83,6 @@ cosmetics:
       price: 0
       description: # The description appears in lore of the item in the shop
         - 'A simple red line.'
-        - 'The default trail.'
       particle: REDSTONE
       # For redstone, you can choose the size of the particle. 1 = default
       size: 0.85

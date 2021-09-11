@@ -19,7 +19,7 @@ public class CosmeticsSubmenu<T extends SelectableCosmetic<T>> extends PlayerSpe
         setSlot(2, 1, border);
 
         setSlot(3, 1, MenuManager.getBalSlot());
-        setSlot(4, 1, MenuManager.getBackToShopSlot());
+        setSlot(4, 1, MenuManager.getBackToCosmeticsSlot());
     }
 
     public void setCurrent(T cosmetic) {

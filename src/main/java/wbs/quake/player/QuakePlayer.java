@@ -53,6 +53,7 @@ public class QuakePlayer {
         setIfNotZero(section, uuid + ".played", played);
         setIfNotZero(section, uuid + ".wins", wins);
         setIfNotZero(section, uuid + ".kills", kills);
+        setIfNotZero(section, uuid + ".headshots", headshots);
         setIfNotZero(section, uuid + ".deaths", deaths);
 
         currentGun.writeToConfig(section, uuid + ".gun");

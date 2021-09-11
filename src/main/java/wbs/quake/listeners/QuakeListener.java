@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -87,14 +88,21 @@ public class QuakeListener extends WbsMessenger implements Listener {
         }
     }
 
+    @EventHandler
+    public void preventDrop(PlayerDropItemEvent event) {
+        Player player = event.getPlayer();
+        if (QuakeLobby.getInstance().getPlayers().contains(PlayerManager.getPlayer(player))) {
+            event.setCancelled(true);
+        }
+    }
 
     @EventHandler
     public void leap(PlayerInteractEvent event) {
         if (event.getAction() != Action.LEFT_CLICK_AIR
                 && event.getAction() != Action.LEFT_CLICK_BLOCK) return;
 
-        if (isUsingGun(event)) {
-            Player player = event.getPlayer();
+        Player player = event.getPlayer();
+        if (isHoldingGun(player)) {
             QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
             Gun gun = quakePlayer.getCurrentGun();
 
@@ -109,8 +117,8 @@ public class QuakeListener extends WbsMessenger implements Listener {
         if (event.getAction() != Action.RIGHT_CLICK_AIR
                 && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
-        if (isUsingGun(event)) {
-            Player player = event.getPlayer();
+        Player player = event.getPlayer();
+        if (isHoldingGun(player)) {
             QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
             Gun gun = quakePlayer.getCurrentGun();
 
@@ -118,10 +126,11 @@ public class QuakeListener extends WbsMessenger implements Listener {
         }
     }
 
-    private boolean isUsingGun(PlayerInteractEvent event) {
-
-        Player player = event.getPlayer();
+    private boolean isHoldingGun(Player player) {
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
+
+        ItemMeta meta = itemInHand.getItemMeta();
+        if (meta == null) return false;
 
         if (itemInHand.getType() == Material.AIR) return false;
 
@@ -130,9 +139,6 @@ public class QuakeListener extends WbsMessenger implements Listener {
         Gun gun = quakePlayer.getCurrentGun();
 
         if (itemInHand.getType() != gun.getSkin()) return false;
-
-        ItemMeta meta = itemInHand.getItemMeta();
-        if (meta == null) return false;
 
         String gunKeyCheck = meta.getPersistentDataContainer().get(Gun.GUN_KEY, PersistentDataType.STRING);
 
