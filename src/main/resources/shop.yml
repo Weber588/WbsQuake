@@ -110,6 +110,9 @@ cosmetics:
   armour:
     to: do
 
+  # Kill messages describe what message appears in chat when a player
+  # kills another during a round. The kill message used is the one the
+  # killing player has selected.
   kill-messages:
     default:
       message: '%attacker% killed %victim%'
@@ -120,18 +123,43 @@ cosmetics:
       # Description is automatically populated with the message and headshot message
 
     # You can configure more message/headshots here, but when a cosmetics section is
-    # empty, it's simply omitted from the shop menus.
+    # empty except for default, it's simply omitted from the shop menus.
 
-  kill-effects:
+  death-effects:
     to: do
 
-  shoot-sounds:
+  # The sound that plays when a player dies
+  death-sounds:
     default:
-      sound:
+      item: NOTE_BLOCK
+      display: '&c&lDefault'
+      price: 0
+      sound: 'entity.generic.death'
       volume: 1
       pitch: 1
 
-  kill-soundsd:
-    default:
-      sound: 'entity.arrow.hit_player'
+    wither:
+      item: wither_skeleton_skull
+      display: '&8&lWither'
+      price: 2500
+      sound: 'entity.wither.spawn'
+      volume: 0.5
+      pitch: 2
 
+    weird:
+      item: SUSPICIOUS_STEW
+      display: '&d&lWeird'
+      price: 5000
+      sound: 'entity.mooshroom.convert'
+      volume: 2
+      pitch: 2
+
+  # The sound that plays when a player shoots.
+  shoot-sounds:
+    default:
+      item: BELL
+      display: '&c&lDefault'
+      price: 0
+      sound: 'entity.generic.explode'
+      volume: 0.5
+      pitch: 2

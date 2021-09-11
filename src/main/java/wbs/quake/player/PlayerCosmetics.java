@@ -22,6 +22,12 @@ public class PlayerCosmetics {
 
         skin = store.getSkin("default");
         setCosmetic(skin);
+
+        deathSound = store.getDeathSound("default");
+        setCosmetic(deathSound);
+
+        shootSound = store.getShootSound("default");
+        setCosmetic(shootSound);
     }
 
     public PlayerCosmetics(QuakePlayer player, @NotNull ConfigurationSection section) {
@@ -35,16 +41,35 @@ public class PlayerCosmetics {
         String skinString = section.getString("skin");
         skin = store.getSkin(skinString);
         setCosmetic(skin);
+
+        String deathSoundString = section.getString("death-sound");
+        deathSound = store.getDeathSound(deathSoundString);
+        setCosmetic(deathSound);
+
+        String shootSoundString = section.getString("shoot-sound");
+        shootSound = store.getShootSound(shootSoundString);
+        setCosmetic(shootSound);
     }
 
     public Trail trail;
     public GunSkin skin;
-    public SelectableSound shootSound;
-    public SelectableSound killSound;
+    public DeathSound deathSound;
+    public ShootSound shootSound;
 
     public void writeToConfig(ConfigurationSection section, String path) {
-        section.set(path + ".trail", trail.getId());
-        section.set(path + ".skin", skin.getId());
+        setIfNotDefault(section, path + ".trail", trail.getId());
+        setIfNotDefault(section, path + ".shoot-sound", shootSound.getId());
+        setIfNotDefault(section, path + ".death-sound", deathSound.getId());
+
+        if (!CosmeticsStore.getInstance().getSkin("default").getId().equalsIgnoreCase(skin.getId())) {
+            section.set(path + ".skin", skin.getId());
+        } else {
+            section.set(path + ".skin", null);
+        }
+    }
+
+    private void setIfNotDefault(ConfigurationSection section, String path, String value) {
+        section.set(path, value.equalsIgnoreCase("default") ? null : value);
     }
 
     private final Map<CosmeticType, SelectableCosmetic<?>> cosmetics = new HashMap<>();

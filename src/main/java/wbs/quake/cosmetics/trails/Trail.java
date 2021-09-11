@@ -11,6 +11,7 @@ import wbs.quake.cosmetics.CosmeticType;
 import wbs.quake.cosmetics.SelectableCosmetic;
 import wbs.quake.player.PlayerCosmetics;
 import wbs.quake.player.QuakePlayer;
+import wbs.utils.exceptions.InvalidConfigurationException;
 import wbs.utils.util.WbsColours;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
@@ -27,7 +28,7 @@ public abstract class Trail extends SelectableCosmetic<Trail> {
     }
 
     @Nullable
-    public static Trail buildTrail(ConfigurationSection section, String directory) {
+    public static Trail buildTrail(ConfigurationSection section, String directory) throws InvalidConfigurationException {
         String typeString = section.getString("type", "STANDARD");
 
         TrailType type = WbsEnums.getEnumFromString(TrailType.class, typeString);
@@ -62,7 +63,8 @@ public abstract class Trail extends SelectableCosmetic<Trail> {
         WbsConfigReader.requireNotNull(section, "particle", settings, directory);
 
         String particleString = section.getString("particle", Particle.FIREWORKS_SPARK.name());
-        particle = Objects.requireNonNull(WbsEnums.getEnumFromString(Particle.class, particleString));
+        particle = WbsEnums.getEnumFromString(Particle.class, particleString);
+        if (particle == null) throw new InvalidConfigurationException("Invalid particle: " + particleString);
     }
 
     protected void configureOptions() {

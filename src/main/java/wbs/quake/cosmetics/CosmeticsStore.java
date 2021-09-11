@@ -1,9 +1,6 @@
 package wbs.quake.cosmetics;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +11,7 @@ import wbs.quake.cosmetics.trails.Trail;
 import wbs.quake.player.PlayerCosmetics;
 import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
+import wbs.utils.exceptions.InvalidConfigurationException;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
 
@@ -40,23 +38,58 @@ public class CosmeticsStore {
     }
 
     public void loadCosmetics(ConfigurationSection cosmeticsSection, String directory) {
-        ConfigurationSection trailsSection = cosmeticsSection.getConfigurationSection("trails");
+
+        String key = "trails";
+
+        ConfigurationSection trailsSection = cosmeticsSection.getConfigurationSection(key);
         if (trailsSection == null) {
-            plugin.settings.logError("Trails section missing! Trails will be disabled in the shop.", directory + "/trails");
+            trails.put("default", buildDefaultTrail());
+            plugin.settings.logError("Trails section missing! Trails will be disabled in the shop.", directory + "/" + key);
         } else {
-            loadTrails(trailsSection, directory + "/trails");
+            loadTrails(trailsSection, directory + "/" + key);
             if (!trailsEnabled) {
                 plugin.logger.info("No valid trails found! Disabling trails in shop.");
             }
         }
 
-        ConfigurationSection skinsSection = cosmeticsSection.getConfigurationSection("gun-skins");
+        key = "gun-skins";
+        ConfigurationSection skinsSection = cosmeticsSection.getConfigurationSection(key);
         if (skinsSection == null) {
-            plugin.settings.logError("Skins section missing! Skins will be disabled in the shop.", directory + "/gun-skins");
+            GunSkin defaultSkin = buildGunSkin(
+                    "default",
+                    DEFAULT_SKIN_MATERIAL,
+                    "",
+                    0);
+            skins.put("default", defaultSkin);
+            plugin.settings.logError("Skins section missing! Skins will be disabled in the shop.", directory + "/" + key);
         } else {
-            loadSkins(skinsSection, directory + "/gun-skins");
+            loadSkins(skinsSection, directory + "/" + key);
             if (!skinsEnabled) {
                 plugin.logger.info("No valid gun skins found! Disabling gun skins in shop.");
+            }
+        }
+
+        key = "death-sounds";
+        ConfigurationSection deathSoundsSection = cosmeticsSection.getConfigurationSection(key);
+        if (deathSoundsSection == null) {
+            deathSounds.putIfAbsent("default", buildDefaultDeathSound());
+            plugin.settings.logError("Death sounds section missing! Death sounds will be disabled in the shop.", directory + "/" + key);
+        } else {
+            loadDeathSounds(deathSoundsSection, directory + "/" + key);
+            if (!deathSoundsEnabled) {
+                plugin.logger.info("No valid death sounds found! Disabling death sounds in shop.");
+            }
+        }
+
+        key = "shoot-sounds";
+        ConfigurationSection shootSoundsSection = cosmeticsSection.getConfigurationSection(key);
+        if (shootSoundsSection == null) {
+            shootSounds.putIfAbsent("default", buildDefaultShootSound());
+            plugin.settings.logError("Shoot sounds section missing! Shoot sounds will be disabled in the shop.", directory + "/" + key);
+        } else {
+            loadShootSounds(shootSoundsSection, directory + "/" + key);
+            if (!shootSoundsEnabled) {
+                plugin.logger.info("No valid shoot sounds found! Disabling shoot sounds in shop.");
             }
         }
     }
@@ -74,14 +107,14 @@ public class CosmeticsStore {
     public boolean killMessagesEnabled;
     private final LinkedHashMap<String, SelectableCosmetic<?>> killMessages = new LinkedHashMap<>();
 
-    public boolean killEffectsEnabled;
-    private final LinkedHashMap<String, SelectableCosmetic<?>> killEffects = new LinkedHashMap<>();
+    public boolean deathEffectsEnabled;
+    private final LinkedHashMap<String, SelectableCosmetic<?>> deathEffects = new LinkedHashMap<>();
 
     public boolean shootSoundsEnabled;
-    private final LinkedHashMap<String, SelectableSound> shootSounds = new LinkedHashMap<>();
+    private final LinkedHashMap<String, ShootSound> shootSounds = new LinkedHashMap<>();
 
-    public boolean killSoundsEnabled;
-    private final LinkedHashMap<String, SelectableSound> killSounds = new LinkedHashMap<>();
+    public boolean deathSoundsEnabled;
+    private final LinkedHashMap<String, DeathSound> deathSounds = new LinkedHashMap<>();
 
     private <T extends SelectableCosmetic<T>> void populateOrdered(List<T> unsorted, LinkedHashMap<String, T> map) {
         unsorted.stream()
@@ -105,12 +138,14 @@ public class CosmeticsStore {
                 continue;
             }
 
-            Trail trail = Trail.buildTrail(trailSection, directory + "/" + key);
+            try {
+                Trail trail = Trail.buildTrail(trailSection, directory + "/" + key);
 
-            if (trail != null) {
-                unsortedTrails.add(trail);
-                trailsAdded++;
-            }
+                if (trail != null) {
+                    unsortedTrails.add(trail);
+                    trailsAdded++;
+                }
+            } catch (InvalidConfigurationException ignored) {}
         }
 
         trailsEnabled = trailsAdded > 0;
@@ -157,7 +192,7 @@ public class CosmeticsStore {
     //            SKINS             //
     /* ============================ */
 
-
+    private static final Material DEFAULT_SKIN_MATERIAL = Material.WOODEN_HOE;
 
     private void loadSkins(@NotNull ConfigurationSection section, String directory) {
         skins.clear();
@@ -203,7 +238,7 @@ public class CosmeticsStore {
         Material defaultMaterial = WbsEnums.getEnumFromString(Material.class, defaultMaterialString);
         if (defaultMaterial == null) {
             settings.logError("Invalid material: " + defaultMaterialString, directory + "/default-skin");
-            defaultMaterial = Material.WOODEN_HOE;
+            defaultMaterial = DEFAULT_SKIN_MATERIAL;
         }
 
         GunSkin defaultSkin = buildGunSkin("default", defaultMaterial, "", 0);
@@ -232,6 +267,113 @@ public class CosmeticsStore {
     public GunSkin getSkin(String id) {
         GunSkin skin = skins.get(id);
         return skin == null ? skins.get("default") : skin;
+    }
+
+    /* ============================ */
+    //         Death Sounds         //
+    /* ============================ */
+
+    private DeathSound buildDefaultDeathSound() {
+        return new DeathSound("default",
+                Material.STICK,
+                "&c&lDefault",
+                "",
+                null,
+                0,
+                Sound.ENTITY_GENERIC_DEATH,
+                1,
+                1);
+    }
+
+    private void loadDeathSounds(@NotNull ConfigurationSection section, String directory) {
+        deathSounds.clear();
+
+        int deathSoundsAdded = 0;
+        List<DeathSound> unsortedDeathSounds = new LinkedList<>();
+        for (String key : section.getKeys(false)) {
+            ConfigurationSection deathSoundSection = section.getConfigurationSection(key);
+            if (deathSoundSection == null) {
+                settings.logError(key + " must be a section.", directory + "/" + key);
+                continue;
+            }
+
+            try {
+                DeathSound deathSound = new DeathSound(deathSoundSection, directory + "/" + key);
+
+                unsortedDeathSounds.add(deathSound);
+                deathSoundsAdded++;
+            } catch (InvalidConfigurationException ignored) {}
+        }
+
+        deathSoundsEnabled = deathSoundsAdded > 0;
+
+        deathSounds.putIfAbsent("default", buildDefaultDeathSound());
+
+        populateOrdered(unsortedDeathSounds, deathSounds);
+    }
+
+    public Collection<DeathSound> allDeathSounds() {
+        return deathSounds.values();
+    }
+
+    @NotNull
+    public DeathSound getDeathSound(String id) {
+        DeathSound deathSound = deathSounds.get(id);
+        return deathSound == null ? deathSounds.get("default") : deathSound;
+    }
+
+    /* ============================ */
+    //         Shoot Sounds         //
+    /* ============================ */
+
+    private ShootSound buildDefaultShootSound() {
+        return new ShootSound("default",
+                Material.STICK,
+                "&c&lDefault",
+                "",
+                null,
+                0,
+                Sound.ENTITY_GENERIC_EXPLODE,
+                2,
+                2);
+
+    }
+
+    private void loadShootSounds(@NotNull ConfigurationSection section, String directory) {
+        shootSounds.clear();
+
+        int shootSoundsAdded = 0;
+        List<ShootSound> unsortedShootSounds = new LinkedList<>();
+        for (String key : section.getKeys(false)) {
+            ConfigurationSection shootSoundSection = section.getConfigurationSection(key);
+            if (shootSoundSection == null) {
+                settings.logError(key + " must be a section.", directory + "/" + key);
+                continue;
+            }
+
+            try {
+                ShootSound shootSound = new ShootSound(shootSoundSection, directory + "/" + key);
+
+                unsortedShootSounds.add(shootSound);
+                shootSoundsAdded++;
+            } catch (InvalidConfigurationException ignored) {}
+        }
+
+        shootSoundsEnabled = shootSoundsAdded > 0;
+
+        shootSounds.putIfAbsent("default", buildDefaultShootSound());
+
+        populateOrdered(unsortedShootSounds, shootSounds);
+    }
+
+    public Collection<ShootSound> allShootSounds() {
+        return shootSounds.values();
+    }
+
+    @NotNull
+    public ShootSound getShootSound(String id) {
+        ShootSound shootSound = shootSounds.get(id);
+        return shootSound == null ? shootSounds.get("default") : shootSound;
     }
 
 }

@@ -6,6 +6,7 @@ import wbs.quake.QuakeSettings;
 import wbs.quake.WbsQuake;
 import wbs.quake.player.PlayerCosmetics;
 import wbs.quake.player.QuakePlayer;
+import wbs.utils.exceptions.InvalidConfigurationException;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
 
@@ -18,7 +19,8 @@ public abstract class SelectableCosmetic<T extends SelectableCosmetic<T>> {
         this.material = material;
         this.display = display;
         this.permission = permission;
-        this.description.addAll(description);
+        if (description != null)
+            this.description.addAll(description);
         this.price = price;
         this.id = id;
 
@@ -29,14 +31,15 @@ public abstract class SelectableCosmetic<T extends SelectableCosmetic<T>> {
     public SelectableCosmetic(ConfigurationSection section, String directory) {
         WbsConfigReader.requireNotNull(section, "item", WbsQuake.getInstance().settings, directory);
         WbsConfigReader.requireNotNull(section, "display", WbsQuake.getInstance().settings, directory);
-        WbsConfigReader.requireNotNull(section, "description", WbsQuake.getInstance().settings, directory);
         WbsConfigReader.requireNotNull(section, "price", WbsQuake.getInstance().settings, directory);
 
         id = section.getName();
         this.material = WbsEnums.materialFromString(section.getString("item"), Material.BARRIER);
         this.display = section.getString("display");
         this.permission = section.getString("permission", "wbsquake.cosmetics." + getCosmeticType().name().toLowerCase() + "." + id);
-        this.description.addAll(section.getStringList("description"));
+        if (!section.getStringList("description").isEmpty()) {
+            this.description.addAll(section.getStringList("description"));
+        }
         this.price = section.getDouble("price");
 
         plugin = WbsQuake.getInstance();

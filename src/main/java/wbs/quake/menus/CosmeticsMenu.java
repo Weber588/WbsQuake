@@ -2,9 +2,7 @@ package wbs.quake.menus;
 
 import org.bukkit.Material;
 import wbs.quake.cosmetics.CosmeticsStore;
-import wbs.quake.menus.cosmetics.ArmourMenu;
-import wbs.quake.menus.cosmetics.SkinMenu;
-import wbs.quake.menus.cosmetics.TrailMenu;
+import wbs.quake.menus.cosmetics.*;
 import wbs.utils.util.menus.MenuSlot;
 import wbs.utils.util.menus.WbsMenu;
 import wbs.utils.util.plugin.WbsPlugin;
@@ -66,11 +64,23 @@ public class CosmeticsMenu extends WbsMenu {
             setNextFreeSlot(slot);
         }
 
-        if (store.killMessagesEnabled) {
+        if (false) {
             slot = new MenuSlot(plugin, Material.SKELETON_SKULL,
                     "&5Kill Effects",
-                    "&7Choose what happens when",
-                    "&7when you kill a player!"
+                    "&7Choose what effect plays",
+                    "&7when you die!"
+            );
+            setNextFreeSlot(slot);
+        }
+
+        if (store.deathSoundsEnabled) {
+            slot = new MenuSlot(plugin, Material.NOTE_BLOCK,
+                    "&cDeath Sounds",
+                    "&7Choose what sounds plays",
+                    "&7when you die!"
+            );
+            slot.setClickAction(inventoryClickEvent ->
+                    MenuManager.openMenuFor(inventoryClickEvent.getWhoClicked(), DeathSoundsMenu.class)
             );
             setNextFreeSlot(slot);
         }
@@ -81,15 +91,8 @@ public class CosmeticsMenu extends WbsMenu {
                     "&7Choose what sounds plays",
                     "&7when you shoot!"
             );
-            setNextFreeSlot(slot);
-        }
-
-        if (store.killSoundsEnabled)
-        {
-            slot = new MenuSlot(plugin, Material.NOTE_BLOCK,
-                    "&cKill Sounds",
-                    "&7Choose what sounds plays",
-                    "&7when you kill a player!"
+            slot.setClickAction(inventoryClickEvent ->
+                    MenuManager.openMenuFor(inventoryClickEvent.getWhoClicked(), ShootSoundsMenu.class)
             );
             setNextFreeSlot(slot);
         }

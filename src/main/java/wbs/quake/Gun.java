@@ -97,20 +97,20 @@ public class Gun {
 
         skin = WbsEnums.materialFromString(section.getString(path + ".skin"), Material.WOODEN_HOE);
         shiny = section.getBoolean(path + ".shiny", shiny);
-        bounces = section.getInt(path + ".bounces", bounces);
-        multishotChance = section.getDouble(path + ".multishot-chance", multishotChance);
     }
 
     public void writeToConfig(ConfigurationSection section, String path) {
-        section.set(path + ".cooldown", cooldown.getCurrentProgress());
-        section.set(path + ".leap-speed", leapSpeed.getCurrentProgress());
-        section.set(path + ".leap-cooldown", leapCooldown.getCurrentProgress());
-        section.set(path + ".speed", speed.getCurrentProgress());
+        setIfNotZero(section, path + ".cooldown", cooldown);
+        setIfNotZero(section, path + ".leap-speed", leapSpeed);
+        setIfNotZero(section, path + ".leap-cooldown", leapCooldown);
+        setIfNotZero(section, path + ".speed", speed);
 
-        section.set(path + ".skin", skin.toString());
-        section.set(path + ".shiny", shiny);
-        section.set(path + ".bounces", bounces);
-        section.set(path + ".multishot-chance", multishotChance);
+        // Don't need to save skin, that's done in cosmetics
+        section.set(path + ".shiny", shiny ? true : null);
+    }
+
+    private void setIfNotZero(ConfigurationSection section, String path, UpgradeableOption value) {
+        section.set(path, value.getCurrentProgress() != 0 ? value.getCurrentProgress() : null);
     }
 
     public ItemStack buildGun() {
@@ -263,6 +263,10 @@ public class Gun {
             if (playersKilled >= piercing.intVal()) {
                 running = false;
             }
+        }
+
+        if (fired) {
+            player.getCosmetics().shootSound.play(bukkitPlayer.getEyeLocation());
         }
 
         return fired;

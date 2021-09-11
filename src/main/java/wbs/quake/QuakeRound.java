@@ -222,6 +222,8 @@ public class QuakeRound {
         victim.addDeath();
         attacker.addKill();
 
+        victim.getCosmetics().deathSound.play(victim.getPlayer().getLocation());
+
         double moneyToGive = settings.moneyPerKill;
         if (headshot) moneyToGive += settings.headshotBonus;
 

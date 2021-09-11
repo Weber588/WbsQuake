@@ -5,7 +5,6 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import wbs.quake.Gun;
-import wbs.quake.cosmetics.SelectableCosmetic;
 import wbs.utils.util.WbsMath;
 
 import java.util.*;
@@ -50,13 +49,35 @@ public class QuakePlayer {
         if (name != null) {
             section.set(uuid + ".name", name);
         }
-        section.set(uuid + ".played", played);
-        section.set(uuid + ".wins", wins);
-        section.set(uuid + ".kills", kills);
-        section.set(uuid + ".deaths", deaths);
+
+        setIfNotZero(section, uuid + ".played", played);
+        setIfNotZero(section, uuid + ".wins", wins);
+        setIfNotZero(section, uuid + ".kills", kills);
+        setIfNotZero(section, uuid + ".deaths", deaths);
 
         currentGun.writeToConfig(section, uuid + ".gun");
         cosmetics.writeToConfig(section, uuid + ".cosmetics");
+
+        // Remove cosmetics if everything was default and therefore empty
+        ConfigurationSection cosmeticsSection = section.getConfigurationSection(uuid + ".cosmetics");
+        if (cosmeticsSection != null && cosmeticsSection.getKeys(false).size() == 0) {
+            section.set(uuid + ".cosmetics", null);
+        }
+
+        ConfigurationSection gunSection = section.getConfigurationSection(uuid + ".gun");
+        if (gunSection != null && gunSection.getKeys(false).size() == 0) {
+            section.set(uuid + ".gun", null);
+        }
+
+        // If it's just their name left because everything else was default, don't save this at all
+        ConfigurationSection playerSection = section.getConfigurationSection(uuid.toString());
+        if (playerSection != null && playerSection.getKeys(false).size() <= 1) {
+            section.set(uuid.toString(), null);
+        }
+    }
+
+    private void setIfNotZero(ConfigurationSection section, String path, int value) {
+        section.set(path, value != 0 ? value : null);
     }
 
     public QuakePlayer(UUID uuid) {
