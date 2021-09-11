@@ -10,6 +10,6 @@ public class DeathSoundsMenu extends CosmeticsSubmenu<DeathSound> {
         super(plugin, player, "&4&lDeath Sounds", "death_sounds");
 
         setCurrent(player.getCosmetics().deathSound);
-        CosmeticsStore.getInstance().allDeathSounds().forEach(this::addCosmetic);
+        CosmeticsStore.getInstance().allDeathSounds().forEach(this::addSlot);
     }
 }

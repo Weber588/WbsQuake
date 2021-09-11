@@ -4,12 +4,13 @@ import org.bukkit.Material;
 import wbs.quake.WbsQuake;
 import wbs.quake.cosmetics.SelectableCosmetic;
 import wbs.quake.menus.MenuManager;
-import wbs.quake.menus.PlayerSpecificMenu;
-import wbs.quake.cosmetics.SelectableSlot;
+import wbs.quake.menus.PlayerSelectionMenu;
+import wbs.quake.cosmetics.CosmeticSlot;
+import wbs.quake.menus.SelectableSlot;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.menus.MenuSlot;
 
-public class CosmeticsSubmenu<T extends SelectableCosmetic> extends PlayerSpecificMenu {
+public class CosmeticsSubmenu<T extends SelectableCosmetic> extends PlayerSelectionMenu<T> {
     public CosmeticsSubmenu(WbsQuake plugin, QuakePlayer player, String title, String id) {
         super(plugin, player, title, 6, id);
 
@@ -22,24 +23,17 @@ public class CosmeticsSubmenu<T extends SelectableCosmetic> extends PlayerSpecif
         setSlot(4, 1, MenuManager.getBackToCosmeticsSlot());
     }
 
-    public void setCurrent(T cosmetic) {
-        SelectableSlot<T> slot = new SelectableSlot<>(this, cosmetic);
-
+    public void setCurrent(SelectableSlot<T> slot) {
         setSlot(1, 1, slot);
     }
 
-    protected void addCosmetic(T cosmetic) {
-        SelectableSlot<T> slot = new SelectableSlot<>(this, cosmetic);
-
-        setNextFreeSlot(slot);
+    @Override
+    protected CosmeticSlot<T> getSlotFor(T selected) {
+        return new CosmeticSlot<>(this, selected);
     }
 
-    protected void addCosmetic(SelectableSlot<T> cosmeticSlot) {
-        setNextFreeSlot(cosmeticSlot);
-    }
-
-    public void updateSelected(SelectableSlot<T> slot) {
+    public void updateSelected(CosmeticSlot<T> slot) {
         setSlot(1, 1, slot);
-        update();
+        super.updateSelected(slot);
     }
 }

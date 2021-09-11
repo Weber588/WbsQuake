@@ -10,6 +10,6 @@ public class ShootSoundsMenu extends CosmeticsSubmenu<ShootSound> {
         super(plugin, player, "&e&lShoot Sounds", "shoot_sounds");
 
         setCurrent(player.getCosmetics().shootSound);
-        CosmeticsStore.getInstance().allShootSounds().forEach(this::addCosmetic);
+        CosmeticsStore.getInstance().allShootSounds().forEach(this::addSlot);
     }
 }

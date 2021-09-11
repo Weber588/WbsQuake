@@ -7,6 +7,8 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffectType;
 import wbs.quake.Gun;
 import wbs.quake.WbsQuake;
+import wbs.quake.killperks.KillPerk;
+import wbs.quake.killperks.KillPerkSlot;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.upgrades.UpgradeableOption;
 import wbs.utils.util.menus.MenuSlot;
@@ -15,7 +17,7 @@ import wbs.utils.util.plugin.WbsPlugin;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class UpgradesMenu extends PlayerSpecificMenu {
+public class UpgradesMenu extends PlayerSelectionMenu<KillPerk> {
 
     public static final int BAL_SLOT = 8;
 
@@ -109,5 +111,15 @@ public class UpgradesMenu extends PlayerSpecificMenu {
                             "&2Piercing: &h%value%");
             setNextFreeSlot(slot);
         }
+    }
+
+    @Override
+    protected void setCurrent(SelectableSlot<KillPerk> slot) {
+
+    }
+
+    @Override
+    protected SelectableSlot<KillPerk> getSlotFor(KillPerk selected) {
+        return selected.buildSlot();
     }
 }

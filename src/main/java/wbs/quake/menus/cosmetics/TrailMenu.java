@@ -10,6 +10,6 @@ public class TrailMenu extends CosmeticsSubmenu<Trail> {
         super(plugin, player, "&3&lTrails", "trails");
 
         setCurrent(player.getCosmetics().trail);
-        CosmeticsStore.getInstance().allTrails().forEach(this::addCosmetic);
+        CosmeticsStore.getInstance().allTrails().forEach(this::addSlot);
     }
 }
