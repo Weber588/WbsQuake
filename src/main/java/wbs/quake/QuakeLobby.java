@@ -433,7 +433,7 @@ public class QuakeLobby extends WbsMessenger {
     private void startVoting() {
         state = GameState.VOTING;
 
-        messagePlayers("Time to vote! Click or use &h/q vote [id]&r to vote!");
+        messagePlayers("Time to vote! &hClick&r or use &h/q vote [id]&r to vote!");
 
         // TODO: Pick arenas based on amount of players in lobby
         // For now, just showing all arenas

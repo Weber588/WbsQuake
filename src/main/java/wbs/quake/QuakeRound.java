@@ -1,11 +1,13 @@
 package wbs.quake;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import wbs.quake.player.QuakePlayer;
+import wbs.quake.powerups.PowerUp;
 import wbs.utils.util.WbsScoreboard;
 import wbs.utils.util.pluginhooks.VaultWrapper;
 
@@ -220,6 +222,10 @@ public class QuakeRound {
         attacker.addKill();
 
         victim.getCosmetics().deathSound.play(victim.getPlayer().getLocation());
+
+        for (Location powerUpLocation : arena.getPowerUps().keySet()) {
+            arena.getPowerUps().get(powerUpLocation).remove(powerUpLocation, victim);
+        }
 
         double moneyToGive = settings.moneyPerKill;
         if (headshot) moneyToGive += settings.headshotBonus;

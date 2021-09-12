@@ -71,6 +71,11 @@ public class PotionPowerUp extends PowerUp {
     }
 
     @Override
+    public void remove(QuakePlayer player) {
+        player.getPlayer().removePotionEffect(effect.getType());
+    }
+
+    @Override
     protected Material getDefaultItem() {
         return Material.POTION;
     }

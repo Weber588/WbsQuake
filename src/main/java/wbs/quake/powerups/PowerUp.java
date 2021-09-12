@@ -86,6 +86,7 @@ public abstract class PowerUp {
 
     private final Map<Location, Item> itemEntities = new HashMap<>();
     private final Map<Location, Integer> runnables = new HashMap<>();
+    private final Map<Location, Integer> removeRunnables = new HashMap<>();
 
     protected abstract Material getDefaultItem();
     protected abstract String getDefaultDisplay();
@@ -138,12 +139,15 @@ public abstract class PowerUp {
 
         runnables.put(location, respawnRunnableId);
 
-        new BukkitRunnable() {
+        int removeId = new BukkitRunnable() {
             @Override
             public void run() {
                 remove(player);
+                removeRunnables.remove(finalLocation);
             }
-        }.runTaskLater(plugin, duration);
+        }.runTaskLater(plugin, duration).getTaskId();
+
+        removeRunnables.put(location, removeId);
 
         return true;
     }
@@ -186,8 +190,14 @@ public abstract class PowerUp {
     }
 
     protected abstract void runOn(QuakePlayer player);
-    protected void remove(QuakePlayer player) {
+    protected abstract void remove(QuakePlayer player);
 
+    public void remove(Location location, QuakePlayer player) {
+        Integer removeRunnableId = removeRunnables.remove(location);
+        if (removeRunnableId != null) {
+            remove(player);
+            Bukkit.getScheduler().cancelTask(removeRunnableId);
+        }
     }
 
     public String getId() {
