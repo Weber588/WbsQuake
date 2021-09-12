@@ -304,6 +304,7 @@ public class Arena {
     public void distributePlayers() {
         List<QuakePlayer> playersToDistribute = QuakeLobby.getInstance().getPlayers();
         List<Location> unusedSpawnpoints = new LinkedList<>(spawnPoints);
+        Collections.shuffle(unusedSpawnpoints);
 
         while (!playersToDistribute.isEmpty()) {
             QuakePlayer player = playersToDistribute.get(0);
@@ -316,6 +317,7 @@ public class Arena {
 
             if (unusedSpawnpoints.isEmpty()) {
                 unusedSpawnpoints.addAll(spawnPoints);
+                Collections.shuffle(unusedSpawnpoints);
             }
         }
     }

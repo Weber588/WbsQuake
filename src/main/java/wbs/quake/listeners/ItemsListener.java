@@ -2,6 +2,7 @@ package wbs.quake.listeners;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -24,7 +25,7 @@ public class ItemsListener extends WbsMessenger implements Listener {
         super(plugin);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onRightClick(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_AIR
                 && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
@@ -42,12 +43,14 @@ public class ItemsListener extends WbsMessenger implements Listener {
 
         if (leaveItemCheck != null) {
             player.performCommand("wbsquake leave");
+            event.setCancelled(true);
             return;
         }
 
         String shopItemCheck = container.get(QuakeLobby.SHOP_ITEM_KEY, PersistentDataType.STRING);
         if (shopItemCheck != null) {
             player.performCommand("wbsquake shop");
+            event.setCancelled(true);
         }
     }
 
