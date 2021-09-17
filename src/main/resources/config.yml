@@ -63,8 +63,8 @@ power-ups:
     type: potion
     potion: invisibility
     item: phantom_membrane
-    duration: 300
-    cooldown: 600
+    duration: 200
+    cooldown: 500
     # You can leave out some variables and they'll use a default value.
     # Default target is player
     # Default amplifier is 1
@@ -95,3 +95,18 @@ power-ups:
   # target: random_not_player # A random player in the arena, excluding the player who activates it
   # target: player # The player who activates it
   # target: closest # The closest player to the player who activates it
+
+  short_invis:
+    type: potion
+    potion: invisibility
+    item: phantom_membrane
+    duration: 80
+    cooldown: 160
+
+  glow_closest:
+    type: potion
+    potion: glowing
+    item: spectral_arrow
+    duration: 60
+    cooldown: 600
+    target: closest

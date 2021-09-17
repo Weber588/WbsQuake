@@ -4,13 +4,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.quake.menus.SelectableSlot;
 import wbs.quake.player.QuakePlayer;
-import wbs.quake.upgrades.UpgradesMenu;
+import wbs.quake.powerups.PotionPowerUp;
 
 public class KillPerkSlot extends SelectableSlot<KillPerk> {
 
@@ -26,15 +24,18 @@ public class KillPerkSlot extends SelectableSlot<KillPerk> {
     public ItemStack getFormattedItem(@Nullable Player player) {
         ItemStack formattedItem = super.getFormattedItem(player);
 
-        if (formattedItem.getItemMeta() instanceof PotionMeta) {
-            if (selectable instanceof PotionKillPerk) {
-                PotionKillPerk potionKillPerk = (PotionKillPerk) selectable;
+        // Selectable is not populated when this is called with null player.
+        if (player != null) {
+            if (formattedItem.getItemMeta() instanceof PotionMeta) {
+                if (selectable.powerUp instanceof PotionPowerUp) {
+                    PotionPowerUp potionPowerUp = (PotionPowerUp) selectable.powerUp;
 
-                PotionMeta meta = (PotionMeta) formattedItem.getItemMeta();
-                meta.addCustomEffect(potionKillPerk.effect, true);
-                meta.setColor(potionKillPerk.effect.getType().getColor());
+                    PotionMeta meta = (PotionMeta) formattedItem.getItemMeta();
+                    meta.addCustomEffect(potionPowerUp.getEffect(), true);
+                    meta.setColor(potionPowerUp.getEffect().getType().getColor());
 
-                formattedItem.setItemMeta(meta);
+                    formattedItem.setItemMeta(meta);
+                }
             }
         }
 

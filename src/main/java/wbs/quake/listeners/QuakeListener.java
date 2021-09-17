@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -16,12 +17,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import wbs.quake.*;
+import wbs.quake.Gun;
+import wbs.quake.QuakeLobby;
+import wbs.quake.WbsQuake;
 import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
-import wbs.quake.powerups.PowerUp;
+import wbs.quake.powerups.ArenaPowerUp;
 import wbs.utils.util.plugin.WbsMessenger;
-import wbs.utils.util.string.WbsStringify;
 
 @SuppressWarnings("unused")
 public class QuakeListener extends WbsMessenger implements Listener {
@@ -45,16 +47,27 @@ public class QuakeListener extends WbsMessenger implements Listener {
     }
 
     @EventHandler
+    public void onCombust(EntityCombustEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+
+            if (QuakeLobby.getInstance().getPlayers().contains(PlayerManager.getPlayer(player))) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
     public void onPowerupDespawn(ItemDespawnEvent event) {
         Item itemEntity = event.getEntity();
         ItemMeta meta = itemEntity.getItemStack().getItemMeta();
         if (meta == null) return;
         PersistentDataContainer container = meta.getPersistentDataContainer();
 
-        String powerUpId = container.get(PowerUp.POWER_UP_KEY, PersistentDataType.STRING);
+        String powerUpId = container.get(ArenaPowerUp.POWER_UP_KEY, PersistentDataType.STRING);
         if (powerUpId != null) {
             event.setCancelled(true);
-            itemEntity.setTicksLived(1);
+            itemEntity.setTicksLived(0);
         }
     }
 
@@ -62,29 +75,17 @@ public class QuakeListener extends WbsMessenger implements Listener {
     public void onPowerup(EntityPickupItemEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
 
-        Player player = (Player) event.getEntity();
-        QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
-
         Item itemEntity = event.getItem();
-        ItemMeta meta = itemEntity.getItemStack().getItemMeta();
-        if (meta == null) return;
-        PersistentDataContainer container = meta.getPersistentDataContainer();
 
-        String powerUpId = container.get(PowerUp.POWER_UP_KEY, PersistentDataType.STRING);
-        if (powerUpId != null) {
+        ArenaPowerUp powerUp = ArenaPowerUp.getArenaPowerUp(itemEntity);
+
+        if (powerUp != null) {
             event.setCancelled(true);
-            itemEntity.remove();
 
-            PowerUp powerUp = plugin.settings.powerUps.get(powerUpId);
+            Player player = (Player) event.getEntity();
+            QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
 
-            if (powerUp == null) {
-                plugin.logger.warning("An invalid powerup item was found at " + WbsStringify.toString(itemEntity.getLocation(), true));
-                return;
-            }
-
-            if (!powerUp.apply(itemEntity.getLocation(), quakePlayer)) {
-                System.out.println("Powerup failed to apply: " + powerUpId);
-            }
+            powerUp.run(quakePlayer);
         }
     }
 

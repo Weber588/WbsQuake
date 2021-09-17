@@ -199,6 +199,7 @@ public class QuakePlayer {
 
     public void setPlayer(Player player) {
         this.player = player;
+        this.name = player.getName();
     }
 
     @Override

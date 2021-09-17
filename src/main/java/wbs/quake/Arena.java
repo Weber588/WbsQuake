@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import wbs.quake.player.QuakePlayer;
+import wbs.quake.powerups.ArenaPowerUp;
 import wbs.quake.powerups.PowerUp;
 
 import java.util.*;
@@ -18,7 +19,7 @@ public class Arena {
 
     // Arena details
     private final List<Location> spawnPoints = new ArrayList<>();
-    private final Map<Location, PowerUp> powerups = new HashMap<>();
+    private final Map<Location, ArenaPowerUp> powerups = new HashMap<>();
 
     private final String name;
     private String description;
@@ -358,7 +359,7 @@ public class Arena {
     }
 
     public void addPowerUp(Location loc, PowerUp powerUp) {
-        powerups.put(loc, powerUp);
+        powerups.put(loc, new ArenaPowerUp(loc, powerUp));
     }
     public void removePowerUp(Location loc) {
         powerups.remove(loc);
@@ -400,7 +401,7 @@ public class Arena {
 
     // Powerups
 
-    public HashMap<Location, PowerUp> getPowerUps() {
+    public HashMap<Location, ArenaPowerUp> getPowerUps() {
         return new HashMap<>(powerups);
     }
 
@@ -430,16 +431,16 @@ public class Arena {
     }
 
     public void start() {
-        for (Location loc : powerups.keySet()) {
-            powerups.get(loc).spawnAt(loc);
+        for (ArenaPowerUp powerUp : powerups.values()) {
+            powerUp.spawn();
         }
 
         distributePlayers();
     }
 
     public void finish() {
-        for (Location loc : powerups.keySet()) {
-            powerups.get(loc).removeAndCancel(loc);
+        for (ArenaPowerUp powerUp : powerups.values()) {
+            powerUp.removeAndCancel();
         }
     }
 }

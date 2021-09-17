@@ -1,6 +1,7 @@
 package wbs.quake.cosmetics.menus;
 
 import org.bukkit.Material;
+import org.jetbrains.annotations.NotNull;
 import wbs.quake.WbsQuake;
 import wbs.quake.cosmetics.SelectableCosmetic;
 import wbs.quake.menus.MenuManager;
@@ -28,7 +29,7 @@ public class CosmeticsSubmenu<T extends SelectableCosmetic> extends PlayerSelect
     }
 
     @Override
-    protected CosmeticSlot<T> getSlotFor(T selected) {
+    protected CosmeticSlot<T> getSlotFor(@NotNull T selected) {
         return new CosmeticSlot<>(this, selected);
     }
 

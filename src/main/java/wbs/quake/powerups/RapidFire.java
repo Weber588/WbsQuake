@@ -19,13 +19,13 @@ public class RapidFire extends PowerUp {
     private final double multiplier;
 
     @Override
-    public void runOn(QuakePlayer player) {
+    public void apply(QuakePlayer player) {
         Gun gun = player.getCurrentGun();
         gun.addCooldownModifier(multiplier);
     }
 
     @Override
-    public void remove(QuakePlayer player) {
+    public void removeFrom(QuakePlayer player) {
         Gun gun = player.getCurrentGun();
         gun.removeCooldownModifier(multiplier);
         plugin.sendMessage(getDisplay() + " wears off...", player.getPlayer());
@@ -38,12 +38,6 @@ public class RapidFire extends PowerUp {
     @Override
     protected String getDefaultDisplay() {
         return "Rapid Fire";
-    }
-
-    @Override
-    public void writeToConfig(ConfigurationSection section, String path, Location location) {
-        super.writeToConfig(section, path, location);
-        section.set(path + ".multiplier", multiplier);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package wbs.quake.menus;
 
+import org.jetbrains.annotations.NotNull;
 import wbs.quake.WbsQuake;
 import wbs.quake.player.QuakePlayer;
 
@@ -14,14 +15,17 @@ public abstract class PlayerSelectionMenu<T extends MenuSelectable> extends Play
     }
 
     public void setCurrent(T selected) {
-        SelectableSlot<T> slot = getSlotFor(selected);
+        if (selected == null) {
+            return;
+        }
 
+        SelectableSlot<T> slot = getSlotFor(selected);
         setCurrent(slot);
     }
 
     protected abstract void setCurrent(SelectableSlot<T> slot);
 
-    protected abstract SelectableSlot<T> getSlotFor(T selected);
+    protected abstract SelectableSlot<T> getSlotFor(@NotNull T selected);
 
     protected void addSlot(T selected) {
         SelectableSlot<T> slot = getSlotFor(selected);

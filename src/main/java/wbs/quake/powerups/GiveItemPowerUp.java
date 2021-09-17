@@ -35,12 +35,12 @@ public class GiveItemPowerUp extends PowerUp {
     }
 
     @Override
-    protected void runOn(QuakePlayer player) {
+    public void apply(QuakePlayer player) {
 
     }
 
     @Override
-    public void remove(QuakePlayer player) {
+    public void removeFrom(QuakePlayer player) {
 
     }
 }

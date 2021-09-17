@@ -3,6 +3,7 @@ package wbs.quake.menus;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import wbs.quake.cosmetics.menus.CosmeticsMenu;
 import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
@@ -31,7 +32,7 @@ public final class MenuManager {
         return getMenu(PlayerManager.getPlayer((Player) player), clazz);
     }
     @SuppressWarnings("unchecked")
-    public static <T extends PlayerSpecificMenu> T getMenu(QuakePlayer player, Class<T> clazz) {
+    public static <T extends PlayerSpecificMenu> T getMenu(@NotNull QuakePlayer player, Class<T> clazz) {
         if (!managers.containsKey(clazz)) {
             PlayerMenuManager<T> manager = new PlayerMenuManager<>();
             managers.put(clazz, (PlayerMenuManager<PlayerSpecificMenu>) manager);

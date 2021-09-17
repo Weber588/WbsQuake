@@ -64,14 +64,14 @@ public class PotionPowerUp extends PowerUp {
     private PlayerTargeter.TargetType targetType;
 
     @Override
-    public void runOn(QuakePlayer player) {
+    public void apply(QuakePlayer player) {
         for (QuakePlayer target : PlayerTargeter.getTargets(player, targetType)) {
             target.getPlayer().addPotionEffect(effect);
         }
     }
 
     @Override
-    public void remove(QuakePlayer player) {
+    public void removeFrom(QuakePlayer player) {
         player.getPlayer().removePotionEffect(effect.getType());
     }
 
@@ -106,6 +106,10 @@ public class PotionPowerUp extends PowerUp {
 
         itemStack.setItemMeta(meta);
         return itemStack;
+    }
+
+    public PotionEffect getEffect() {
+        return effect;
     }
 
     @Override

@@ -2,6 +2,7 @@ package wbs.quake.menus;
 
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import wbs.quake.WbsQuake;
 import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
@@ -14,7 +15,7 @@ import java.util.Map;
 public class PlayerMenuManager<T extends PlayerSpecificMenu> {
 
     private final Map<QuakePlayer, T> menus = new HashMap<>();
-    public T getMenu(QuakePlayer player, Class<T> clazz) {
+    public T getMenu(@NotNull QuakePlayer player, Class<T> clazz) {
         if (menus.containsKey(player)) return menus.get(player);
 
         T playerMenu;

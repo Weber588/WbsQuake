@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.Arena;
 import wbs.quake.ArenaManager;
+import wbs.quake.powerups.ArenaPowerUp;
 import wbs.quake.powerups.PowerUp;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.plugin.WbsPlugin;
@@ -48,14 +49,14 @@ public class ArenaPowerUpListSubcommand extends WbsSubcommand {
             return true;
         }
 
-        HashMap<Location, PowerUp> powerups = arena.getPowerUps();
+        HashMap<Location, ArenaPowerUp> powerUps = arena.getPowerUps();
 
-        if (powerups.isEmpty()) {
+        if (powerUps.isEmpty()) {
             sendMessage("No powerups defined for " + arena.getName(), sender);
             return true;
         }
 
-        List<String> locationStrings = powerups.keySet().stream()
+        List<String> locationStrings = powerUps.keySet().stream()
                 .map(spawn ->
                         spawn.getBlockX() + ", " +
                                 spawn.getBlockY() + ", " +
@@ -74,7 +75,7 @@ public class ArenaPowerUpListSubcommand extends WbsSubcommand {
         boolean canDelete = sender.hasPermission(deletePerm);
 
         int i = 0;
-        for (Location loc : powerups.keySet()) {
+        for (Location loc : powerUps.keySet()) {
             i++;
 
             TextComponent fullMessage = new TextComponent();
@@ -82,7 +83,7 @@ public class ArenaPowerUpListSubcommand extends WbsSubcommand {
             // LOCATION
             String blockLoc = WbsStringify.toString(loc, false);
             String hoverString =
-                    "&rType: &h" + powerups.get(loc).getId() + "\n" +
+                    "&rType: &h" + powerUps.get(loc).getId() + "\n" +
                             "&rX: &h" + loc.getX() + "\n" +
                             "&rY: &h" + loc.getY() + "\n" +
                             "&rZ: &h" + loc.getZ();

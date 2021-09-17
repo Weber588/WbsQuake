@@ -1,8 +1,8 @@
 package wbs.quake.killperks;
 
 import org.bukkit.Material;
+import org.jetbrains.annotations.NotNull;
 import wbs.quake.WbsQuake;
-import wbs.quake.cosmetics.CosmeticsStore;
 import wbs.quake.menus.MenuManager;
 import wbs.quake.menus.PlayerSelectionMenu;
 import wbs.quake.menus.SelectableSlot;
@@ -35,8 +35,7 @@ public class KillPerksMenu extends PlayerSelectionMenu<KillPerk> {
     }
 
     @Override
-    protected SelectableSlot<KillPerk> getSlotFor(KillPerk selected) {
-        if (selected == null) return null;
+    protected SelectableSlot<KillPerk> getSlotFor(@NotNull KillPerk selected) {
         return new KillPerkSlot(this, selected);
     }
 }

@@ -18,13 +18,13 @@ public class Multishot extends PowerUp {
     private final double chance;
 
     @Override
-    public void runOn(QuakePlayer player) {
+    public void apply(QuakePlayer player) {
         Gun gun = player.getCurrentGun();
         gun.setMultishotChance(chance);
     }
 
     @Override
-    public void remove(QuakePlayer player) {
+    public void removeFrom(QuakePlayer player) {
         Gun gun = player.getCurrentGun();
         if (chance == gun.getMultishotChance()) {
             gun.setMultishotChance(0);

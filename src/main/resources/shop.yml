@@ -47,25 +47,21 @@ upgradeable-options:
 # By default, no perk is equipped.
 kill-perks:
   invisibility:
-    type: potion
-    chance: 33.33 # The chance of the kill perk being given, as a percentage.
+    chance: 50 # The chance of the kill perk being given, as a percentage.
 
     # Shop details for the perk
-    item: potion # When item is potion, and so is type, it'll display as the correct colour
+    item: phantom_membrane
     display: '&bInvisibility'
     price: 2500
     description:
       - 'Gain invisibility for'
       - '3 seconds!'
 
-    # Type-specific options.
-    potion: invisibility
-    level: 1
-    duration: 60 # In ticks (1 second = 20 ticks; 3 seconds = 60 ticks)
-    target: player # See the power-ups section of config.yml for possible targets.
+    # Reference a power-up defiend in config.yml to run it!
+    # Power-up cooldowns are only used in arena power ups, not with kill perks.
+    power-up: short_invis
 
   speed:
-    type: potion
     chance: 100
 
     item: potion # When item is potion, and so is type, it'll display as the correct colour
@@ -75,14 +71,10 @@ kill-perks:
       - 'Gain speed for'
       - '5 seconds!'
 
-    potion: speed
-    level: 3
-    duration: 100
-    target: player
+    power-up: speed
 
   glow-closest:
-    type: potion
-    chance: 50
+    chance: 75
 
     item: spectral_arrow
     display: '&eGlow nearby player'
@@ -91,10 +83,7 @@ kill-perks:
       - 'Makes the nearest player'
       - 'glow for 10 seconds!'
 
-    potion: glowing
-    level: 1
-    duration: 200
-    target: closest # The closest player after the kill.
+    power-up: glow_closest
 
 cosmetics:
 
@@ -139,12 +128,12 @@ cosmetics:
         - 'A simple red line.'
       particle: REDSTONE
       # For redstone, you can choose the size of the particle. 1 = default
-      size: 0.85
+      size: 1
       # Use a hex colour for colourable particles. Default is ff0000 = red.
       # You may also use dye colours.
       colour: ff0000
       # How many particles are spawned every block along the trail
-      amount-per-block: 5
+      amount-per-block: 8
     example-spiral:
       type: SPIRAL
       item: STRING

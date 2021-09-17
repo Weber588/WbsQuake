@@ -31,6 +31,8 @@ import wbs.utils.util.string.WbsStrings;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -162,11 +164,15 @@ public class Gun {
         return Math.abs(Duration.between(lastShot, LocalDateTime.now()).toMillis() / 1000.0) > getCooldown() / 20.0;
     }
 
-    public void instantReload(QuakePlayer player) {
+    private int freeReloads = 0;
+
+    public void instantReload(QuakePlayer player, int freeReloads) {
         lastShot = null;
 
         player.getPlayer().setExp(1);
         Bukkit.getScheduler().cancelTask(xpTimerId);
+
+        this.freeReloads = freeReloads;
     }
 
     public void addCooldownModifier(double modifier) {
@@ -179,13 +185,21 @@ public class Gun {
         cooldownModifier = 1;
     }
 
+    private List<Material> bounceIgnored = Collections.singletonList(Material.BARRIER);
+
     /**
      * Fire the gun from the given player
      * @param player The player who fired
      */
     public boolean fire(QuakePlayer player) {
         if (QuakeLobby.getInstance().getState() != QuakeLobby.GameState.GAMEPLAY) return false;
-        if (!offCooldown()) return false;
+
+        if (freeReloads <= 0) {
+            if (!offCooldown()) return false;
+        } else {
+            freeReloads--;
+        }
+
         lastShot = LocalDateTime.now();
 
         startXPTimer(player);
@@ -237,11 +251,15 @@ public class Gun {
 
                 if (result.getHitBlock() != null) {
                     if (bouncesLeft > 0) {
-                        bouncesLeft--;
+                        if (bounceIgnored.contains(result.getHitBlock().getType())) {
+                            running = false;
+                        } else {
+                            bouncesLeft--;
 
-                        BlockFace blockFace = result.getHitBlockFace();
-                        assert blockFace != null;
-                        facing = WbsMath.reflectVector(facing, blockFace.getDirection());
+                            BlockFace blockFace = result.getHitBlockFace();
+                            assert blockFace != null;
+                            facing = WbsMath.reflectVector(facing, blockFace.getDirection());
+                        }
                     } else {
                         running = false;
                     }

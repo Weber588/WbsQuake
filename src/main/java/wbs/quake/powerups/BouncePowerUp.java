@@ -17,12 +17,12 @@ public class BouncePowerUp extends PowerUp {
     private final int bounces;
 
     @Override
-    public void runOn(QuakePlayer player) {
+    public void apply(QuakePlayer player) {
         player.getCurrentGun().setBounces(bounces);
     }
 
     @Override
-    public void remove(QuakePlayer player) {
+    public void removeFrom(QuakePlayer player) {
         Gun gun = player.getCurrentGun();
         if (bounces == gun.getBounces()) {
             gun.setBounces(0);

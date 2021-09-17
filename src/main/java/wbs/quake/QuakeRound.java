@@ -7,6 +7,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import wbs.quake.player.QuakePlayer;
+import wbs.quake.powerups.ArenaPowerUp;
 import wbs.quake.powerups.PowerUp;
 import wbs.utils.util.WbsScoreboard;
 import wbs.utils.util.pluginhooks.VaultWrapper;
@@ -170,6 +171,12 @@ public class QuakeRound {
     }
 
     public void roundOver() {
+        for (ArenaPowerUp powerUp : arena.getPowerUps().values()) {
+            for (QuakePlayer player : lobby.getPlayers()) {
+                powerUp.remove(player);
+            }
+        }
+
         List<Map.Entry<QuakePlayer, Integer>> winners = getLeaderboard();
 
         int winnerPoints = winners.get(0).getValue();
@@ -223,8 +230,8 @@ public class QuakeRound {
 
         victim.getCosmetics().deathSound.play(victim.getPlayer().getLocation());
 
-        for (Location powerUpLocation : arena.getPowerUps().keySet()) {
-            arena.getPowerUps().get(powerUpLocation).remove(powerUpLocation, victim);
+        for (ArenaPowerUp powerUp : arena.getPowerUps().values()) {
+            powerUp.remove(victim);
         }
 
         double moneyToGive = settings.moneyPerKill;
@@ -254,6 +261,6 @@ public class QuakeRound {
 
         // Run kill perk after respawning to ensure "closest" target can work
         if (attacker.killPerk != null)
-            attacker.killPerk.apply(attacker, victim);
+            attacker.killPerk.apply(attacker);
     }
 }

@@ -260,9 +260,9 @@ public class QuakeSettings extends WbsSettings {
             }
 
             try {
-                KillPerk shootSound = KillPerk.getPerk(perkSection, directory + "/" + key);
+                KillPerk newPerk = new KillPerk(perkSection, directory + "/" + key);
 
-                unsortedPerks.add(shootSound);
+                unsortedPerks.add(newPerk);
                 perksFound++;
             } catch (InvalidConfigurationException ignored) {}
         }
@@ -301,7 +301,7 @@ public class QuakeSettings extends WbsSettings {
         if (quakeSection == null) {
             logger.info("Quake section missing from misc.yml! Using default items.");
         } else {
-
+            // TODO: Read round items from quake config
         }
     }
 
