@@ -50,6 +50,16 @@ public class ItemManager {
         return quakeCompassSlot;
     }
 
+    private static int quakeGunSlot = 0;
+    public static int getQuakeGunSlot() {
+        return quakeGunSlot;
+    }
+
+    private static String quakeGunName = "&9&lRailgun";
+    public static String getQuakeGunName() {
+        return quakeGunName;
+    }
+
     public static void loadItems(ConfigurationSection section, String directory) {
         ConfigurationSection lobbySection = section.getConfigurationSection("lobby");
 
@@ -60,21 +70,29 @@ public class ItemManager {
         }
 
         ConfigurationSection quakeSection = section.getConfigurationSection("quake");
-
         if (quakeSection == null) {
             plugin.logger.info("Quake section missing from misc.yml! Using default items.");
         } else {
-            configureQuakeItems(quakeSection, directory + "/lobby");
+            configureQuakeItems(quakeSection, directory + "/quake");
         }
     }
 
     public static void configureQuakeItems(ConfigurationSection section, String directory) {
-        ConfigurationSection leaveSection = section.getConfigurationSection("lobby-leave");
-        if (leaveSection == null) {
+        ConfigurationSection compassSection = section.getConfigurationSection("quake-compass");
+        if (compassSection == null) {
             plugin.settings.logError("quake-compass item missing!", directory + "/quake-compass");
         } else {
-            quakeCompass = loadItem(leaveSection, directory + "/quake-compass", "&6Nearest Player", QUAKE_COMPASS_KEY);
-            quakeCompassSlot = getSlot(leaveSection, quakeCompassSlot);
+            compassSection.set("item", "COMPASS");
+            quakeCompass = loadItem(compassSection, directory + "/quake-compass", "&6Nearest Player", QUAKE_COMPASS_KEY);
+            quakeCompassSlot = getSlot(compassSection, quakeCompassSlot);
+        }
+
+        ConfigurationSection gunSection = section.getConfigurationSection("quake-gun");
+        if (gunSection == null) {
+            plugin.settings.logError("quake-gun item missing!", directory + "/quake-gun");
+        } else {
+            quakeGunSlot = getSlot(gunSection, quakeGunSlot);
+            quakeGunName = gunSection.getString("display", quakeGunName);
         }
     }
 

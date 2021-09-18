@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.powerups.ArenaPowerUp;
@@ -130,10 +131,11 @@ public class QuakeRound {
         for (QuakePlayer player : lobby.getPlayers()) {
             points.put(player, 0);
 
-            Inventory inv = player.getPlayer().getInventory();
+            PlayerInventory inv = player.getPlayer().getInventory();
             inv.clear();
-            inv.addItem(player.getCurrentGun().buildGun());
-            inv.addItem(new ItemStack(Material.COMPASS));
+            inv.setItem(ItemManager.getQuakeGunSlot(), player.getCurrentGun().buildGun());
+            inv.setItem(ItemManager.getQuakeCompassSlot(), ItemManager.getQuakeCompass());
+            inv.setHeldItemSlot(ItemManager.getQuakeGunSlot());
         }
 
         arena.start();

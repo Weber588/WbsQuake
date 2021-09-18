@@ -38,9 +38,6 @@ public class Gun {
 
     public static final NamespacedKey GUN_KEY = new NamespacedKey(WbsQuake.getInstance(), "isGun");
 
-    // TODO: Make this read from misc.yml
-    public String gunName = "&9&lRailgun";
-
     @NotNull
     private UpgradeableOption cooldown; // 20
     @NotNull
@@ -120,7 +117,7 @@ public class Gun {
         // If gun type is air
         if (meta == null) throw new IllegalArgumentException("Invalid skin: " + skin);
 
-        meta.setDisplayName(WbsStrings.colourise(gunName));
+        meta.setDisplayName(WbsStrings.colourise(ItemManager.getQuakeGunName()));
         if (shiny) {
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
