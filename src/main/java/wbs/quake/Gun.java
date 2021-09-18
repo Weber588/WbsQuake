@@ -21,10 +21,7 @@ import wbs.quake.cosmetics.trails.Trail;
 import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.upgrades.UpgradeableOption;
-import wbs.utils.util.WbsEntities;
-import wbs.utils.util.WbsEnums;
-import wbs.utils.util.WbsMath;
-import wbs.utils.util.WbsTime;
+import wbs.utils.util.*;
 import wbs.utils.util.particles.LineParticleEffect;
 import wbs.utils.util.string.WbsStringify;
 import wbs.utils.util.string.WbsStrings;
@@ -69,6 +66,7 @@ public class Gun {
 
     private LocalDateTime lastShot;
     private LocalDateTime lastLeap;
+    private final WbsSound leapSound = new WbsSound(Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 2);
 
     public Gun() {
         QuakeSettings settings = WbsQuake.getInstance().settings;
@@ -334,6 +332,7 @@ public class Gun {
         lastLeap = LocalDateTime.now();
 
         WbsEntities.push(player.getPlayer(), leapSpeed.val());
+        leapSound.play(player.getPlayer().getLocation());
     }
 
     public void setTrail(@NotNull Trail trail) {

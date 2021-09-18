@@ -4,7 +4,6 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import wbs.quake.QuakeSettings;
 import wbs.quake.WbsQuake;
-import wbs.quake.cosmetics.SelectableCosmetic;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
 
@@ -23,6 +22,9 @@ public abstract class MenuSelectable {
     public final String permission;
     public final List<String> description = new LinkedList<>();
     public final double price;
+
+    public boolean purchasable = true;
+    public String costAlternativeMessage = "Not purchasable.";
 
     public MenuSelectable(String id, Material material, String display, String permission, List<String> description, double price) {
         this.material = material;
@@ -49,6 +51,9 @@ public abstract class MenuSelectable {
             this.description.addAll(section.getStringList("description"));
         }
         this.price = section.getDouble("price");
+
+        costAlternativeMessage = section.getString("cost-alternative-message", costAlternativeMessage);
+        purchasable = section.getBoolean("purchasable", purchasable);
 
         plugin = WbsQuake.getInstance();
         settings = plugin.settings;

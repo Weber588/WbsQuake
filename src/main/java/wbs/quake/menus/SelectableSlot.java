@@ -37,15 +37,20 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
         Player player = (Player) event.getWhoClicked();
 
         if (!player.hasPermission(selectable.permission)) {
-            if (VaultWrapper.hasMoney(player, selectable.price)) {
-                VaultWrapper.takeMoney(player, selectable.price);
+            if (selectable.purchasable) {
+                if (VaultWrapper.hasMoney(player, selectable.price)) {
+                    VaultWrapper.takeMoney(player, selectable.price);
 
-                plugin.sendMessage("Bought for &h" + VaultWrapper.formatMoney(selectable.price) + "&r!", player);
+                    plugin.sendMessage("Bought for &h" + VaultWrapper.formatMoney(selectable.price) + "&r!", player);
 
-                VaultWrapper.givePermission(player, selectable.permission);
+                    VaultWrapper.givePermission(player, selectable.permission);
+                } else {
+                    plugin.sendMessage("Not enough money! Balance: &w"
+                            + VaultWrapper.formatMoneyFor(player) + "&r. Cost: &h" + VaultWrapper.formatMoney(selectable.price), player);
+                    return;
+                }
             } else {
-                plugin.sendMessage("Not enough money! Balance: &w"
-                        + VaultWrapper.formatMoneyFor(player) + "&r. Cost: &h" + VaultWrapper.formatMoney(selectable.price), player);
+                plugin.sendMessage(selectable.costAlternativeMessage, player);
                 return;
             }
         }
@@ -72,7 +77,11 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
                 if (player.hasPermission(selectable.permission)) {
                     lore.add("&6Click to enable!");
                 } else {
-                    lore.add("&6Cost: &h" + VaultWrapper.formatMoney(selectable.price));
+                    if (selectable.purchasable) {
+                        lore.add("&6Cost: &h" + VaultWrapper.formatMoney(selectable.price));
+                    } else {
+                        lore.add(selectable.costAlternativeMessage);
+                    }
                 }
             }
 
