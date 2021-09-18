@@ -279,6 +279,8 @@ public class QuakeSettings extends WbsSettings {
     /* ============================ */
 
     private void loadMisc() {
+        ItemManager.loadItems(miscConfig, "misc.yml");
+
         ConfigurationSection lobbySection = miscConfig.getConfigurationSection("lobby");
 
         if (lobbySection == null) {
@@ -292,17 +294,9 @@ public class QuakeSettings extends WbsSettings {
 
                 QuakeLobby.getInstance().setLobbySpawn(lobbySpawn);
             }
-
-            QuakeLobby.getInstance().configureLobbyItems(lobbySection, directory);
         }
 
         ConfigurationSection quakeSection = miscConfig.getConfigurationSection("quake");
-
-        if (quakeSection == null) {
-            logger.info("Quake section missing from misc.yml! Using default items.");
-        } else {
-            // TODO: Read round items from quake config
-        }
     }
 
     private Location locationFromString(String locString, String directory) {

@@ -12,6 +12,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+import wbs.quake.ItemManager;
 import wbs.quake.QuakeLobby;
 import wbs.quake.WbsQuake;
 import wbs.quake.player.PlayerManager;
@@ -39,7 +40,7 @@ public class ItemsListener extends WbsMessenger implements Listener {
         if (meta == null) return;
 
         PersistentDataContainer container = meta.getPersistentDataContainer();
-        String leaveItemCheck = container.get(QuakeLobby.LEAVE_ITEM_KEY, PersistentDataType.STRING);
+        String leaveItemCheck = container.get(ItemManager.LEAVE_ITEM_KEY, PersistentDataType.STRING);
 
         if (leaveItemCheck != null) {
             player.performCommand("wbsquake leave");
@@ -47,7 +48,7 @@ public class ItemsListener extends WbsMessenger implements Listener {
             return;
         }
 
-        String shopItemCheck = container.get(QuakeLobby.SHOP_ITEM_KEY, PersistentDataType.STRING);
+        String shopItemCheck = container.get(ItemManager.SHOP_ITEM_KEY, PersistentDataType.STRING);
         if (shopItemCheck != null) {
             player.performCommand("wbsquake shop");
             event.setCancelled(true);

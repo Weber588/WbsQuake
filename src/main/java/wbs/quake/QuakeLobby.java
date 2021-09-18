@@ -5,27 +5,23 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.*;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.quake.player.QuakePlayer;
-import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsScoreboard;
+import wbs.utils.util.entities.state.SavedEntityState;
+import wbs.utils.util.entities.state.SavedPlayerState;
+import wbs.utils.util.entities.state.tracker.*;
 import wbs.utils.util.plugin.WbsMessenger;
 import wbs.utils.util.pluginhooks.VaultWrapper;
 
 import java.util.*;
 
 public class QuakeLobby extends WbsMessenger {
-
-    public static final NamespacedKey SHOP_ITEM_KEY = new NamespacedKey(WbsQuake.getInstance(), "lobby-shop");
-    public static final NamespacedKey LEAVE_ITEM_KEY = new NamespacedKey(WbsQuake.getInstance(), "lobby-leave");
 
     // Constants
     private static final int VOTING_DURATION = 30;
@@ -51,99 +47,39 @@ public class QuakeLobby extends WbsMessenger {
     private QuakeLobby(WbsQuake plugin) {
         super(plugin);
         this.plugin = plugin;
+
+        lobbyInventory[ItemManager.getLeaveItemSlot()] = ItemManager.getLeaveItem();
+        lobbyInventory[ItemManager.getShopItemSlot()] = ItemManager.getShopItem();
+
+        lobbyState.track(new XPState(0))
+                .track(new GameModeState(GameMode.ADVENTURE))
+                .track(new InventoryState(lobbyInventory))
+                .track(new InvulnerableState(true))
+                .trackAll();
     }
 
     private final WbsQuake plugin;
     private Location lobbySpawn = null;
+    private final SavedEntityState<Player> lobbyState = new SavedPlayerState<>();
 
     private final List<QuakePlayer> players = new LinkedList<>();
-
-    // Misc
-
     public List<QuakePlayer> getPlayers() {
         return new LinkedList<>(players);
     }
 
+    // ============================= //
+    //             MISC              //
+    // ============================= //
+
     private final ItemStack[] lobbyInventory = new ItemStack[36];
-
-    public void configureLobbyItems(ConfigurationSection section, String directory) {
-        ConfigurationSection leaveSection = section.getConfigurationSection("lobby-leave");
-        if (leaveSection == null) {
-            plugin.settings.logError("lobby-leave item missing. It is recommended that you regenerate your config.", directory + "/lobby-leave");
-        } else {
-            loadLeaveItem(leaveSection, directory + "/lobby-leave");
-        }
-
-        ConfigurationSection shopSection = section.getConfigurationSection("lobby-shop");
-        if (shopSection == null) {
-            plugin.settings.logError("lobby-shop item missing. It is recommended that you regenerate your config.", directory + "/lobby-shop");
-        } else {
-            loadShopItem(shopSection, directory + "/lobby-shop");
-        }
-    }
-
-    private void loadLeaveItem(ConfigurationSection section, String directory) {
-        String materialString = section.getString("item", "CLOCK");
-        Material type = WbsEnums.getEnumFromString(Material.class, materialString);
-
-        if (type == null) {
-            plugin.settings.logError("Invalid lobby-leave item: " + materialString, directory + "/lobby-leave/item");
-            type = Material.CLOCK;
-        }
-
-        String display = section.getString("display", "&c&lExit");
-        List<String> lore = section.getStringList("lore");
-
-        int slot = section.getInt("slot", 8);
-
-        ItemStack leaveItem = new ItemStack(type);
-        ItemMeta meta = Objects.requireNonNull(leaveItem.getItemMeta());
-
-        meta.setDisplayName(plugin.dynamicColourise(display));
-        meta.setLore(plugin.colouriseAll(lore));
-
-        meta.getPersistentDataContainer().set(LEAVE_ITEM_KEY, PersistentDataType.STRING, "true");
-
-        leaveItem.setItemMeta(meta);
-
-        lobbyInventory[slot] = leaveItem;
-    }
-
-    private void loadShopItem(ConfigurationSection section, String directory) {
-        String materialString = section.getString("item", "CLOCK");
-        Material type = WbsEnums.getEnumFromString(Material.class, materialString);
-
-        if (type == null) {
-            plugin.settings.logError("Invalid lobby-shop item: " + materialString, directory + "/lobby-shop/item");
-            type = Material.CLOCK;
-        }
-
-        String display = section.getString("display", "&b&lShop");
-        List<String> lore = section.getStringList("lore");
-
-        int slot = section.getInt("slot", 4);
-
-        ItemStack shopItem = new ItemStack(type);
-        ItemMeta meta = Objects.requireNonNull(shopItem.getItemMeta());
-
-        meta.setDisplayName(plugin.dynamicColourise(display));
-        meta.setLore(plugin.colouriseAll(lore));
-
-        meta.getPersistentDataContainer().set(SHOP_ITEM_KEY, PersistentDataType.STRING, "true");
-
-        shopItem.setItemMeta(meta);
-
-        lobbyInventory[slot] = shopItem;
-    }
 
     public void setLobbySpawn(Location lobbySpawn) {
         this.lobbySpawn = lobbySpawn;
+        lobbyState.track(new LocationState(lobbySpawn));
     }
 
-    public void teleportToLobby(QuakePlayer player) {
-        if (lobbySpawn != null) {
-            player.teleport(lobbySpawn);
-        }
+    public void returnToLobby(QuakePlayer player) {
+        lobbyState.restoreState(player.getPlayer());
     }
 
     public Location getLobbySpawn() {
@@ -161,12 +97,9 @@ public class QuakeLobby extends WbsMessenger {
      */
     public boolean join(QuakePlayer player) {
         if (players.contains(player)) return false;
-        Player bukkitPlayer = player.getPlayer();
 
         savePlayerState(player);
-        teleportToLobby(player);
-        bukkitPlayer.setInvulnerable(true);
-        bukkitPlayer.getInventory().setContents(lobbyInventory);
+        returnToLobby(player);
 
         messagePlayers("&h" + player.getName() + "&r joined the lobby! &h(" + (players.size() + 1) + ")");
 
@@ -548,7 +481,7 @@ public class QuakeLobby extends WbsMessenger {
         state = GameState.WAITING_FOR_PLAYERS;
 
         for (QuakePlayer lobbyPlayer : players) {
-            teleportToLobby(lobbyPlayer);
+            returnToLobby(lobbyPlayer);
             lobbyPlayer.getPlayer().getInventory().setContents(lobbyInventory);
             WbsScoreboard scoreboard = scoreboards.get(lobbyPlayer);
             scoreboard.clear();
@@ -565,37 +498,25 @@ public class QuakeLobby extends WbsMessenger {
     //          Messages & player states        //
     // ======================================== //
 
-
-    private final Map<QuakePlayer, ItemStack[]> inventories = new HashMap<>();
-    private final Map<QuakePlayer, Location> oldLocations = new HashMap<>();
-    private final Map<QuakePlayer, GameMode> gamemodes = new HashMap<>();
-    private final Map<QuakePlayer, Scoreboard> vanillaScoreboards = new HashMap<>();
+    private final Map<QuakePlayer, SavedPlayerState<Player>> playerStates = new HashMap<>();
 
     private void savePlayerState(QuakePlayer player) {
         Player bukkitPlayer = player.getPlayer();
 
-        inventories.put(player, bukkitPlayer.getInventory().getStorageContents());
-        bukkitPlayer.getInventory().clear();
+        SavedPlayerState<Player> playerState = playerStates.get(player);
 
-        gamemodes.put(player, bukkitPlayer.getGameMode());
-        bukkitPlayer.setGameMode(GameMode.ADVENTURE);
+        if (playerState == null) {
+            playerState = new SavedPlayerState<>();
+            playerState.trackAll();
+        }
 
-        oldLocations.put(player, bukkitPlayer.getLocation());
+        playerState.captureState(bukkitPlayer);
 
-        vanillaScoreboards.put(player, player.getPlayer().getScoreboard());
+        playerStates.put(player, playerState);
     }
 
     private void restorePlayerState(QuakePlayer player) {
-        Player bukkitPlayer = player.getPlayer();
-
-        bukkitPlayer.getInventory().clear();
-        bukkitPlayer.getInventory().setContents(inventories.get(player));
-
-        bukkitPlayer.setGameMode(gamemodes.get(player));
-
-        bukkitPlayer.teleport(oldLocations.get(player));
-
-        player.getPlayer().setScoreboard(vanillaScoreboards.get(player));
+        playerStates.get(player).restoreState(player.getPlayer());
     }
 
     public void messagePlayers(String message) {
