@@ -19,7 +19,7 @@ public class KillPerksMenu extends PlayerSelectionMenu<KillPerk> {
         setSlot(2, 1, border);
 
         setSlot(3, 1, MenuManager.getBalSlot());
-        setSlot(4, 1, MenuManager.getBackToShopSlot());
+        setSlot(4, 1, MenuManager.getBackToShopSlot(player));
 
         minSlot = 2;
 

@@ -1,49 +1,86 @@
 package wbs.quake.player;
 
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import wbs.quake.QuakeDB;
 import wbs.quake.WbsQuake;
+import wbs.utils.util.database.WbsRecord;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Consumer;
 
 public final class PlayerManager {
     private PlayerManager() {}
 
-    public static void initialize() {}
+    private static final WbsQuake plugin = WbsQuake.getInstance();
 
-    private static final Map<UUID, QuakePlayer> players = new HashMap<>();
+    private static int cacheSize = 25;
+    private final static Map<UUID, QuakePlayer> cache = new LinkedHashMap<UUID, QuakePlayer>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<UUID, QuakePlayer> eldest) {
+            return size() > cacheSize;
+        }
+    };
+    public static void setCacheSize(int size) {
+        cacheSize = size;
+    }
 
+    @NotNull
     public static QuakePlayer getPlayer(Player player) {
-        UUID uuid = player.getUniqueId();
-        if (players.get(uuid) == null) {
-            players.put(uuid, new QuakePlayer(player.getUniqueId()));
-        }
-        return players.get(uuid);
+        return getPlayer(player.getUniqueId());
     }
 
-    public static int loadPlayers(ConfigurationSection section) {
-        players.clear();
-        int i = 0;
+    @NotNull
+    public static QuakePlayer getPlayer(UUID uuid) {
+        if (cache.containsKey(uuid)) return cache.get(uuid);
 
-        for (String key : section.getKeys(false)) {
-            ConfigurationSection playerSection = section.getConfigurationSection(key);
-            if (playerSection == null) {
-                WbsQuake.getInstance().logger.warning("Invalid player section! (" + key + ")");
-                continue;
-            }
+        List<WbsRecord> records = QuakeDB.playerTable.selectOnField(QuakeDB.uuidField, uuid);
 
-            QuakePlayer quakePlayer = new QuakePlayer(playerSection);
-
-            players.put(quakePlayer.getUUID(), quakePlayer);
-            i++;
+        QuakePlayer player;
+        if (records.size() > 0) {
+            WbsRecord record = records.get(0);
+            player = new QuakePlayer(record);
+        } else {
+            player = new QuakePlayer(uuid);
         }
 
-        return i;
+        cache.put(uuid, player);
+        return player;
     }
 
-    public static void savePlayers(ConfigurationSection section) {
-        players.values().forEach(p -> p.writeToConfig(section));
+    @Nullable
+    public static QuakePlayer getCachedPlayer(Player player) {
+        return getCachedPlayer(player.getUniqueId());
+    }
+
+    @Nullable
+    public static QuakePlayer getCachedPlayer(UUID uuid) {
+        return cache.get(uuid);
+    }
+
+    public static int getPlayerAsync(Player player, @NotNull Consumer<QuakePlayer> callback) {
+        return getPlayerAsync(player.getUniqueId(), callback);
+    }
+
+    public static int getPlayerAsync(UUID uuid, @NotNull Consumer<QuakePlayer> callback) {
+        // Don't bother doing it async if we can get it instantly
+        if (cache.containsKey(uuid)) callback.accept(cache.get(uuid));
+        return plugin.getAsync(() -> getPlayer(uuid), callback);
+    }
+
+    public static void saveCacheAsync() {
+        savePlayers(new LinkedList<>(cache.values()));
+    }
+
+    public static void savePlayers(Collection<QuakePlayer> players) {
+        plugin.runAsync(
+                () -> {
+                    for (QuakePlayer player : players) {
+                        player.upsert();
+                    }
+                },
+                () -> plugin.logger.info("Saved " + players.size() + " players!")
+        );
     }
 }

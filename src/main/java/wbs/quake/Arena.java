@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.powerups.ArenaPowerUp;
 import wbs.quake.powerups.PowerUp;
@@ -222,16 +223,19 @@ public class Arena {
 
 
 
-    public boolean respawn(QuakePlayer player) {
+    public boolean respawn(Player player) {
         Location point = getRandomSpawnPoint(player);
         if (point == null) return false;
         player.teleport(point);
         return true;
     }
 
+    public boolean respawn(QuakePlayer player) {
+        return respawn(player.getPlayer());
+    }
 
     private final Random random = new Random();
-    private Location getRandomSpawnPoint(QuakePlayer player) {
+    private Location getRandomSpawnPoint(Player player) {
         if (spawnPoints.size() == 0) return null;
 
         Location chosen = null;
@@ -254,7 +258,7 @@ public class Arena {
         return spawnPoints.get(random.nextInt(spawnPoints.size()));
     }
 
-    private Location getNotClosestSpawnpoint(QuakePlayer player) {
+    private Location getNotClosestSpawnpoint(Player player) {
         Location closestLocation = getClosestSpawnpoint(player);
         if (spawnPoints.size() == 1) {
             return spawnPoints.get(0);
@@ -268,12 +272,12 @@ public class Arena {
         return foundLocation;
     }
 
-    private Location getClosestSpawnpoint(QuakePlayer player) {
+    private Location getClosestSpawnpoint(Player player) {
         double distanceToClosest = Double.MAX_VALUE;
-        Location playerLoc = player.getPlayer().getLocation();
+        Location playerLoc = player.getLocation();
         Location closest = null;
         for (Location spawnPoint : spawnPoints) {
-            if (!player.getPlayer().getWorld().equals(spawnPoint.getWorld())) continue;
+            if (!player.getWorld().equals(spawnPoint.getWorld())) continue;
             double distance = playerLoc.distance(spawnPoint);
             if (distance < distanceToClosest) {
                 distanceToClosest = distance;

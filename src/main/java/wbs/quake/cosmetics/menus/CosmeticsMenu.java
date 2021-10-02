@@ -1,19 +1,22 @@
 package wbs.quake.cosmetics.menus;
 
 import org.bukkit.Material;
+import wbs.quake.WbsQuake;
 import wbs.quake.cosmetics.CosmeticsStore;
 import wbs.quake.menus.MenuManager;
+import wbs.quake.menus.PlayerSpecificMenu;
+import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.menus.MenuSlot;
 import wbs.utils.util.menus.WbsMenu;
 import wbs.utils.util.plugin.WbsPlugin;
 
-public class CosmeticsMenu extends WbsMenu {
-    public CosmeticsMenu(WbsPlugin plugin) {
-        super(plugin, "&d&lCosmetics", 3, "cosmetics");
+public class CosmeticsMenu extends PlayerSpecificMenu {
+    public CosmeticsMenu(WbsQuake plugin, QuakePlayer player) {
+        super(plugin, player, "&d&lCosmetics", 3, "cosmetics");
 
         setOutline(new MenuSlot(plugin, Material.MAGENTA_STAINED_GLASS_PANE, "&r"));
 
-        setSlot(2, 8, MenuManager.getBackToShopSlot());
+        setSlot(2, 8, MenuManager.getBackToShopSlot(player));
 
         MenuSlot slot;
 
@@ -26,7 +29,7 @@ public class CosmeticsMenu extends WbsMenu {
                     "&7appears as!"
             );
             slot.setClickAction(inventoryClickEvent ->
-                    MenuManager.openMenuFor(inventoryClickEvent.getWhoClicked(), SkinMenu.class)
+                    MenuManager.openMenuFor(player, SkinMenu.class)
             );
             setNextFreeSlot(slot);
         }
@@ -38,7 +41,7 @@ public class CosmeticsMenu extends WbsMenu {
                     "&7when you shoot!"
             );
             slot.setClickAction(inventoryClickEvent ->
-                    MenuManager.openMenuFor(inventoryClickEvent.getWhoClicked(), TrailMenu.class)
+                    MenuManager.openMenuFor(player, TrailMenu.class)
             );
             setNextFreeSlot(slot);
         }
@@ -50,7 +53,7 @@ public class CosmeticsMenu extends WbsMenu {
                     "&7in rounds!"
             );
             slot.setClickAction(inventoryClickEvent ->
-                    MenuManager.openMenuFor(inventoryClickEvent.getWhoClicked(), ArmourMenu.class)
+                    MenuManager.openMenuFor(player, ArmourMenu.class)
             );
             setNextFreeSlot(slot);
         }
@@ -80,7 +83,7 @@ public class CosmeticsMenu extends WbsMenu {
                     "&7when you die!"
             );
             slot.setClickAction(inventoryClickEvent ->
-                    MenuManager.openMenuFor(inventoryClickEvent.getWhoClicked(), DeathSoundsMenu.class)
+                    MenuManager.openMenuFor(player, DeathSoundsMenu.class)
             );
             setNextFreeSlot(slot);
         }
@@ -92,7 +95,7 @@ public class CosmeticsMenu extends WbsMenu {
                     "&7when you shoot!"
             );
             slot.setClickAction(inventoryClickEvent ->
-                    MenuManager.openMenuFor(inventoryClickEvent.getWhoClicked(), ShootSoundsMenu.class)
+                    MenuManager.openMenuFor(player, ShootSoundsMenu.class)
             );
             setNextFreeSlot(slot);
         }

@@ -25,7 +25,7 @@ public class UpgradesMenu extends PlayerSpecificMenu {
         setOutline(borderItem);
 
         setSlot(BAL_SLOT, MenuManager.getBalSlot());
-        setSlot(ROWS - 1, 8, MenuManager.getBackToShopSlot());
+        setSlot(ROWS - 1, 8, MenuManager.getBackToShopSlot(player));
 
         Gun gun = player.getCurrentGun();
 

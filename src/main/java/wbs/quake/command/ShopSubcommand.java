@@ -3,9 +3,13 @@ package wbs.quake.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import wbs.quake.QuakeDB;
+import wbs.quake.cosmetics.menus.CosmeticsMenu;
 import wbs.quake.killperks.KillPerksMenu;
 import wbs.quake.menus.MenuManager;
 import wbs.quake.menus.ShopMenu;
+import wbs.quake.player.PlayerManager;
+import wbs.quake.player.QuakePlayer;
 import wbs.quake.upgrades.UpgradesMenu;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.menus.WbsMenu;
@@ -26,8 +30,12 @@ public class ShopSubcommand extends WbsSubcommand {
             return true;
         }
 
-        Player player = (Player) sender;
+        PlayerManager.getPlayerAsync((Player) sender, (quakePlayer -> openMenu(quakePlayer, args)));
 
+        return true;
+    }
+
+    private void openMenu(QuakePlayer player, String[] args) {
         WbsMenu menu = null;
         if (args.length > 1) {
             switch (args[1].toLowerCase()) {
@@ -36,7 +44,7 @@ public class ShopSubcommand extends WbsSubcommand {
                     menu = MenuManager.getMenu(player, UpgradesMenu.class);
                     break;
                 case "cosmetics":
-                    menu = MenuManager.getCosmeticMenu();
+                    menu = MenuManager.getMenu(player, CosmeticsMenu.class);
                     break;
                 case "killperks":
                     menu = MenuManager.getMenu(player, KillPerksMenu.class);
@@ -48,9 +56,7 @@ public class ShopSubcommand extends WbsSubcommand {
             menu = MenuManager.getMenu(player, ShopMenu.class);
         }
 
-        menu.showTo(player);
-
-        return true;
+        menu.showTo(player.getPlayer());
     }
 
     @Override

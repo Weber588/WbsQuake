@@ -3,6 +3,7 @@ package wbs.quake.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import wbs.quake.QuakeDB;
 import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.WbsQuake;
@@ -21,16 +22,17 @@ public class StatsSubcommand extends WbsSubcommand {
         }
 
         Player player = (Player) sender;
-        QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
+        PlayerManager.getPlayerAsync(player, this::showStats);
+        return true;
+    }
 
-        sendMessage("&m                             ", sender); // line break
+    private void showStats(QuakePlayer player) {
+        sendMessage("&m                             ", player.getPlayer()); // line break
 
-        for (String line : quakePlayer.getStatsDisplay()) {
-            sendMessage(line, sender);
+        for (String line : player.getStatsDisplay()) {
+            sendMessage(line, player.getPlayer());
         }
 
-        sendMessage("&m                             ", sender);
-
-        return true;
+        sendMessage("&m                             ", player.getPlayer());
     }
 }

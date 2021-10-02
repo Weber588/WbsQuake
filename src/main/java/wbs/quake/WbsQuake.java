@@ -21,6 +21,7 @@ public class WbsQuake extends WbsPlugin {
 
         settings = new QuakeSettings(this);
         settings.reload();
+        QuakeDB.setupDatabase();
 
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(new QuakeListener(this), this);
@@ -32,7 +33,6 @@ public class WbsQuake extends WbsPlugin {
     @Override
     public void onDisable() {
         QuakeLobby.getInstance().kickAll();
-        settings.savePlayers();
         settings.saveArenas();
         settings.saveLobbySpawn();
 

@@ -15,7 +15,7 @@ public class KillPerkSlot extends SelectableSlot<KillPerk> {
     private final KillPerksMenu menu;
 
     public KillPerkSlot(KillPerksMenu menu, @NotNull KillPerk selectable) {
-        super(selectable);
+        super(selectable, menu);
 
         this.menu = menu;
     }

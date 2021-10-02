@@ -6,11 +6,13 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 import wbs.quake.Gun;
+import wbs.quake.QuakeDB;
 import wbs.quake.QuakeSettings;
 import wbs.quake.WbsQuake;
 import wbs.quake.killperks.KillPerk;
 import wbs.quake.menus.SelectableSlot;
 import wbs.utils.util.WbsMath;
+import wbs.utils.util.database.WbsRecord;
 
 import java.util.*;
 
@@ -52,53 +54,39 @@ public class QuakePlayer {
         }
     }
 
-    public void writeToConfig(ConfigurationSection section) {
-        if (name != null) {
-            section.set(uuid + ".name", name);
-        }
-
-        setIfNotZero(section, uuid + ".played", played);
-        setIfNotZero(section, uuid + ".wins", wins);
-        setIfNotZero(section, uuid + ".kills", kills);
-        setIfNotZero(section, uuid + ".headshots", headshots);
-        setIfNotZero(section, uuid + ".deaths", deaths);
-
-        if (killPerk != null)
-            section.set(uuid + ".kill-perk", killPerk.getId());
-
-        currentGun.writeToConfig(section, uuid + ".gun");
-        cosmetics.writeToConfig(section, uuid + ".cosmetics");
-
-        // Remove cosmetics if everything was default and therefore empty
-        ConfigurationSection cosmeticsSection = section.getConfigurationSection(uuid + ".cosmetics");
-        if (cosmeticsSection != null && cosmeticsSection.getKeys(false).size() == 0) {
-            section.set(uuid + ".cosmetics", null);
-        }
-
-        ConfigurationSection gunSection = section.getConfigurationSection(uuid + ".gun");
-        if (gunSection != null && gunSection.getKeys(false).size() == 0) {
-            section.set(uuid + ".gun", null);
-        }
-
-        // If it's just their name left because everything else was default, don't save this at all
-        ConfigurationSection playerSection = section.getConfigurationSection(uuid.toString());
-        if (playerSection != null && playerSection.getKeys(false).size() <= 1) {
-            section.set(uuid.toString(), null);
-        }
-    }
-
-    private void setIfNotZero(ConfigurationSection section, String path, int value) {
-        section.set(path, value != 0 ? value : null);
-    }
-
     public QuakePlayer(UUID uuid) {
         this.uuid = uuid;
         currentGun = new Gun();
+
+        tryGetPlayer();
+
+        cosmetics = new PlayerCosmetics(this);
+    }
+
+    public QuakePlayer(WbsRecord record) {
+        uuid = UUID.fromString(record.getValue(QuakeDB.uuidField, String.class));
+
+        tryGetPlayer();
+
+        if (name == null) {
+            name = record.getValue(QuakeDB.nameField, String.class);
+        }
+
+        kills = record.getOrDefault(QuakeDB.killsField, Integer.class);
+        headshots = record.getOrDefault(QuakeDB.headshotsField, Integer.class);
+        wins = record.getOrDefault(QuakeDB.winsField, Integer.class);
+        played = record.getOrDefault(QuakeDB.playedField, Integer.class);
+        deaths = record.getOrDefault(QuakeDB.deathsField, Integer.class);
+
+        currentGun = new Gun(record);
+        cosmetics = new PlayerCosmetics(this, record);
+    }
+
+    public void tryGetPlayer() {
         player = Bukkit.getPlayer(uuid);
         if (player != null) {
             name = player.getName();
         }
-        cosmetics = new PlayerCosmetics(this);
     }
 
     public Gun getCurrentGun() {
@@ -200,6 +188,67 @@ public class QuakePlayer {
     public void setPlayer(Player player) {
         this.player = player;
         this.name = player.getName();
+    }
+
+    public void upsert() {
+        toRecord().upsert(QuakeDB.playerTable);
+    }
+
+    public WbsRecord toRecord() {
+        WbsRecord record = new WbsRecord(QuakeDB.getDatabase());
+
+        record.setField(QuakeDB.uuidField, uuid);
+        record.setField(QuakeDB.nameField, name);
+
+        record.setField(QuakeDB.killsField, kills);
+        record.setField(QuakeDB.headshotsField, headshots);
+        record.setField(QuakeDB.winsField, wins);
+        record.setField(QuakeDB.playedField, played);
+        record.setField(QuakeDB.deathsField, deaths);
+
+        currentGun.toRecord(record);
+        cosmetics.toRecord(record);
+
+        return record;
+    }
+
+    public void writeToConfig(ConfigurationSection section) {
+        if (name != null) {
+            section.set(uuid + ".name", name);
+        }
+
+        setIfNotZero(section, uuid + ".played", played);
+        setIfNotZero(section, uuid + ".wins", wins);
+        setIfNotZero(section, uuid + ".kills", kills);
+        setIfNotZero(section, uuid + ".headshots", headshots);
+        setIfNotZero(section, uuid + ".deaths", deaths);
+
+        if (killPerk != null)
+            section.set(uuid + ".kill-perk", killPerk.getId());
+
+        currentGun.writeToConfig(section, uuid + ".gun");
+        cosmetics.writeToConfig(section, uuid + ".cosmetics");
+
+        // Remove cosmetics if everything was default and therefore empty
+        ConfigurationSection cosmeticsSection = section.getConfigurationSection(uuid + ".cosmetics");
+        if (cosmeticsSection != null && cosmeticsSection.getKeys(false).size() == 0) {
+            section.set(uuid + ".cosmetics", null);
+        }
+
+        ConfigurationSection gunSection = section.getConfigurationSection(uuid + ".gun");
+        if (gunSection != null && gunSection.getKeys(false).size() == 0) {
+            section.set(uuid + ".gun", null);
+        }
+
+        // If it's just their name left because everything else was default, don't save this at all
+        ConfigurationSection playerSection = section.getConfigurationSection(uuid.toString());
+        if (playerSection != null && playerSection.getKeys(false).size() <= 1) {
+            section.set(uuid.toString(), null);
+        }
+    }
+
+    private void setIfNotZero(ConfigurationSection section, String path, int value) {
+        section.set(path, value != 0 ? value : null);
     }
 
     @Override

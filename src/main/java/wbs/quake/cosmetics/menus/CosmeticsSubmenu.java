@@ -21,7 +21,7 @@ public class CosmeticsSubmenu<T extends SelectableCosmetic> extends PlayerSelect
         setSlot(2, 1, border);
 
         setSlot(3, 1, MenuManager.getBalSlot());
-        setSlot(4, 1, MenuManager.getBackToCosmeticsSlot());
+        setSlot(4, 1, MenuManager.getBackToCosmeticsSlot(player));
     }
 
     public void setCurrent(SelectableSlot<T> slot) {

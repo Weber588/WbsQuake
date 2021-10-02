@@ -22,16 +22,14 @@ import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.upgrades.UpgradeableOption;
 import wbs.utils.util.*;
+import wbs.utils.util.database.WbsRecord;
 import wbs.utils.util.particles.LineParticleEffect;
 import wbs.utils.util.string.WbsStringify;
 import wbs.utils.util.string.WbsStrings;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class Gun {
@@ -94,6 +92,36 @@ public class Gun {
 
         skin = WbsEnums.materialFromString(section.getString(path + ".skin"), Material.WOODEN_HOE);
         shiny = section.getBoolean(path + ".shiny", shiny);
+    }
+
+    public Gun(WbsRecord record) {
+        this();
+
+        int cooldownProgress =
+                record.getOrDefault(QuakeDB.gunCooldownField, Integer.class);
+        int leapSpeedProgress =
+                record.getOrDefault(QuakeDB.leapSpeedField, Integer.class);
+        int leapCooldownProgress =
+                record.getOrDefault(QuakeDB.leapCooldownField, Integer.class);
+        int speedProgress =
+                record.getOrDefault(QuakeDB.speedField, Integer.class);
+        int piercingProgress =
+                record.getOrDefault(QuakeDB.piercingField, Integer.class);
+
+        QuakeSettings settings = WbsQuake.getInstance().settings;
+        cooldown = settings.getOption("cooldown", cooldownProgress);
+        leapSpeed = settings.getOption("leap-speed", leapSpeedProgress);
+        leapCooldown = settings.getOption("leap-cooldown", leapCooldownProgress);
+        speed = settings.getOption("speed", speedProgress);
+        piercing = settings.getOption("piercing", piercingProgress);
+    }
+
+    public void toRecord(WbsRecord record) {
+        record.setField(QuakeDB.gunCooldownField, cooldown.getCurrentProgress());
+        record.setField(QuakeDB.leapSpeedField, leapSpeed.getCurrentProgress());
+        record.setField(QuakeDB.leapCooldownField, leapCooldown.getCurrentProgress());
+        record.setField(QuakeDB.speedField, speed.getCurrentProgress());
+        record.setField(QuakeDB.piercingField, piercing.getCurrentProgress());
     }
 
     public void writeToConfig(ConfigurationSection section, String path) {
@@ -224,7 +252,7 @@ public class Gun {
                         return false;
                     }
 
-                    if (!QuakeLobby.getInstance().getPlayers().contains(PlayerManager.getPlayer((Player) e))) {
+                    if (!QuakeLobby.getInstance().isInRound((Player) e)) {
                         return false;
                     }
 
@@ -263,7 +291,7 @@ public class Gun {
                     Player hitPlayer = (Player) result.getHitEntity();
                     ignorePlayers.add(hitPlayer);
 
-                    QuakePlayer victim = PlayerManager.getPlayer(hitPlayer);
+                    QuakePlayer victim = Objects.requireNonNull(QuakeLobby.getInstance().getPlayer(hitPlayer));
 
                     Location hitLoc = result.getHitPosition().toLocation(hitPlayer.getWorld());
 

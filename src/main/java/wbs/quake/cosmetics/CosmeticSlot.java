@@ -13,7 +13,7 @@ public class CosmeticSlot<T extends SelectableCosmetic> extends SelectableSlot<T
     private final CosmeticsSubmenu<T> menu;
 
     public CosmeticSlot(CosmeticsSubmenu<T> menu, T cosmetic) {
-        super(cosmetic);
+        super(cosmetic, menu);
 
         this.menu = menu;
     }

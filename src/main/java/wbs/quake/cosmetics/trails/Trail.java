@@ -72,7 +72,7 @@ public abstract class Trail extends SelectableCosmetic {
     }
 
     protected void configure(ConfigurationSection section, String directory) {
-        amountPerBlock = section.getInt("amount-per-block", amountPerBlock);
+        setAmountPerBlock(section.getInt("amount-per-block", amountPerBlock));
 
         if (particle.getDataType() == Particle.DustOptions.class) {
             String colourString = section.getString("colour", "red");

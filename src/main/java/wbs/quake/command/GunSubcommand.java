@@ -1,10 +1,14 @@
 package wbs.quake.command;
 
 import org.bukkit.Material;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.Gun;
+import wbs.quake.QuakeDB;
+import wbs.quake.QuakeLobby;
+import wbs.quake.WbsQuake;
 import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.WbsEnums;
@@ -16,9 +20,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GunSubcommand extends WbsSubcommand {
-    public GunSubcommand(WbsPlugin plugin) {
+    private final WbsQuake plugin;
+    public GunSubcommand(WbsQuake plugin) {
         super(plugin, "gun"); // TODO: Change this to shop when making menus
-
+        this.plugin = plugin;
 
     }
 
@@ -41,15 +46,28 @@ public class GunSubcommand extends WbsSubcommand {
             return true;
         }
 
-        Player player = (Player) sender;
-        QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
-        Gun gun = quakePlayer.getCurrentGun();
+        if (args.length == 1 || WbsEnums.getEnumFromString(GunArg.class, args[1]) == null) {
+            sendGunUsage(sender, label, args);
+            return true;
+        }
 
+        QuakePlayer player = QuakeLobby.getInstance().getPlayer((Player) sender);
+        if (player == null) {
+            PlayerManager.getPlayerAsync(
+                    ((Player) sender),
+                    (quakePlayer) -> parseCommand(quakePlayer, sender, label, args)
+            );
+        } else {
+            parseCommand(player, sender, label, args);
+        }
+
+        return true;
+    }
+
+    private void parseCommand(QuakePlayer player, CommandSender sender, String label, String[] args) {
+        Gun gun = player.getCurrentGun();
 
         switch (args.length) {
-            case 1:
-                sendGunUsage(sender, label, args);
-                break;
             case 2:
                 GunArg arg = WbsEnums.getEnumFromString(GunArg.class, args[1]);
 
@@ -74,7 +92,7 @@ public class GunSubcommand extends WbsSubcommand {
                         break;
                     case GET:
                         sendMessage("Given gun.", sender);
-                        player.getInventory().addItem(gun.buildGun());
+                        player.getPlayer().getInventory().addItem(gun.buildGun());
                         break;
                     case SPEED:
                         sendMessage("Speed: " + gun.getSpeedOption().formattedValue(), sender);
@@ -117,7 +135,7 @@ public class GunSubcommand extends WbsSubcommand {
                         break;
                     case GET:
                         sendMessage("Given gun.", sender);
-                        player.getInventory().addItem(gun.buildGun());
+                        player.getPlayer().getInventory().addItem(gun.buildGun());
                         break;
                     case SPEED:
                         sendMessage("Setting speed progress to &h"
@@ -134,8 +152,6 @@ public class GunSubcommand extends WbsSubcommand {
                 break;
 
         }
-
-        return true;
     }
 
     @Override

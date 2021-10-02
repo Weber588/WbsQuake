@@ -21,6 +21,7 @@ public class QuakeCommand extends WbsCommand {
         addSubcommand(new StatsSubcommand(plugin), perm + ".stats");
         addSubcommand(new SetLobbySubcommand(plugin), perm + ".setlobby");
         addSubcommand(new ForceStartSubcommand(plugin), perm + ".forcestart");
+        addSubcommand(new TopSubcommand(plugin), perm + ".top");
 
         addSubcommand(new ReloadSubcommand(plugin), perm + ".reload");
         addSubcommand(new ErrorsSubcommand(plugin), perm + ".reload");

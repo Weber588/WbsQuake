@@ -36,11 +36,11 @@ public class VoteSubcommand extends WbsSubcommand {
         }
 
         Player player = (Player) sender;
-        QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
 
         QuakeLobby lobby = QuakeLobby.getInstance();
+        QuakePlayer quakePlayer = lobby.getPlayer(player);
 
-        if (!lobby.getPlayers().contains(quakePlayer)) {
+        if (quakePlayer == null) {
             sendMessage("You must be in the lobby to vote!", sender);
             return true;
         }

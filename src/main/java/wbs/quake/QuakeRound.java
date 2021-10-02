@@ -1,15 +1,11 @@
 package wbs.quake;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
+import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.powerups.ArenaPowerUp;
-import wbs.quake.powerups.PowerUp;
 import wbs.utils.util.WbsScoreboard;
 import wbs.utils.util.pluginhooks.VaultWrapper;
 
@@ -24,6 +20,8 @@ public class QuakeRound {
     private final Arena arena;
     private final QuakeLobby lobby;
 
+    private final List<QuakePlayer> initialPlayersInRound = new LinkedList<>();
+
     // Round info
     private int secondsRemaining;
 
@@ -35,11 +33,13 @@ public class QuakeRound {
 
     private final WbsQuake plugin;
     private final QuakeSettings settings;
-    public QuakeRound(Arena arena) {
+    public QuakeRound(Arena arena, List<QuakePlayer> playersInRound) {
         this.arena = arena;
         lobby = QuakeLobby.getInstance();
         plugin = WbsQuake.getInstance();
         settings = plugin.settings;
+
+        this.initialPlayersInRound.addAll(playersInRound);
 
         scoreboard = new WbsScoreboard(plugin, "WbsQuake", "&c&lQuake");
 
@@ -54,7 +54,7 @@ public class QuakeRound {
         if (settings.showLeaderboardInGame) {
             scoreboard.addLine("&r1: ");
             scoreboard.addLine("&r2: ");
-            if (lobby.getPlayers().size() >= 3) {
+            if (playersInRound.size() >= 3) {
                 scoreboard.addLine("&r3: ");
                 scoreboardSize++;
             }
@@ -124,11 +124,8 @@ public class QuakeRound {
         secondsRemaining = arena.getSecondsInRound();
 
         renderScoreboard();
-        for (QuakePlayer player : lobby.getPlayers()) {
+        for (QuakePlayer player : initialPlayersInRound) {
             scoreboard.showToPlayer(player.getPlayer());
-        }
-
-        for (QuakePlayer player : lobby.getPlayers()) {
             points.put(player, 0);
 
             PlayerInventory inv = player.getPlayer().getInventory();
@@ -148,7 +145,7 @@ public class QuakeRound {
 
                 renderScoreboard();
 
-                for (QuakePlayer player : lobby.getPlayers()) {
+                for (QuakePlayer player : lobby.getPlayersInRound()) {
                     Player bukkitPlayer = player.getPlayer();
                     bukkitPlayer.setSaturation(1);
                     QuakePlayer closest = arena.getClosestPlayer(player);
@@ -174,8 +171,9 @@ public class QuakeRound {
 
     public void roundOver() {
         for (ArenaPowerUp powerUp : arena.getPowerUps().values()) {
-            for (QuakePlayer player : lobby.getPlayers()) {
+            for (QuakePlayer player : lobby.getPlayersInRound()) {
                 powerUp.remove(player);
+                player.getCurrentGun().clearCooldownModifier();
             }
         }
 
@@ -208,6 +206,8 @@ public class QuakeRound {
         scoreboard.clear();
 
         arena.finish();
+
+        PlayerManager.savePlayers(initialPlayersInRound);
 
         lobby.roundOver(endMessage);
     }
@@ -256,7 +256,8 @@ public class QuakeRound {
         format = format.replace("%attacker%", attacker.getName());
         format = format.replace("%victim%", victim.getName());
 
-        lobby.messagePlayersNoPrefix(format);
+        String deathMessage = format;
+        lobby.getPlayersInRound().forEach(player -> plugin.sendMessageNoPrefix(deathMessage, player.getPlayer()));
 
         givePoint(attacker);
         arena.respawn(victim);

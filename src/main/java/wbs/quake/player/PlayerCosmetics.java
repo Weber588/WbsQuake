@@ -1,9 +1,13 @@
 package wbs.quake.player;
 
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
+import wbs.quake.QuakeDB;
 import wbs.quake.cosmetics.*;
 import wbs.quake.cosmetics.trails.Trail;
+import wbs.utils.util.WbsEnums;
+import wbs.utils.util.database.WbsRecord;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +54,34 @@ public class PlayerCosmetics {
         setCosmetic(shootSound);
     }
 
+    public PlayerCosmetics(QuakePlayer player, WbsRecord record) {
+        this.player = player;
+        CosmeticsStore store = CosmeticsStore.getInstance();
+
+        String trailId = record.getOrDefault(QuakeDB.trailField, String.class);
+        trail = store.getTrail(trailId);
+        setCosmetic(trail);
+
+        String skinString = record.getOrDefault(QuakeDB.skinField, String.class);
+        skin = store.getSkin(skinString);
+        setCosmetic(skin);
+
+        String deathSoundString = record.getOrDefault(QuakeDB.deathSoundField, String.class);
+        deathSound = store.getDeathSound(deathSoundString);
+        setCosmetic(deathSound);
+
+        String shootSoundString = record.getOrDefault(QuakeDB.shootSoundField, String.class);
+        shootSound = store.getShootSound(shootSoundString);
+        setCosmetic(shootSound);
+    }
+
+    public void toRecord(WbsRecord record) {
+        record.setField(QuakeDB.trailField, trail.getId());
+        record.setField(QuakeDB.skinField, skin.getId());
+        record.setField(QuakeDB.deathSoundField, deathSound.getId());
+        record.setField(QuakeDB.shootSoundField, shootSound.getId());
+    }
+
     @NotNull
     public Trail trail;
     @NotNull
@@ -82,7 +114,7 @@ public class PlayerCosmetics {
         return cosmetics.get(type);
     }
 
-    public <T extends SelectableCosmetic> void setCosmetic(@NotNull SelectableCosmetic cosmetic) {
+    public void setCosmetic(@NotNull SelectableCosmetic cosmetic) {
         cosmetics.put(cosmetic.getCosmeticType(), cosmetic);
 
         cosmetic.onSelect(player, this);

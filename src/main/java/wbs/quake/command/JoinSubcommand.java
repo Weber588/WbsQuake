@@ -22,14 +22,15 @@ public class JoinSubcommand extends WbsSubcommand {
         }
 
         Player player = (Player) sender;
-        QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
 
-        boolean success = QuakeLobby.getInstance().join(quakePlayer);
-
-        if (!success) {
+        if (QuakeLobby.getInstance().isInLobby(player)) {
             sendMessage("You were already in the lobby!", player);
+            return true;
         }
 
+        PlayerManager.getPlayerAsync(player.getUniqueId(),
+                (quakePlayer) -> QuakeLobby.getInstance().join(quakePlayer)
+        );
         return true;
     }
 }

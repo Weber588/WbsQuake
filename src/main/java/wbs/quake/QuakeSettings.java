@@ -42,7 +42,7 @@ public class QuakeSettings extends WbsSettings {
     private YamlConfiguration miscConfig = null;
 
     private final String arenaFileName = "arenas.yml";
-    private final String playerFileName = "players.yml";
+ //   private final String playerFileName = "players.yml";
     private final String miscFileName = "misc.yml";
 
     @Override
@@ -58,19 +58,21 @@ public class QuakeSettings extends WbsSettings {
         setupShop();
         loadMisc();
 
+
         File arenaFile = new File(plugin.getDataFolder(), arenaFileName);
         if (arenaFile.exists()) {
             arenaConfig = loadConfigSafely(arenaFile);
         } else {
             plugin.logger.info("Arena file missing.");
         }
-
+        /*
         File playerFile = new File(plugin.getDataFolder(), playerFileName);
         if (playerFile.exists()) {
             playersConfig = loadConfigSafely(playerFile);
         } else {
             plugin.logger.info("Player file missing.");
         }
+         */
 
         if (config.contains("options.furthest-spawnpoint")) {
             findFurthestSpawnpoint = config.getBoolean("options.furthest-spawnpoint", true);
@@ -96,15 +98,17 @@ public class QuakeSettings extends WbsSettings {
         if (config.contains("options.headshot-money-bonus")) {
             headshotBonus = config.getDouble("options.headshot-money-bonus", headshotBonus);
         }
+        if (config.contains("options.player-cache-size")) {
+            PlayerManager.setCacheSize(config.getInt("options.player-cache-size", 25));
+        }
+        if (config.contains("options.max-arenas-per-vote")) {
+            maxArenasPerVote = config.getInt("options.max-arenas-per-vote", maxArenasPerVote);
+        }
 
         ArenaManager.setPlugin(plugin);
         Arena.setPlugin(plugin);
 
-        // To initialize the class in case it's never called before the plugin disables
-        PlayerManager.initialize();
-
         loadArenas();
-        loadPlayers();
     }
 
     public boolean findFurthestSpawnpoint;
@@ -113,6 +117,7 @@ public class QuakeSettings extends WbsSettings {
     public String headshotFormat;
     public double moneyPerKill = 10;
     public double headshotBonus = 5;
+    public int maxArenasPerVote = 5;
 
     public final Map<String, PowerUp> powerUps = new HashMap<>();
 
@@ -295,8 +300,6 @@ public class QuakeSettings extends WbsSettings {
                 QuakeLobby.getInstance().setLobbySpawn(lobbySpawn);
             }
         }
-
-        ConfigurationSection quakeSection = miscConfig.getConfigurationSection("quake");
     }
 
     private Location locationFromString(String locString, String directory) {
@@ -346,17 +349,6 @@ public class QuakeSettings extends WbsSettings {
                             yaml.set("lobby.lobby-spawn", lobbySpawnString)
             );
         }
-    }
-
-    public void loadPlayers() {
-        if (playersConfig != null) {
-            PlayerManager.loadPlayers(playersConfig);
-        }
-    }
-
-
-    public void savePlayers() {
-        playersConfig = saveYamlData(playersConfig, playerFileName, "player", PlayerManager::savePlayers);
     }
 
     public void loadArenas() {

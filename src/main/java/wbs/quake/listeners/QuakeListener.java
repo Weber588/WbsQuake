@@ -35,15 +35,18 @@ public class QuakeListener extends WbsMessenger implements Listener {
 
     @EventHandler
     public void onDisconnect(PlayerQuitEvent event) {
-        QuakePlayer player = PlayerManager.getPlayer(event.getPlayer());
-        QuakeLobby.getInstance().leave(player);
+        QuakePlayer player = QuakeLobby.getInstance().getPlayer(event.getPlayer());
+        if (player != null)
+            QuakeLobby.getInstance().leave(player);
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
-        quakePlayer.setPlayer(player);
+        QuakePlayer quakePlayer = PlayerManager.getCachedPlayer(player);
+        if (quakePlayer != null) {
+            quakePlayer.setPlayer(player);
+        }
     }
 
     @EventHandler
@@ -51,7 +54,7 @@ public class QuakeListener extends WbsMessenger implements Listener {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
 
-            if (QuakeLobby.getInstance().getPlayers().contains(PlayerManager.getPlayer(player))) {
+            if (QuakeLobby.getInstance().isInLobby(player)) {
                 event.setCancelled(true);
             }
         }
@@ -67,7 +70,7 @@ public class QuakeListener extends WbsMessenger implements Listener {
         String powerUpId = container.get(ArenaPowerUp.POWER_UP_KEY, PersistentDataType.STRING);
         if (powerUpId != null) {
             event.setCancelled(true);
-            itemEntity.setTicksLived(0);
+            itemEntity.setTicksLived(1);
         }
     }
 
@@ -83,16 +86,18 @@ public class QuakeListener extends WbsMessenger implements Listener {
             event.setCancelled(true);
 
             Player player = (Player) event.getEntity();
-            QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
+            QuakePlayer quakePlayer = QuakeLobby.getInstance().getPlayer(player);
 
-            powerUp.run(quakePlayer);
+            if (quakePlayer != null) {
+                powerUp.run(quakePlayer);
+            }
         }
     }
 
     @EventHandler
     public void preventDrop(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
-        if (QuakeLobby.getInstance().getPlayers().contains(PlayerManager.getPlayer(player))) {
+        if (QuakeLobby.getInstance().isInLobby(player)) {
             event.setCancelled(true);
         }
     }
@@ -103,13 +108,15 @@ public class QuakeListener extends WbsMessenger implements Listener {
                 && event.getAction() != Action.LEFT_CLICK_BLOCK) return;
 
         Player player = event.getPlayer();
-        if (isHoldingGun(player)) {
-            QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
-            Gun gun = quakePlayer.getCurrentGun();
+        QuakePlayer quakePlayer = QuakeLobby.getInstance().getPlayer(player);
+        if (quakePlayer != null) {
+            if (isHoldingGun(quakePlayer)) {
+                Gun gun = quakePlayer.getCurrentGun();
 
-            gun.leap(quakePlayer);
+                gun.leap(quakePlayer);
 
-            event.setCancelled(true);
+                event.setCancelled(true);
+            }
         }
     }
 
@@ -119,25 +126,25 @@ public class QuakeListener extends WbsMessenger implements Listener {
                 && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
         Player player = event.getPlayer();
-        if (isHoldingGun(player)) {
-            QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
-            Gun gun = quakePlayer.getCurrentGun();
+        QuakePlayer quakePlayer = QuakeLobby.getInstance().getPlayer(player);
+        if (quakePlayer != null) {
+            if (isHoldingGun(quakePlayer)) {
+                Gun gun = quakePlayer.getCurrentGun();
 
-            gun.fire(quakePlayer);
+                gun.fire(quakePlayer);
+            }
         }
     }
 
-    private boolean isHoldingGun(Player player) {
-        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+    private boolean isHoldingGun(QuakePlayer player) {
+        ItemStack itemInHand = player.getPlayer().getInventory().getItemInMainHand();
 
         ItemMeta meta = itemInHand.getItemMeta();
         if (meta == null) return false;
 
         if (itemInHand.getType() == Material.AIR) return false;
 
-        QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
-
-        Gun gun = quakePlayer.getCurrentGun();
+        Gun gun = player.getCurrentGun();
 
         if (itemInHand.getType() != gun.getSkin()) return false;
 

@@ -4,10 +4,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class ArenaManager {
@@ -45,8 +42,8 @@ public final class ArenaManager {
         }
     }
 
-    public static Collection<Arena> getAllArenas() {
-        return arenas.values();
+    public static List<Arena> getAllArenas() {
+        return new LinkedList<>(arenas.values());
     }
 
     public static List<String> getArenaNames() {

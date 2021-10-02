@@ -28,9 +28,6 @@ public final class MenuManager {
 
     private static final Map<Class<? extends PlayerSpecificMenu>, PlayerMenuManager<PlayerSpecificMenu>> managers = new HashMap<>();
 
-    public static <T extends PlayerSpecificMenu> T getMenu(HumanEntity player, Class<T> clazz) {
-        return getMenu(PlayerManager.getPlayer((Player) player), clazz);
-    }
     @SuppressWarnings("unchecked")
     public static <T extends PlayerSpecificMenu> T getMenu(@NotNull QuakePlayer player, Class<T> clazz) {
         if (!managers.containsKey(clazz)) {
@@ -40,54 +37,33 @@ public final class MenuManager {
         return clazz.cast(managers.get(clazz).getMenu(player, (Class<PlayerSpecificMenu>) clazz));
     }
 
-
-
-    public static void openMenuFor(HumanEntity player, Class<? extends PlayerSpecificMenu> clazz) {
-        openMenuFor(PlayerManager.getPlayer((Player) player), clazz);
-    }
-
     public static void openMenuFor(QuakePlayer player, Class<? extends PlayerSpecificMenu> clazz) {
         getMenu(player, clazz).showTo(player.getPlayer());
     }
 
-    private static CosmeticsMenu cosmeticMenu;
-    public static CosmeticsMenu getCosmeticMenu() {
-        if (cosmeticMenu != null) return cosmeticMenu;
-
-        cosmeticMenu = new CosmeticsMenu(getPlugin());
-        return cosmeticMenu;
-    }
-
-
     // Common slots
 
     private static MenuSlot backToShopSlot;
-    public static MenuSlot getBackToShopSlot() {
+    public static MenuSlot getBackToShopSlot(QuakePlayer player) {
         if (backToShopSlot != null) return backToShopSlot;
 
         backToShopSlot = new MenuSlot(getPlugin(), Material.CLOCK, "&7Back to Shop");
 
         backToShopSlot.setClickAction(inventoryClickEvent ->
-                {
-                    Player player = (Player) inventoryClickEvent.getWhoClicked();
-                    getMenu(player, ShopMenu.class).showTo(player);
-                }
+                getMenu(player, ShopMenu.class).showTo(player.getPlayer())
         );
 
         return backToShopSlot;
     }
 
     private static MenuSlot backToCosmeticsSlot;
-    public static MenuSlot getBackToCosmeticsSlot() {
+    public static MenuSlot getBackToCosmeticsSlot(QuakePlayer player) {
         if (backToCosmeticsSlot != null) return backToCosmeticsSlot;
 
         backToCosmeticsSlot = new MenuSlot(getPlugin(), Material.CLOCK, "&bBack to Cosmetics");
 
         backToCosmeticsSlot.setClickAction(inventoryClickEvent ->
-                {
-                    Player player = (Player) inventoryClickEvent.getWhoClicked();
-                    getCosmeticMenu().showTo(player);
-                }
+                getMenu(player, ShopMenu.class).showTo(player.getPlayer())
         );
 
         return backToCosmeticsSlot;

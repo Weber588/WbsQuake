@@ -23,11 +23,10 @@ public class LeaveSubcommand extends WbsSubcommand {
         }
 
         Player player = (Player) sender;
-        QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
-
-        boolean success = QuakeLobby.getInstance().leave(quakePlayer);
-
-        if (!success) {
+        QuakePlayer quakePlayer = QuakeLobby.getInstance().getPlayer(player);
+        if (quakePlayer != null) {
+            QuakeLobby.getInstance().leave(quakePlayer);
+        } else {
             sendMessage("You were not in the lobby!", player);
         }
 

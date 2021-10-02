@@ -40,6 +40,15 @@ options:
   # Money per headshot is given as on top of the kill money.
   headshot-money-bonus: 5
 
+  # How many players are stored in active memory (not including players in the lobby).
+  # Higher numbers use more memory, but will speed up some operations.
+  player-cache-size: 25
+
+  # How many arenas should appear in votes.
+  # Note that if there are fewer arenas with the correct min/max player counts,
+  # there may be fewer than this many arenas shown.
+  max-arenas-per-vote: 5
+
 power-ups:
   rapid_fire: # You reference these in game to add to arenas
     type: rapid_fire # Types are: rapid_fire, multishot, bounceshot, and potion

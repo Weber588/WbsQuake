@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import wbs.quake.WbsQuake;
 import wbs.quake.cosmetics.CosmeticsStore;
+import wbs.quake.cosmetics.menus.CosmeticsMenu;
 import wbs.quake.killperks.KillPerksMenu;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.upgrades.UpgradesMenu;
@@ -42,7 +43,7 @@ public class ShopMenu extends PlayerSpecificMenu {
             cosmeticsMenu = new MenuSlot(plugin, Material.CAKE, "&5&lCosmetics", "&dExpress yourself!");
 
             cosmeticsMenu.setClickAction(inventoryClickEvent ->
-                    MenuManager.getCosmeticMenu().showTo(player.getPlayer())
+                    MenuManager.getMenu(player, CosmeticsMenu.class).showTo(player.getPlayer())
             );
 
         } else {

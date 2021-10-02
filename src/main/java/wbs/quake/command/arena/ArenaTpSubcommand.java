@@ -34,7 +34,7 @@ public class ArenaTpSubcommand extends WbsSubcommand {
             return true;
         }
 
-        arena.respawn(PlayerManager.getPlayer((Player) sender));
+        arena.respawn((Player) sender);
         sendMessage("Teleporting...", sender);
 
         return true;

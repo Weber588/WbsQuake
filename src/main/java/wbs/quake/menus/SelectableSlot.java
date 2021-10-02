@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import wbs.quake.QuakeDB;
 import wbs.quake.WbsQuake;
 import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
@@ -23,10 +24,13 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
     protected final WbsQuake plugin;
     @NotNull
     protected final T selectable;
+    @NotNull
+    protected final PlayerSpecificMenu menu;
 
-    public SelectableSlot(@NotNull T selectable) {
+    public SelectableSlot(@NotNull T selectable, @NotNull PlayerSpecificMenu menu) {
         super(WbsQuake.getInstance(), selectable.material, selectable.display, selectable.description);
 
+        this.menu = menu;
         this.selectable = selectable;
         plugin = WbsQuake.getInstance();
 
@@ -69,7 +73,7 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
 
             lore = selectable.updateLore(lore);
 
-            QuakePlayer quakePlayer = PlayerManager.getPlayer(player);
+            QuakePlayer quakePlayer = menu.getPlayer();
             if (isSelected(quakePlayer, selectable)) {
                 lore.add("&aSelected.");
                 meta.addEnchant(Enchantment.LOYALTY, 1, true);
