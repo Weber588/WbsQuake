@@ -31,6 +31,9 @@ public class PlayerCosmetics {
 
         shootSound = store.getShootSound("default");
         setCosmetic(shootSound);
+
+        killMessage = store.getKillMessage("default");
+        setCosmetic(killMessage);
     }
 
     public PlayerCosmetics(QuakePlayer player, @NotNull ConfigurationSection section) {
@@ -52,6 +55,10 @@ public class PlayerCosmetics {
         String shootSoundString = section.getString("shoot-sound");
         shootSound = store.getShootSound(shootSoundString);
         setCosmetic(shootSound);
+
+        String killMessageString = section.getString("kill-message");
+        killMessage = store.getKillMessage(killMessageString);
+        setCosmetic(killMessage);
     }
 
     public PlayerCosmetics(QuakePlayer player, WbsRecord record) {
@@ -73,6 +80,10 @@ public class PlayerCosmetics {
         String shootSoundString = record.getOrDefault(QuakeDB.shootSoundField, String.class);
         shootSound = store.getShootSound(shootSoundString);
         setCosmetic(shootSound);
+
+        String killMessageString = record.getOrDefault(QuakeDB.killMessageField, String.class);
+        killMessage = store.getKillMessage(killMessageString);
+        setCosmetic(killMessage);
     }
 
     public void toRecord(WbsRecord record) {
@@ -80,6 +91,7 @@ public class PlayerCosmetics {
         record.setField(QuakeDB.skinField, skin.getId());
         record.setField(QuakeDB.deathSoundField, deathSound.getId());
         record.setField(QuakeDB.shootSoundField, shootSound.getId());
+        record.setField(QuakeDB.killMessageField, killMessage.getId());
     }
 
     @NotNull
@@ -90,6 +102,8 @@ public class PlayerCosmetics {
     public DeathSound deathSound;
     @NotNull
     public ShootSound shootSound;
+    @NotNull
+    public KillMessage killMessage;
 
     public void writeToConfig(ConfigurationSection section, String path) {
         setIfNotDefault(section, path + ".trail", trail.getId());

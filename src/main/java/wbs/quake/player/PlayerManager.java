@@ -65,7 +65,10 @@ public final class PlayerManager {
 
     public static int getPlayerAsync(UUID uuid, @NotNull Consumer<QuakePlayer> callback) {
         // Don't bother doing it async if we can get it instantly
-        if (cache.containsKey(uuid)) callback.accept(cache.get(uuid));
+        if (cache.containsKey(uuid)) {
+            callback.accept(cache.get(uuid));
+            return -1;
+        }
         return plugin.getAsync(() -> getPlayer(uuid), callback);
     }
 

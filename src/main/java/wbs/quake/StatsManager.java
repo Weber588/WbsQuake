@@ -48,6 +48,12 @@ public final class StatsManager {
 
     private static final Map<TrackedStat, List<QuakePlayer>> stats = new HashMap<>();
 
+    public static void recalculateAll() {
+        for (TrackedStat stat : TrackedStat.values()) {
+            recalculate(stat);
+        }
+    }
+
     public static List<QuakePlayer> recalculate(TrackedStat stat) {
         List<QuakePlayer> topList = new LinkedList<>();
 

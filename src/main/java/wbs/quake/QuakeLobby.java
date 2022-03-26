@@ -61,7 +61,7 @@ public class QuakeLobby extends WbsMessenger {
 
     private final WbsQuake plugin;
     private Location lobbySpawn = null;
-    private final SavedEntityState<Player> lobbyState = new SavedPlayerState<>();
+    private final SavedPlayerState lobbyState = new SavedPlayerState();
 
     private final Map<UUID, QuakePlayer> players = new HashMap<>();
 
@@ -131,6 +131,15 @@ public class QuakeLobby extends WbsMessenger {
         }
 
         return true;
+    }
+
+    public void refreshScoreboard(QuakePlayer player) {
+        if (players.containsValue(player)) {
+            WbsScoreboard scoreboard = scoreboards.get(player);
+            scoreboard.clear();
+            configureScoreboard(scoreboard, player);
+            scoreboard.showToPlayer(player.getPlayer());
+        }
     }
 
     /**
@@ -504,6 +513,7 @@ public class QuakeLobby extends WbsMessenger {
         cancelRunnable();
         state = GameState.ROUND_OVER;
         playersInRound.clear();
+        StatsManager.recalculateAll();
         round = null;
         messagePlayers(endMessage);
         registerRunnable(new BukkitRunnable() {
@@ -526,10 +536,7 @@ public class QuakeLobby extends WbsMessenger {
         for (QuakePlayer lobbyPlayer : getPlayers()) {
             returnToLobby(lobbyPlayer);
             lobbyPlayer.getPlayer().getInventory().setContents(lobbyInventory);
-            WbsScoreboard scoreboard = scoreboards.get(lobbyPlayer);
-            scoreboard.clear();
-            configureScoreboard(scoreboard, lobbyPlayer);
-            scoreboard.showToPlayer(lobbyPlayer.getPlayer());
+            refreshScoreboard(lobbyPlayer);
         }
 
         if (autoStart && players.size() >= PLAYERS_TO_START) {
@@ -541,15 +548,15 @@ public class QuakeLobby extends WbsMessenger {
     //          Messages & player states        //
     // ======================================== //
 
-    private final Map<QuakePlayer, SavedPlayerState<Player>> playerStates = new HashMap<>();
+    private final Map<QuakePlayer, SavedPlayerState> playerStates = new HashMap<>();
 
     private void savePlayerState(QuakePlayer player) {
         Player bukkitPlayer = player.getPlayer();
 
-        SavedPlayerState<Player> playerState = playerStates.get(player);
+        SavedPlayerState playerState = playerStates.get(player);
 
         if (playerState == null) {
-            playerState = new SavedPlayerState<>();
+            playerState = new SavedPlayerState();
             playerState.trackAll();
         }
 

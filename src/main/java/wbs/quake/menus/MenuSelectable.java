@@ -40,12 +40,21 @@ public abstract class MenuSelectable {
     }
 
     public MenuSelectable(ConfigurationSection section, String directory) {
-        WbsConfigReader.requireNotNull(section, "item", WbsQuake.getInstance().settings, directory);
-        WbsConfigReader.requireNotNull(section, "display", WbsQuake.getInstance().settings, directory);
-        WbsConfigReader.requireNotNull(section, "price", WbsQuake.getInstance().settings, directory);
+        plugin = WbsQuake.getInstance();
+        settings = plugin.settings;
+        WbsConfigReader.requireNotNull(section, "item", settings, directory);
+        WbsConfigReader.requireNotNull(section, "display", settings, directory);
+        WbsConfigReader.requireNotNull(section, "price", settings, directory);
 
         id = section.getName();
-        this.material = WbsEnums.materialFromString(section.getString("item"), Material.BARRIER);
+        String materialString = section.getString("item");
+        Material checkMaterial = WbsEnums.materialFromString(materialString);
+        if (checkMaterial != null) {
+            material = checkMaterial;
+        } else {
+            material = Material.BARRIER;
+            settings.logError("Invalid material: " + materialString, directory + "/item");
+        }
         this.display = section.getString("display");
         if (!section.getStringList("description").isEmpty()) {
             this.description.addAll(section.getStringList("description"));
@@ -54,9 +63,6 @@ public abstract class MenuSelectable {
 
         costAlternativeMessage = section.getString("cost-alternative-message", costAlternativeMessage);
         purchasable = section.getBoolean("purchasable", purchasable);
-
-        plugin = WbsQuake.getInstance();
-        settings = plugin.settings;
 
         this.permission = section.getString("permission", getPermission());
     }

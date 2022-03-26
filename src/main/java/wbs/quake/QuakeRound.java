@@ -243,21 +243,17 @@ public class QuakeRound {
 
         String format;
         if (headshot) {
-            format = settings.headshotFormat;
+            format = attacker.getCosmetics().killMessage.formatHeadshot(attacker, victim);
             attacker.addHeadshot();
 
             if (settings.headshotsGiveBonusPoints) {
                 givePoint(attacker);
             }
         } else {
-            format = settings.killFormat;
+            format = attacker.getCosmetics().killMessage.format(attacker, victim);
         }
 
-        format = format.replace("%attacker%", attacker.getName());
-        format = format.replace("%victim%", victim.getName());
-
-        String deathMessage = format;
-        lobby.getPlayersInRound().forEach(player -> plugin.sendMessageNoPrefix(deathMessage, player.getPlayer()));
+        lobby.getPlayersInRound().forEach(player -> plugin.sendMessageNoPrefix(format, player.getPlayer()));
 
         givePoint(attacker);
         arena.respawn(victim);

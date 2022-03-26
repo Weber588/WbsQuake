@@ -43,11 +43,8 @@ public final class MenuManager {
 
     // Common slots
 
-    private static MenuSlot backToShopSlot;
     public static MenuSlot getBackToShopSlot(QuakePlayer player) {
-        if (backToShopSlot != null) return backToShopSlot;
-
-        backToShopSlot = new MenuSlot(getPlugin(), Material.CLOCK, "&7Back to Shop");
+        MenuSlot backToShopSlot = new MenuSlot(getPlugin(), Material.CLOCK, "&7Back to Shop");
 
         backToShopSlot.setClickAction(inventoryClickEvent ->
                 getMenu(player, ShopMenu.class).showTo(player.getPlayer())
@@ -56,11 +53,8 @@ public final class MenuManager {
         return backToShopSlot;
     }
 
-    private static MenuSlot backToCosmeticsSlot;
     public static MenuSlot getBackToCosmeticsSlot(QuakePlayer player) {
-        if (backToCosmeticsSlot != null) return backToCosmeticsSlot;
-
-        backToCosmeticsSlot = new MenuSlot(getPlugin(), Material.CLOCK, "&bBack to Cosmetics");
+        MenuSlot backToCosmeticsSlot = new MenuSlot(getPlugin(), Material.CLOCK, "&bBack to Cosmetics");
 
         backToCosmeticsSlot.setClickAction(inventoryClickEvent ->
                 getMenu(player, ShopMenu.class).showTo(player.getPlayer())

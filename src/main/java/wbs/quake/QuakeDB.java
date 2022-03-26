@@ -45,9 +45,7 @@ public final class QuakeDB {
     public static final WbsField trailField = new WbsField("trail", WbsFieldType.STRING);
     public static final WbsField deathSoundField = new WbsField("death_sound", WbsFieldType.STRING);
     public static final WbsField shootSoundField = new WbsField("shoot_sound", WbsFieldType.STRING);
-
-    //
-
+    public static final WbsField killMessageField = new WbsField("kill_message", WbsFieldType.STRING);
 
     public static void setupDatabase() {
         plugin = WbsQuake.getInstance();
@@ -69,7 +67,9 @@ public final class QuakeDB {
 
                 skinField,
                 trailField,
-                deathSoundField
+                deathSoundField,
+                shootSoundField,
+                killMessageField
         );
 
         database.addTable(playerTable);
@@ -88,6 +88,7 @@ public final class QuakeDB {
      * Add new fields added after the initial run.
      */
     private static void addNewFields() {
-    //    playerTable.addFieldIfNotExists(newField);
+        playerTable.addFieldIfNotExists(shootSoundField);
+        playerTable.addFieldIfNotExists(killMessageField);
     }
 }

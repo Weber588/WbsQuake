@@ -103,10 +103,7 @@ public class QuakePlayer {
 
     public Player getPlayer() {
         if (player == null) {
-            player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                name = player.getName();
-            }
+            tryGetPlayer();
         }
         return player;
     }

@@ -64,6 +64,9 @@ public class CosmeticsMenu extends PlayerSpecificMenu {
                     "&7Choose what message appears",
                     "&7when you kill a player!"
             );
+            slot.setClickAction(inventoryClickEvent ->
+                    MenuManager.openMenuFor(player, KillMessageMenu.class)
+            );
             setNextFreeSlot(slot);
         }
 

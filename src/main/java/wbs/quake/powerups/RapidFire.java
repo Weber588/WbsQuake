@@ -13,7 +13,7 @@ public class RapidFire extends PowerUp {
     public RapidFire(WbsQuake plugin, ConfigurationSection section, String directory) {
         super(plugin, section, directory);
 
-        multiplier = section.getInt("multiplier", 2);
+        multiplier = section.getDouble("multiplier", 2);
     }
 
     private final double multiplier;

@@ -18,6 +18,8 @@ import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.string.WbsStringify;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class ArenaPowerUp {
@@ -39,6 +41,8 @@ public class ArenaPowerUp {
     private boolean active;
     private int respawnId = -1;
     private int removeId = -1;
+
+    private List<QuakePlayer> lastAffected = new LinkedList<>();
 
     public ArenaPowerUp(Location location, PowerUp powerUp) {
         this.location = location;
@@ -64,6 +68,7 @@ public class ArenaPowerUp {
 
     public void run(QuakePlayer player) {
         itemEntity.remove();
+        lastAffected.add(player);
 
         QuakeLobby.getInstance().sendActionBars("&e" + player.getName() + " used &b" + powerUp.getDisplay() + "&e!");
 
@@ -82,14 +87,16 @@ public class ArenaPowerUp {
             public void run() {
                 remove(player);
                 removeId = -1;
+                lastAffected.remove(player);
             }
         }.runTaskLater(plugin, powerUp.duration).getTaskId();
     }
 
     public void remove(QuakePlayer player) {
-        powerUp.removeFrom(player);
-        if (removeId != -1) {
+        if (removeId != -1 && lastAffected.contains(player)) {
+            powerUp.removeFrom(player);
             Bukkit.getScheduler().cancelTask(removeId);
+            lastAffected.remove(player);
         }
     }
 
@@ -101,6 +108,8 @@ public class ArenaPowerUp {
         if (respawnId != -1) {
             Bukkit.getScheduler().cancelTask(respawnId);
         }
+
+        lastAffected.clear();
 
         return itemEntity != null || respawnId != -1;
     }

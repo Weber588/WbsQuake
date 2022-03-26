@@ -9,10 +9,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.quake.QuakeDB;
+import wbs.quake.QuakeLobby;
 import wbs.quake.WbsQuake;
 import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.menus.MenuSlot;
+import wbs.utils.util.pluginhooks.PlaceholderAPIWrapper;
 import wbs.utils.util.pluginhooks.VaultWrapper;
 
 import java.util.List;
@@ -34,6 +36,8 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
         this.selectable = selectable;
         plugin = WbsQuake.getInstance();
 
+        setFillPlaceholders(true);
+
         setClickAction(this::onClick);
     }
 
@@ -46,6 +50,8 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
                     VaultWrapper.takeMoney(player, selectable.price);
 
                     plugin.sendMessage("Bought for &h" + VaultWrapper.formatMoney(selectable.price) + "&r!", player);
+
+                    PlayerManager.getPlayerAsync(player, qPlayer -> QuakeLobby.getInstance().refreshScoreboard(qPlayer));
 
                     VaultWrapper.givePermission(player, selectable.permission);
                 } else {
@@ -69,7 +75,10 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
         if (player != null) {
             ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
 
-            List<String> lore = selectable.description.stream().map(line -> "&7" + line).collect(Collectors.toList());
+            List<String> lore = selectable.description.stream()
+                    .map(line -> "&7" + line)
+                    .map(line -> PlaceholderAPIWrapper.setPlaceholders(player, line))
+                    .collect(Collectors.toList());
 
             lore = selectable.updateLore(lore);
 

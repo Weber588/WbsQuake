@@ -30,11 +30,6 @@ options:
   # When true, headshots give 2 points instead of 1 (but still counts as 1 kill)
   headshots-give-bonus-points: false
 
-  # The kill message
-  kill-format: '%attacker% killed %victim%!'
-  # The kill message for when players get a headshot
-  headshot-format: '%attacker% killed %victim%! &hHeadshot!'
-
   # How much money every kill should give
   money-per-kill: 10
   # Money per headshot is given as on top of the kill money.

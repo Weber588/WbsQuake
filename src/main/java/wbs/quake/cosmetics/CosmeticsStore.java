@@ -99,6 +99,20 @@ public class CosmeticsStore {
                 cosmeticTypesLoaded++;
             }
         }
+
+        key = "kill-messages";
+        ConfigurationSection killMessagesSection = cosmeticsSection.getConfigurationSection(key);
+        if (killMessagesSection == null) {
+            killMessages.putIfAbsent("default", buildDefaultKillMessage());
+            plugin.settings.logError("Kill messages section missing! Shoot sounds will be disabled in the shop.", directory + "/" + key);
+        } else {
+            loadKillMessages(killMessagesSection, directory + "/" + key);
+            if (!killMessagesEnabled) {
+                plugin.logger.info("No valid kill messages found! Disabling kill messages in shop.");
+            } else {
+                cosmeticTypesLoaded++;
+            }
+        }
     }
 
     public boolean trailsEnabled;
@@ -112,7 +126,7 @@ public class CosmeticsStore {
     private final LinkedHashMap<String, SelectableCosmetic> armourSets = new LinkedHashMap<>();
 
     public boolean killMessagesEnabled;
-    private final LinkedHashMap<String, SelectableCosmetic> killMessages = new LinkedHashMap<>();
+    private final LinkedHashMap<String, KillMessage> killMessages = new LinkedHashMap<>();
 
     public boolean deathEffectsEnabled;
     private final LinkedHashMap<String, SelectableCosmetic> deathEffects = new LinkedHashMap<>();
@@ -377,5 +391,57 @@ public class CosmeticsStore {
 
     public int getCosmeticTypesLoaded() {
         return cosmeticTypesLoaded;
+    }
+
+
+    /* ============================ */
+    //         Kill Messages        //
+    /* ============================ */
+
+    private KillMessage buildDefaultKillMessage() {
+        return new KillMessage(
+                "default",
+                "%attacker% killed %victim%",
+                "%attacker% killed %victim% &hHeadshot!",
+                Material.OAK_SIGN,
+                "Default",
+                "",
+                null,
+                0);
+    }
+
+    private void loadKillMessages(@NotNull ConfigurationSection section, String directory) {
+        killMessages.clear();
+
+        List<KillMessage> unsortedKillMessages = new LinkedList<>();
+        for (String key : section.getKeys(false)) {
+            ConfigurationSection killMessageSection = section.getConfigurationSection(key);
+            if (killMessageSection == null) {
+                settings.logError(key + " must be a section.", directory + "/" + key);
+                continue;
+            }
+
+            try {
+                KillMessage message = new KillMessage(killMessageSection, directory + "/" + key);
+
+                unsortedKillMessages.add(message);
+            } catch (InvalidConfigurationException ignored) {}
+        }
+
+        killMessages.putIfAbsent("default", buildDefaultKillMessage());
+
+        populateOrdered(unsortedKillMessages, killMessages);
+
+        killMessagesEnabled = killMessages.size() > 1;
+    }
+
+    public Collection<KillMessage> allKillMessages() {
+        return killMessages.values();
+    }
+
+    @NotNull
+    public KillMessage getKillMessage(String id) {
+        KillMessage killMessage = killMessages.get(id);
+        return killMessage == null ? killMessages.get("default") : killMessage;
     }
 }
