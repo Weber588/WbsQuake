@@ -44,7 +44,7 @@ public class ArenaInfoSubcommand extends WbsSubcommand {
         String timeString = WbsStringify.toString(Duration.ofSeconds(secondsInRound), true);
         sendMessage("Duration: &h" + timeString + " (" + secondsInRound + " seconds)", sender);
         sendMessage("Min players: &h" + arena.getMinPlayers(), sender);
-        sendMessage("Max players: &h" + arena.getMinPlayers(), sender);
+        sendMessage("Max players: &h" + arena.getMaxPlayers(), sender);
         sendMessage("Number of spawnpoints: &h" + arena.getSpawnpoints().size(), sender);
         sendMessage("Number of powerups: &h" + arena.getPowerUps().size(), sender);
 

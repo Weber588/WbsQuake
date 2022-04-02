@@ -31,8 +31,8 @@ public class TopSubcommand extends WbsSubcommand {
         StatsManager.TrackedStat stat = WbsEnums.getEnumFromString(StatsManager.TrackedStat.class, statString);
 
         if (stat == null) {
-            // TODO: Make this show all available stats, for future proofing
-            sendMessage("Invalid stat: " + args[1] + ".", sender);
+            sendMessage("Invalid stat: " + args[1] + ". Please choose from the following: &h" +
+                    WbsEnums.joiningPrettyStrings(StatsManager.TrackedStat.class, ", "), sender);
             return true;
         }
 
@@ -47,7 +47,7 @@ public class TopSubcommand extends WbsSubcommand {
 
         int i = 1;
         for (QuakePlayer player : top) {
-            sendMessage("&6" + i + ") &h" + player.getName() + "&r> &h" + stat.of(player), sender);
+            sendMessage("&6" + (i++) + ") &h" + player.getName() + "&r> &h" + stat.of(player), sender);
         }
     }
 
