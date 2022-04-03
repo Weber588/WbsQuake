@@ -78,6 +78,11 @@ public class QuakePlayer {
         played = record.getOrDefault(QuakeDB.playedField, Integer.class);
         deaths = record.getOrDefault(QuakeDB.deathsField, Integer.class);
 
+        String killPerkId = record.getOrDefault(QuakeDB.killPerkField, String.class);
+        if (killPerkId != null) {
+            killPerk = WbsQuake.getInstance().settings.getKillPerk(killPerkId);
+        }
+
         currentGun = new Gun(record);
         cosmetics = new PlayerCosmetics(this, record);
     }
@@ -202,6 +207,10 @@ public class QuakePlayer {
         record.setField(QuakeDB.winsField, wins);
         record.setField(QuakeDB.playedField, played);
         record.setField(QuakeDB.deathsField, deaths);
+
+        if (killPerk != null) {
+            record.setField(QuakeDB.killPerkField, killPerk.getId());
+        }
 
         currentGun.toRecord(record);
         cosmetics.toRecord(record);

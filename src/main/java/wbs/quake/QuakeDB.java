@@ -46,6 +46,7 @@ public final class QuakeDB {
     public static final WbsField deathSoundField = new WbsField("death_sound", WbsFieldType.STRING);
     public static final WbsField shootSoundField = new WbsField("shoot_sound", WbsFieldType.STRING);
     public static final WbsField killMessageField = new WbsField("kill_message", WbsFieldType.STRING);
+    public static final WbsField killPerkField = new WbsField("kill_perk", WbsFieldType.STRING);
 
     public static void setupDatabase() {
         plugin = WbsQuake.getInstance();
@@ -90,5 +91,6 @@ public final class QuakeDB {
     private static void addNewFields() {
         playerTable.addFieldIfNotExists(shootSoundField);
         playerTable.addFieldIfNotExists(killMessageField);
+        playerTable.addFieldIfNotExists(killPerkField);
     }
 }
