@@ -7,7 +7,6 @@ import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.powerups.ArenaPowerUp;
 import wbs.utils.util.WbsScoreboard;
-import wbs.utils.util.pluginhooks.VaultWrapper;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -239,7 +238,7 @@ public class QuakeRound {
         double moneyToGive = settings.moneyPerKill;
         if (headshot) moneyToGive += settings.headshotBonus;
 
-        VaultWrapper.giveMoney(attacker.getPlayer(), moneyToGive);
+        EconomyUtil.giveMoney(attacker, moneyToGive);
 
         String format;
         if (headshot) {

@@ -4,21 +4,19 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Scoreboard;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.WbsScoreboard;
-import wbs.utils.util.entities.state.SavedEntityState;
 import wbs.utils.util.entities.state.SavedPlayerState;
 import wbs.utils.util.entities.state.tracker.*;
 import wbs.utils.util.plugin.WbsMessenger;
-import wbs.utils.util.pluginhooks.VaultWrapper;
 
 import java.util.*;
 
@@ -209,7 +207,7 @@ public class QuakeLobby extends WbsMessenger {
         }
         scoreboard.addLine("&r");
 
-        scoreboard.addLine("&rBalance: &h" + VaultWrapper.formatMoneyFor(player.getPlayer()));
+        scoreboard.addLine("&rBalance: &h" + EconomyUtil.formatMoneyFor(player));
 
         scoreboard.addLine("&r&r");
         scoreboard.addLine(BORDER + "&r");

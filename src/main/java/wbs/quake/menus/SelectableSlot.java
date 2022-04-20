@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import wbs.quake.QuakeDB;
+import wbs.quake.EconomyUtil;
 import wbs.quake.QuakeLobby;
 import wbs.quake.WbsQuake;
 import wbs.quake.player.PlayerManager;
@@ -46,19 +46,20 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
 
         if (!player.hasPermission(selectable.permission)) {
             if (selectable.purchasable) {
-                if (VaultWrapper.hasMoney(player, selectable.price)) {
-                    VaultWrapper.takeMoney(player, selectable.price);
+                PlayerManager.getPlayerAsync(player, qPlayer -> {
+                    if (EconomyUtil.hasMoney(qPlayer, selectable.price)) {
+                        EconomyUtil.takeMoney(qPlayer, selectable.price);
 
-                    plugin.sendMessage("Bought for &h" + VaultWrapper.formatMoney(selectable.price) + "&r!", player);
+                        plugin.sendMessage("Bought for &h" + EconomyUtil.formatMoney(selectable.price) + "&r!", player);
 
-                    PlayerManager.getPlayerAsync(player, qPlayer -> QuakeLobby.getInstance().refreshScoreboard(qPlayer));
+                        QuakeLobby.getInstance().refreshScoreboard(qPlayer);
 
-                    VaultWrapper.givePermission(player, selectable.permission);
-                } else {
-                    plugin.sendMessage("Not enough money! Balance: &w"
-                            + VaultWrapper.formatMoneyFor(player) + "&r. Cost: &h" + VaultWrapper.formatMoney(selectable.price), player);
-                    return;
-                }
+                        VaultWrapper.givePermission(player, selectable.permission);
+                    } else {
+                        plugin.sendMessage("Not enough money! Balance: &w"
+                                + EconomyUtil.formatMoneyFor(qPlayer) + "&r. Cost: &h" + EconomyUtil.formatMoney(selectable.price), player);
+                    }
+                });
             } else {
                 plugin.sendMessage(selectable.costAlternativeMessage, player);
                 return;
@@ -91,7 +92,7 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
                     lore.add("&6Click to enable!");
                 } else {
                     if (selectable.purchasable) {
-                        lore.add("&6Cost: &h" + VaultWrapper.formatMoney(selectable.price));
+                        lore.add("&6Cost: &h" + EconomyUtil.formatMoney(selectable.price));
                     } else {
                         lore.add(selectable.costAlternativeMessage);
                     }

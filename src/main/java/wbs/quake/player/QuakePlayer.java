@@ -29,6 +29,8 @@ public class QuakePlayer {
     private int wins;
     private int played;
 
+    private double money = 0;
+
     private final Gun currentGun;
 
     private final PlayerCosmetics cosmetics;
@@ -154,6 +156,14 @@ public class QuakePlayer {
 
     public void addPlayed() {
         played++;
+    }
+
+    public void giveMoney(double amount) {
+        money += amount;
+    }
+
+    public double getMoney() {
+        return money;
     }
 
     public List<String> getStatsDisplay() {

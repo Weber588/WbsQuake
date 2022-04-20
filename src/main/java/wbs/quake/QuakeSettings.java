@@ -104,11 +104,24 @@ public class QuakeSettings extends WbsSettings {
         if (config.contains("options.max-arenas-per-vote")) {
             maxArenasPerVote = config.getInt("options.max-arenas-per-vote", maxArenasPerVote);
         }
+        if (config.contains("options.use-economy")) {
+            useEconomy = config.getBoolean("options.use-economy", useEconomy);
+        }
+        if (config.contains("options.economy-format")) {
+            economyFormat = config.getString("options.economy-format", economyFormat);
+        }
 
         ArenaManager.setPlugin(plugin);
         Arena.setPlugin(plugin);
 
         loadArenas();
+    }
+
+    public boolean useEconomy = false;
+    private String economyFormat = "";
+
+    public String formatMoney(double amount) {
+        return economyFormat.replace("%money%", String.valueOf(amount));
     }
 
     public boolean findFurthestSpawnpoint;

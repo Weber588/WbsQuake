@@ -15,6 +15,16 @@ error-highlight: '7'
 
 
 options:
+  # Should the server economy be used, or should money be tracked internally?
+  # When true, Vault must be installed.
+  # When false, money earnt and spent in Quake will be tracked internally by this plugin as custom currency.
+  use-economy: false
+
+  # How should money be displayed when "use-economy" is set to false?
+  # You can format this however you like, where "%money%" will be replaced with the number to format.
+  # For example, setting this to "$%money%" will display something that costs 5 as "$5".
+  economy-format: '◎%money%'
+
   # When true, players will respawn at the spawnpoint furthest from
   # any other player in the arena. When false, it's completely random.
   # With only 2 players, this uses a random spawnpoint except the closest one

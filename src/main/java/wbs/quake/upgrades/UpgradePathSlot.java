@@ -9,10 +9,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import wbs.quake.EconomyUtil;
+import wbs.quake.player.PlayerManager;
 import wbs.utils.util.menus.MenuSlot;
 import wbs.utils.util.menus.WbsMenu;
 import wbs.utils.util.plugin.WbsPlugin;
-import wbs.utils.util.pluginhooks.VaultWrapper;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -52,18 +53,20 @@ public class UpgradePathSlot extends MenuSlot {
         double cost = path.getPrice( current + 1);
         double nextVal = path.getValue( current + 1);
 
-        if (VaultWrapper.hasMoney(player, cost)) {
-            VaultWrapper.takeMoney(player, cost);
+        PlayerManager.getPlayerAsync(player, qPlayer -> {
+            if (EconomyUtil.hasMoney(qPlayer, cost)) {
+                EconomyUtil.takeMoney(qPlayer, cost);
 
-            option.setCurrentProgress(current + 1);
-            menu.update(event.getSlot());
-            menu.update(UpgradesMenu.BAL_SLOT);
+                option.setCurrentProgress(current + 1);
+                menu.update(event.getSlot());
+                menu.update(UpgradesMenu.BAL_SLOT);
 
-            plugin.sendMessage("Bought upgrade for &h" + VaultWrapper.formatMoney(cost) + "&r! New: " + path.format(nextVal), player);
-        } else {
-            plugin.sendMessage("Not enough money! Balance: &h"
-                    + VaultWrapper.formatMoneyFor(player) + "&r. Cost: &h" + VaultWrapper.formatMoney(cost), player);
-        }
+                plugin.sendMessage("Bought upgrade for &h" + EconomyUtil.formatMoney(cost) + "&r! New: " + path.format(nextVal), player);
+            } else {
+                plugin.sendMessage("Not enough money! Balance: &h"
+                        + EconomyUtil.formatMoneyFor(qPlayer) + "&r. Cost: &h" + EconomyUtil.formatMoney(cost), player);
+            }
+        });
     }
 
     @Override
@@ -89,7 +92,7 @@ public class UpgradePathSlot extends MenuSlot {
             double nextPrice = path.getPrice(current + 1);
 
             lore.add(plugin.dynamicColourise("&6Next tier: &h" + path.format(nextVal)));
-            lore.add(plugin.dynamicColourise("&6Cost: &h" + VaultWrapper.formatMoney(nextPrice)));
+            lore.add(plugin.dynamicColourise("&6Cost: &h" + EconomyUtil.formatMoney(nextPrice)));
             lore.add(plugin.dynamicColourise("&7Click to upgrade!"));
         }
 
