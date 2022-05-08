@@ -1,10 +1,7 @@
 package wbs.quake.menus;
 
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.WbsQuake;
-import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 
 import java.lang.reflect.Constructor;

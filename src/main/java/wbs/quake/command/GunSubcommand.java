@@ -53,7 +53,7 @@ public class GunSubcommand extends WbsSubcommand {
 
         QuakePlayer player = QuakeLobby.getInstance().getPlayer((Player) sender);
         if (player == null) {
-            PlayerManager.getPlayerAsync(
+            QuakeDB.getPlayerManager().getAsync(
                     ((Player) sender),
                     (quakePlayer) -> parseCommand(quakePlayer, sender, label, args)
             );

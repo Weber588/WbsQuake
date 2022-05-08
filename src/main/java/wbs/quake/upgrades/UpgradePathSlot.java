@@ -10,6 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.quake.EconomyUtil;
+import wbs.quake.QuakeDB;
 import wbs.quake.player.PlayerManager;
 import wbs.utils.util.menus.MenuSlot;
 import wbs.utils.util.menus.WbsMenu;
@@ -53,7 +54,7 @@ public class UpgradePathSlot extends MenuSlot {
         double cost = path.getPrice( current + 1);
         double nextVal = path.getValue( current + 1);
 
-        PlayerManager.getPlayerAsync(player, qPlayer -> {
+        QuakeDB.getPlayerManager().getAsync(player, qPlayer -> {
             if (EconomyUtil.hasMoney(qPlayer, cost)) {
                 EconomyUtil.takeMoney(qPlayer, cost);
 

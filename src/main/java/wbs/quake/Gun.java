@@ -18,18 +18,19 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.cosmetics.CosmeticsStore;
 import wbs.quake.cosmetics.trails.Trail;
-import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.upgrades.UpgradeableOption;
 import wbs.utils.util.*;
 import wbs.utils.util.database.WbsRecord;
-import wbs.utils.util.particles.LineParticleEffect;
 import wbs.utils.util.string.WbsStringify;
 import wbs.utils.util.string.WbsStrings;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 public class Gun {

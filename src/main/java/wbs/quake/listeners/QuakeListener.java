@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityCombustEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -18,6 +19,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import wbs.quake.Gun;
+import wbs.quake.QuakeDB;
 import wbs.quake.QuakeLobby;
 import wbs.quake.WbsQuake;
 import wbs.quake.player.PlayerManager;
@@ -43,7 +45,7 @@ public class QuakeListener extends WbsMessenger implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        QuakePlayer quakePlayer = PlayerManager.getCachedPlayer(player);
+        QuakePlayer quakePlayer = QuakeDB.getPlayerManager().getCached(player.getUniqueId());
         if (quakePlayer != null) {
             quakePlayer.setPlayer(player);
         }
@@ -56,6 +58,25 @@ public class QuakeListener extends WbsMessenger implements Listener {
 
             if (QuakeLobby.getInstance().isInLobby(player)) {
                 event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            QuakeLobby lobby = QuakeLobby.getInstance();
+            if (lobby.isInLobby(player)) {
+                event.setCancelled(true);
+
+                if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+                    if (lobby.isInRound(player)) {
+                        lobby.getCurrentRound().getArena().respawn(player);
+                    } else {
+                        player.teleport(lobby.getLobbySpawn());
+                    }
+                }
             }
         }
     }

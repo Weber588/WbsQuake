@@ -3,6 +3,7 @@ package wbs.quake;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.database.*;
 
@@ -21,6 +22,11 @@ public final class QuakeDB {
         return database;
     }
 
+    private static PlayerManager playerManager;
+    public static PlayerManager getPlayerManager() {
+        return playerManager;
+    }
+
     // Player table
 
     public static WbsTable playerTable;
@@ -32,6 +38,8 @@ public final class QuakeDB {
     public static final WbsField killsField = new WbsField("kills", WbsFieldType.INT, 0);
     public static final WbsField headshotsField = new WbsField("headshots", WbsFieldType.INT, 0);
     public static final WbsField deathsField = new WbsField("deaths", WbsFieldType.INT, 0);
+
+    public static final WbsField moneyField = new WbsField("money", WbsFieldType.DOUBLE, 0);
 
     public static final WbsField gunCooldownField = new WbsField("cooldown", WbsFieldType.INT, 0);
     public static final WbsField leapSpeedField = new WbsField("leap_speed", WbsFieldType.INT, 0);
@@ -53,6 +61,7 @@ public final class QuakeDB {
         database = new WbsDatabase(plugin, "quake");
 
         playerTable = new WbsTable(database, "players", uuidField);
+        playerTable.setDebugMode(true);
         playerTable.addField(
                 nameField,
                 playedField,
@@ -81,6 +90,8 @@ public final class QuakeDB {
 
         if (database.createTables()) {
             addNewFields();
+
+            playerManager = new PlayerManager(plugin, playerTable);
         }
     }
 
@@ -92,5 +103,8 @@ public final class QuakeDB {
         playerTable.addFieldIfNotExists(shootSoundField);
         playerTable.addFieldIfNotExists(killMessageField);
         playerTable.addFieldIfNotExists(killPerkField);
+        if (playerTable.addFieldIfNotExists(moneyField)) {
+            playerTable.updateField(moneyField);
+        }
     }
 }

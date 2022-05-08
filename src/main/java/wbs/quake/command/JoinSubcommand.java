@@ -3,9 +3,8 @@ package wbs.quake.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import wbs.quake.*;
-import wbs.quake.player.PlayerManager;
-import wbs.quake.player.QuakePlayer;
+import wbs.quake.QuakeDB;
+import wbs.quake.QuakeLobby;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.plugin.WbsPlugin;
 
@@ -28,7 +27,7 @@ public class JoinSubcommand extends WbsSubcommand {
             return true;
         }
 
-        PlayerManager.getPlayerAsync(player.getUniqueId(),
+        QuakeDB.getPlayerManager().getAsync(player,
                 (quakePlayer) -> QuakeLobby.getInstance().join(quakePlayer)
         );
         return true;

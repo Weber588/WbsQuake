@@ -6,20 +6,14 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.ItemManager;
-import wbs.quake.QuakeLobby;
 import wbs.quake.WbsQuake;
-import wbs.quake.player.PlayerManager;
-import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.plugin.WbsMessenger;
-
-import java.util.Objects;
 
 public class ItemsListener extends WbsMessenger implements Listener {
     public ItemsListener(@NotNull WbsQuake plugin) {

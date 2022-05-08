@@ -124,3 +124,14 @@ power-ups:
     duration: 60
     cooldown: 600
     target: closest
+
+  random:
+    # Chooses a random power up from the list and applies that one.
+    type: random
+    display: 'Random' # This can be set, but is never used - the chosen powerup's display is shown instead!
+    item: chest
+    cooldown: 600
+    power-ups:
+      - invisibility
+      - glow_others
+      - speed

@@ -12,11 +12,12 @@ import wbs.quake.WbsQuake;
 import wbs.quake.killperks.KillPerk;
 import wbs.quake.menus.SelectableSlot;
 import wbs.utils.util.WbsMath;
+import wbs.utils.util.database.RecordProducer;
 import wbs.utils.util.database.WbsRecord;
 
 import java.util.*;
 
-public class QuakePlayer {
+public class QuakePlayer implements RecordProducer {
 
     private final UUID uuid;
     private String name;
@@ -43,6 +44,7 @@ public class QuakePlayer {
         wins = section.getInt("wins");
         kills = section.getInt("kills");
         deaths = section.getInt("deaths");
+        money = section.getInt("money");
 
         killPerk = WbsQuake.getInstance().settings.getKillPerk(section.getString("kill-perk"));
 
@@ -79,6 +81,7 @@ public class QuakePlayer {
         wins = record.getOrDefault(QuakeDB.winsField, Integer.class);
         played = record.getOrDefault(QuakeDB.playedField, Integer.class);
         deaths = record.getOrDefault(QuakeDB.deathsField, Integer.class);
+        money = record.getOrDefault(QuakeDB.moneyField, Double.class);
 
         String killPerkId = record.getOrDefault(QuakeDB.killPerkField, String.class);
         if (killPerkId != null) {
@@ -166,6 +169,10 @@ public class QuakePlayer {
         return money;
     }
 
+    public void setMoney(double money) {
+        this.money = money;
+    }
+
     public List<String> getStatsDisplay() {
         List<String> statsLines = new LinkedList<>();
 
@@ -206,6 +213,7 @@ public class QuakePlayer {
         toRecord().upsert(QuakeDB.playerTable);
     }
 
+    @Override
     public WbsRecord toRecord() {
         WbsRecord record = new WbsRecord(QuakeDB.getDatabase());
 
@@ -217,6 +225,7 @@ public class QuakePlayer {
         record.setField(QuakeDB.winsField, wins);
         record.setField(QuakeDB.playedField, played);
         record.setField(QuakeDB.deathsField, deaths);
+        record.setField(QuakeDB.moneyField, money);
 
         if (killPerk != null) {
             record.setField(QuakeDB.killPerkField, killPerk.getId());

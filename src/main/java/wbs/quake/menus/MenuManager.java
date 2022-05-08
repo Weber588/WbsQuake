@@ -1,13 +1,9 @@
 package wbs.quake.menus;
 
 import org.bukkit.Material;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import wbs.quake.cosmetics.menus.CosmeticsMenu;
-import wbs.quake.player.PlayerManager;
-import wbs.quake.player.QuakePlayer;
 import wbs.quake.WbsQuake;
+import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.menus.MenuSlot;
 
 import java.util.HashMap;
@@ -69,7 +65,7 @@ public final class MenuManager {
 
         balSlot = new MenuSlot(getPlugin(), Material.SUNFLOWER,
                 "&6&lBalance",
-                "&e$%vault_eco_balance_commas%");
+                "&e%wbsquake_balance%");
         balSlot.setFillPlaceholders(true);
 
         return balSlot;

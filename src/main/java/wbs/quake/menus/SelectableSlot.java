@@ -9,9 +9,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.quake.EconomyUtil;
+import wbs.quake.QuakeDB;
 import wbs.quake.QuakeLobby;
 import wbs.quake.WbsQuake;
-import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.menus.MenuSlot;
 import wbs.utils.util.pluginhooks.PlaceholderAPIWrapper;
@@ -46,7 +46,7 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
 
         if (!player.hasPermission(selectable.permission)) {
             if (selectable.purchasable) {
-                PlayerManager.getPlayerAsync(player, qPlayer -> {
+                QuakeDB.getPlayerManager().getAsync(player, qPlayer -> {
                     if (EconomyUtil.hasMoney(qPlayer, selectable.price)) {
                         EconomyUtil.takeMoney(qPlayer, selectable.price);
 

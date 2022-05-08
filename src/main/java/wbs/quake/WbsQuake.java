@@ -18,16 +18,19 @@ public class WbsQuake extends WbsPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        QuakeDB.setupDatabase();
 
         settings = new QuakeSettings(this);
         settings.reload();
-        QuakeDB.setupDatabase();
 
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(new QuakeListener(this), this);
         pm.registerEvents(new ItemsListener(this), this);
 
         new QuakeCommand(this, getCommand("wbsquake"));
+
+        PlaceholderManager.registerPlaceholders();
+        StatsManager.recalculateAll();
     }
 
     @Override

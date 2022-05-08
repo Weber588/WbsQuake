@@ -15,7 +15,7 @@ public final class StatsManager {
     private StatsManager() {}
 
     public enum TrackedStat {
-        KILLS, HEADSHOTS, WINS;
+        KILLS, HEADSHOTS, WINS, MONEY, DEATHS;
 
         public WbsField getField() {
             switch (this) {
@@ -25,12 +25,16 @@ public final class StatsManager {
                     return QuakeDB.headshotsField;
                 case WINS:
                     return QuakeDB.winsField;
+                case MONEY:
+                    return QuakeDB.moneyField;
+                case DEATHS:
+                    return QuakeDB.deathsField;
             }
 
             return null;
         }
 
-        public int of(QuakePlayer player) {
+        public double of(QuakePlayer player) {
             switch (this) {
                 case KILLS:
                     return player.getKills();
@@ -38,20 +42,30 @@ public final class StatsManager {
                     return player.getHeadshots();
                 case WINS:
                     return player.getWins();
+                case MONEY:
+                    return player.getMoney();
+                case DEATHS:
+                    return player.getDeaths();
             }
 
             return -1;
         }
     }
 
-    private static int topListSize = 25;
+    public static int topListSize = 25;
 
     private static final Map<TrackedStat, List<QuakePlayer>> stats = new HashMap<>();
 
     public static void recalculateAll() {
-        for (TrackedStat stat : TrackedStat.values()) {
-            recalculate(stat);
-        }
+        WbsQuake.getInstance().runAsync(() -> {
+            for (TrackedStat stat : TrackedStat.values()) {
+                recalculate(stat);
+            }
+        });
+    }
+
+    public static int recalculateAsync(TrackedStat stat, Consumer<List<QuakePlayer>> consumer) {
+        return WbsQuake.getInstance().getAsync(() -> recalculate(stat), consumer);
     }
 
     public static List<QuakePlayer> recalculate(TrackedStat stat) {
@@ -100,5 +114,9 @@ public final class StatsManager {
                 () -> recalculate(stat),
                 () -> callback.accept(stats.get(stat))
         );
+    }
+
+    public static List<QuakePlayer> getTopCached(TrackedStat stat) {
+        return stats.getOrDefault(stat, new LinkedList<>());
     }
 }

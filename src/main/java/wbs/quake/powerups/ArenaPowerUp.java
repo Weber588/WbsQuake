@@ -72,15 +72,13 @@ public class ArenaPowerUp {
 
         QuakeLobby.getInstance().sendActionBars("&e" + player.getName() + " used &b" + powerUp.getDisplay() + "&e!");
 
-        powerUp.apply(player);
-
         respawnId = new BukkitRunnable() {
             @Override
             public void run() {
                 spawn();
                 respawnId = -1;
             }
-        }.runTaskLater(plugin, powerUp.cooldown).getTaskId();
+        }.runTaskLater(plugin, powerUp.getCooldown()).getTaskId();
 
         removeId = new BukkitRunnable() {
             @Override
@@ -89,7 +87,9 @@ public class ArenaPowerUp {
                 removeId = -1;
                 lastAffected.remove(player);
             }
-        }.runTaskLater(plugin, powerUp.duration).getTaskId();
+        }.runTaskLater(plugin, powerUp.getDuration()).getTaskId();
+
+        powerUp.apply(player);
     }
 
     public void remove(QuakePlayer player) {

@@ -1,11 +1,9 @@
 package wbs.quake.cosmetics;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import wbs.quake.menus.SelectableSlot;
 import wbs.quake.cosmetics.menus.CosmeticsSubmenu;
+import wbs.quake.menus.SelectableSlot;
 import wbs.quake.player.PlayerCosmetics;
-import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 
 public class CosmeticSlot<T extends SelectableCosmetic> extends SelectableSlot<T> {

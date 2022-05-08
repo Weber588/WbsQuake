@@ -10,8 +10,7 @@ import wbs.utils.exceptions.InvalidConfigurationException;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public abstract class PowerUp {
     public static final int DIGITS_TO_ROUND = 2;
@@ -36,6 +35,8 @@ public abstract class PowerUp {
                 return new BouncePowerUp(WbsQuake.getInstance(), section, directory);
             case INSTANT_RELOAD:
                 return new ReloadPowerUp(WbsQuake.getInstance(), section, directory);
+            case RANDOM:
+                return new RandomPowerUp(WbsQuake.getInstance(), section, directory);
         }
 
         return null;
@@ -46,8 +47,27 @@ public abstract class PowerUp {
         return powerUps.get(id);
     }
 
+    public static void validateAll() {
+        List<String> toRemove = new LinkedList<>();
+        for (PowerUp powerUp : powerUps.values()) {
+            if (!powerUp.validate()) {
+                toRemove.add(powerUp.getId());
+            }
+        }
+
+        toRemove.forEach(powerUps::remove);
+    }
+
+    public static Collection<PowerUp> allPowerUps() {
+        return powerUps.values();
+    }
+
+    public int getCooldown() {
+        return cooldown;
+    }
+
     public enum PowerUpType {
-        MULTISHOT, POTION, RAPID_FIRE, BOUNCESHOT, INSTANT_RELOAD
+        MULTISHOT, POTION, RAPID_FIRE, BOUNCESHOT, INSTANT_RELOAD, RANDOM
     }
 
     protected WbsQuake plugin;
@@ -102,5 +122,13 @@ public abstract class PowerUp {
     }
     public int getDuration() {
         return duration;
+    }
+
+    /**
+     * Verifies that this powerup is valid after all powerups are created
+     * @return True if the powerup is valid, false if it should be disabled
+     */
+    protected boolean validate() {
+        return true;
     }
 }

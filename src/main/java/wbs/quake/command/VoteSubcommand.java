@@ -4,7 +4,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.Arena;
-import wbs.quake.player.PlayerManager;
 import wbs.quake.QuakeLobby;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.commands.WbsSubcommand;

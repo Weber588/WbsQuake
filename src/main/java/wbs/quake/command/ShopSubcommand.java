@@ -30,7 +30,7 @@ public class ShopSubcommand extends WbsSubcommand {
             return true;
         }
 
-        PlayerManager.getPlayerAsync((Player) sender, (quakePlayer -> openMenu(quakePlayer, args)));
+        QuakeDB.getPlayerManager().getAsync((Player) sender, (quakePlayer -> openMenu(quakePlayer, args)));
 
         return true;
     }

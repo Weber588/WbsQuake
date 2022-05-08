@@ -206,7 +206,7 @@ public class QuakeRound {
 
         arena.finish();
 
-        PlayerManager.savePlayers(initialPlayersInRound);
+        QuakeDB.getPlayerManager().saveAsync(initialPlayersInRound);
 
         lobby.roundOver(endMessage);
     }

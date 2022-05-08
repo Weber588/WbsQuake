@@ -5,8 +5,10 @@ api-version: 1.14
 author: Weber588
 description: Quake! Because I wanted more customizability lol
 depend: [WbsUtils]
+softdepend:
+  - 'PlaceholderAPI'
 commands:
   wbsquake:
-    aliases: [wq, q]
+    aliases: [wq, q, quake]
     permission: 'wbsquake.command'
     description: The main command to interact with the plugin.

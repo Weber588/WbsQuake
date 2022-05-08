@@ -1,25 +1,18 @@
 package wbs.quake;
 
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
 import wbs.quake.cosmetics.CosmeticsStore;
-import wbs.quake.cosmetics.SelectableCosmetic;
-import wbs.quake.cosmetics.ShootSound;
-import wbs.quake.cosmetics.trails.StandardTrail;
-import wbs.quake.cosmetics.trails.Trail;
 import wbs.quake.killperks.KillPerk;
-import wbs.quake.player.PlayerManager;
+import wbs.quake.powerups.PowerUp;
 import wbs.quake.upgrades.UpgradePath;
 import wbs.quake.upgrades.UpgradePathType;
 import wbs.quake.upgrades.UpgradeableOption;
-import wbs.quake.powerups.PowerUp;
 import wbs.utils.exceptions.InvalidConfigurationException;
-import wbs.utils.util.particles.LineParticleEffect;
 import wbs.utils.util.plugin.WbsSettings;
-import wbs.utils.util.string.WbsStringify;
 
 import java.io.File;
 import java.util.*;
@@ -99,7 +92,7 @@ public class QuakeSettings extends WbsSettings {
             headshotBonus = config.getDouble("options.headshot-money-bonus", headshotBonus);
         }
         if (config.contains("options.player-cache-size")) {
-            PlayerManager.setCacheSize(config.getInt("options.player-cache-size", 25));
+            QuakeDB.getPlayerManager().setCacheSize(config.getInt("options.player-cache-size", 25));
         }
         if (config.contains("options.max-arenas-per-vote")) {
             maxArenasPerVote = config.getInt("options.max-arenas-per-vote", maxArenasPerVote);
@@ -121,7 +114,11 @@ public class QuakeSettings extends WbsSettings {
     private String economyFormat = "";
 
     public String formatMoney(double amount) {
-        return economyFormat.replace("%money%", String.valueOf(amount));
+        String amountString = String.valueOf(amount);
+        if (amount == (int) amount) {
+            amountString = amountString.substring(0, amountString.length() - 2);
+        }
+        return economyFormat.replace("%money%", amountString);
     }
 
     public boolean findFurthestSpawnpoint;
@@ -152,7 +149,11 @@ public class QuakeSettings extends WbsSettings {
             powerUps.put(key, powerUp);
             i++;
         }
-        plugin.logger.info(i + " power up" + (i != 1 ? "s" : "") + " loaded!");
+
+        PowerUp.validateAll();
+
+        int loaded = PowerUp.allPowerUps().size();
+        plugin.logger.info( loaded + " power up" + (loaded != 1 ? "s" : "") + " loaded!");
     }
 
     /* ============================ */

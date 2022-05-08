@@ -22,7 +22,7 @@ public class StatsSubcommand extends WbsSubcommand {
         }
 
         Player player = (Player) sender;
-        PlayerManager.getPlayerAsync(player, this::showStats);
+        QuakeDB.getPlayerManager().getAsync(player, this::showStats);
         return true;
     }
 

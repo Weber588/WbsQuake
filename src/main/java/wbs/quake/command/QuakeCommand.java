@@ -16,14 +16,16 @@ public class QuakeCommand extends WbsCommand {
         addSubcommand(new JoinSubcommand(plugin), perm + ".join");
         addSubcommand(new VoteSubcommand(plugin), perm + ".join");
         addSubcommand(new LeaveSubcommand(plugin), perm + ".join");
-        addSubcommand(new GunSubcommand(plugin), perm + ".gun");
         addSubcommand(new ShopSubcommand(plugin), perm + ".shop");
         addSubcommand(new StatsSubcommand(plugin), perm + ".stats");
-        addSubcommand(new SetLobbySubcommand(plugin), perm + ".setlobby");
-        addSubcommand(new ForceStartSubcommand(plugin), perm + ".forcestart");
         addSubcommand(new TopSubcommand(plugin), perm + ".top");
 
-        addSubcommand(new ReloadSubcommand(plugin), perm + ".reload");
-        addSubcommand(new ErrorsSubcommand(plugin), perm + ".reload");
+        String adminPerm = perm + ".admin";
+        addSubcommand(new ForceStartSubcommand(plugin), adminPerm + ".forcestart");
+        addSubcommand(new MoneyCommand(plugin), adminPerm + ".money");
+        addSubcommand(new SetLobbySubcommand(plugin), adminPerm + ".setlobby");
+        addSubcommand(new GunSubcommand(plugin), adminPerm + ".gun");
+        addSubcommand(new ReloadSubcommand(plugin), adminPerm + ".reload");
+        addSubcommand(new ErrorsSubcommand(plugin), adminPerm + ".reload");
     }
 }
