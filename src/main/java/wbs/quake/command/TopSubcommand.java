@@ -59,9 +59,17 @@ public class TopSubcommand extends WbsSubcommand {
 
         int i = 1;
         for (QuakePlayer player : top) {
-            sendMessage("&6" + (i++) + ") &h" + player.getName() + "&r> &h" + stat.of(player), sender);
+            sendMessage("&6" + (i++) + ") &h" + player.getName() + "&r> &h" + formatDouble(stat.of(player)), sender);
             if (i > amount) break;
         }
+    }
+
+    private String formatDouble(double value) {
+        if (value == (int) value) {
+            return String.valueOf((int) value);
+        }
+
+        return String.valueOf(value);
     }
 
     @Override

@@ -6,11 +6,15 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.EconomyUtil;
 import wbs.quake.QuakeDB;
+import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.commands.WbsSubcommand;
+import wbs.utils.util.database.AbstractDataManager;
 import wbs.utils.util.plugin.WbsPlugin;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,7 +25,7 @@ public class MoneyCommand extends WbsSubcommand {
     }
 
     private enum MoneyArg {
-        GIVE, TAKE, SET
+        GIVE, TAKE, SET, CHECK
     }
 
     @Override
@@ -45,18 +49,20 @@ public class MoneyCommand extends WbsSubcommand {
 
         String playerString = args[2];
 
-        if (args.length < 4) {
-            sendUsage("<points>", sender, label, args);
-            return true;
-        }
+        int amount = 0;
+        if (arg != MoneyArg.CHECK) {
+            if (args.length < 4) {
+                sendUsage("<amount>", sender, label, args);
+                return true;
+            }
 
-        String pointsArg = args[3];
-        int points;
-        try {
-            points = Integer.parseInt(pointsArg);
-        } catch (NumberFormatException e) {
-            sendMessage("Invalid points: " + pointsArg + "&r. Please use an integer.", sender);
-            return true;
+            String amountArg = args[3];
+            try {
+                amount = Integer.parseInt(amountArg);
+            } catch (NumberFormatException e) {
+                sendMessage("Invalid amount: " + amountArg + "&r. Please use an integer.", sender);
+                return true;
+            }
         }
 
         UUID playerUUID = null;
@@ -65,10 +71,11 @@ public class MoneyCommand extends WbsSubcommand {
             playerUUID = online.getUniqueId();
         }
 
+        int finalAmount = amount;
         if (playerUUID != null) {
-            QuakeDB.getPlayerManager().getAsync(playerUUID, player -> apply(player, arg, points, sender));
+            QuakeDB.getPlayerManager().getAsync(playerUUID, player -> apply(player, arg, finalAmount, sender));
         } else {
-            QuakeDB.getPlayerManager().getUUIDsAsync(playerString, uuids -> findUUIDs(uuids, arg, points, playerString, sender));
+            QuakeDB.getPlayerManager().getUUIDsAsync(playerString, uuids -> findUUIDs(uuids, arg, finalAmount, playerString, sender));
         }
 
         return true;
@@ -109,6 +116,13 @@ public class MoneyCommand extends WbsSubcommand {
                 player.setMoney(money);
                 sendMessage("Set " + player.getName() + "'s total to " + EconomyUtil.formatMoney(money) + ".", sender);
                 break;
+            case CHECK:
+                sendMessage(player.getName() + "'s money: " + EconomyUtil.formatMoneyFor(player) + ".", sender);
+                break;
+        }
+
+        if (arg != MoneyArg.CHECK) {
+            QuakeDB.getPlayerManager().saveAsync(Collections.singleton(player));
         }
     }
 

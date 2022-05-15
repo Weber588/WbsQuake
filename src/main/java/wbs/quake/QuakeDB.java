@@ -61,7 +61,6 @@ public final class QuakeDB {
         database = new WbsDatabase(plugin, "quake");
 
         playerTable = new WbsTable(database, "players", uuidField);
-        playerTable.setDebugMode(true);
         playerTable.addField(
                 nameField,
                 playedField,

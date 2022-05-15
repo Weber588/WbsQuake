@@ -13,6 +13,7 @@ import wbs.quake.ArenaManager;
 import wbs.quake.powerups.ArenaPowerUp;
 import wbs.quake.powerups.PowerUp;
 import wbs.utils.util.commands.WbsSubcommand;
+import wbs.utils.util.plugin.WbsMessageBuilder;
 import wbs.utils.util.plugin.WbsPlugin;
 import wbs.utils.util.string.WbsStringify;
 
@@ -78,8 +79,6 @@ public class ArenaPowerUpListSubcommand extends WbsSubcommand {
         for (Location loc : powerUps.keySet()) {
             i++;
 
-            TextComponent fullMessage = new TextComponent();
-
             // LOCATION
             String blockLoc = WbsStringify.toString(loc, false);
             String hoverString =
@@ -88,40 +87,23 @@ public class ArenaPowerUpListSubcommand extends WbsSubcommand {
                             "&rY: &h" + loc.getY() + "\n" +
                             "&rZ: &h" + loc.getZ();
 
-            Text hoverText = new Text(plugin.dynamicColourise(hoverString));
-
-            String locationString = plugin.dynamicColourise("&6" + i + ") &r" + blockLoc);
-            TextComponent locationMessage = new TextComponent(locationString);
-            locationMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText));
-
-            fullMessage.addExtra(locationMessage);
+            WbsMessageBuilder messageBuilder = plugin.buildMessage("&6" + i + ") &r" + blockLoc)
+                    .addHoverText(hoverString);
 
             // TELEPORT
             if (canTeleport) {
-                String tpString = plugin.dynamicColourise(" &6&l[TP]&r");
-                TextComponent tpMessage = new TextComponent(tpString);
-
-                Text tpHover = new Text(plugin.dynamicColourise("&6Click to TP!."));
-                tpMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, tpHover));
-
-                tpMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/wbsquake arena powerup tp " + arena.getName() + " " + loc.hashCode()));
-
-                fullMessage.addExtra(tpMessage);
+                messageBuilder.append(" &6&l[TP]&r")
+                        .addClickCommand("/wbsquake arena powerup tp " + arena.getName() + " " + loc.hashCode())
+                        .addHoverText("&6Click to TP!");
             }
 
             if (canDelete) {
-                String deleteString = plugin.dynamicColourise(" &w&l[DELETE]&r");
-                TextComponent deleteMessage = new TextComponent(deleteString);
-
-                Text deleteHover = new Text(plugin.dynamicColourise("&wClick to remove."));
-                deleteMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, deleteHover));
-
-                deleteMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/wbsquake arena powerup remove " + arena.getName() + " " + loc.hashCode()));
-
-                fullMessage.addExtra(deleteMessage);
+                messageBuilder.append(" &w&l[DELETE]&r")
+                        .addClickCommand("/wbsquake arena powerup remove " + arena.getName() + " " + loc.hashCode())
+                        .addHoverText("&wClick to remove.");
             }
 
-            sender.spigot().sendMessage(fullMessage);
+            messageBuilder.send(sender);
         }
 
         return true;
