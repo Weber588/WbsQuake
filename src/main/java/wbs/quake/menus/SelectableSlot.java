@@ -44,7 +44,9 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
     public void onClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
 
-        if (!player.hasPermission(selectable.permission)) {
+        if (player.hasPermission(selectable.permission)) {
+            onSuccessfulSelection(event, selectable);
+        } else {
             if (selectable.purchasable) {
                 QuakeDB.getPlayerManager().getAsync(player, qPlayer -> {
                     if (EconomyUtil.hasMoney(qPlayer, selectable.price)) {
@@ -55,6 +57,8 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
                         QuakeLobby.getInstance().refreshScoreboard(qPlayer);
 
                         VaultWrapper.givePermission(player, selectable.permission);
+
+                        onSuccessfulSelection(event, selectable);
                     } else {
                         plugin.sendMessage("Not enough money! Balance: &w"
                                 + EconomyUtil.formatMoneyFor(qPlayer) + "&r. Cost: &h" + EconomyUtil.formatMoney(selectable.price), player);
@@ -62,11 +66,8 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
                 });
             } else {
                 plugin.sendMessage(selectable.costAlternativeMessage, player);
-                return;
             }
         }
-
-        onSuccessfulSelection(event, selectable);
     }
 
     @Override
