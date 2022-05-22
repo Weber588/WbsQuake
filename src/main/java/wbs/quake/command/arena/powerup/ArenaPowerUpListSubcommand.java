@@ -53,7 +53,7 @@ public class ArenaPowerUpListSubcommand extends WbsSubcommand {
         HashMap<Location, ArenaPowerUp> powerUps = arena.getPowerUps();
 
         if (powerUps.isEmpty()) {
-            sendMessage("No powerups defined for " + arena.getName(), sender);
+            sendMessage("No powerups defined for " + arena.getDisplayName(), sender);
             return true;
         }
 

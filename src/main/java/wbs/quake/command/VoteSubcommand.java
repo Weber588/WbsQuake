@@ -52,7 +52,7 @@ public class VoteSubcommand extends WbsSubcommand {
         Arena chosen = lobby.playerVote(quakePlayer, id);
 
         if (chosen != null) {
-            lobby.messagePlayers("&h" + player.getName() + "&r voted for &h" + chosen.getName());
+            lobby.messagePlayers("&h" + player.getName() + "&r voted for &h" + chosen.getDisplayName());
         } else {
             sendMessage("&wInvalid ID!", sender);
         }

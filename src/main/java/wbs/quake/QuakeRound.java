@@ -1,12 +1,19 @@
 package wbs.quake;
 
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.powerups.ArenaPowerUp;
 import wbs.utils.util.WbsScoreboard;
+import wbs.utils.util.entities.state.SavedPlayerState;
+import wbs.utils.util.entities.state.tracker.GameModeState;
+import wbs.utils.util.entities.state.tracker.InventoryState;
+import wbs.utils.util.entities.state.tracker.InvulnerableState;
+import wbs.utils.util.entities.state.tracker.XPState;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,8 +51,9 @@ public class QuakeRound {
 
         scoreboard.addLine(BORDER);
         scoreboard.addLine("");
+        scoreboard.addLine("&rMap: &h" + arena.getDisplayName());
+        scoreboard.addLine("&rPoints to win: &h" + arena.getKillsToWin());
         scoreboard.addLine("&rTime left: &h");
-        scoreboard.addLine("&rMap: &h" + arena.getName());
 
         // TODO: Find a way to not need this lol
         scoreboard.addLine("&r");
@@ -115,6 +123,22 @@ public class QuakeRound {
         }
     }
 
+    // Build a new one every time to read from settings
+    private SavedPlayerState getRoundState() {
+        SavedPlayerState roundState = new SavedPlayerState();
+
+        ItemStack[] inv = new ItemStack[40];
+        inv[ItemManager.getQuakeCompassSlot()] = ItemManager.getQuakeCompass();
+
+        roundState.track(new XPState(0))
+                .track(new GameModeState(GameMode.ADVENTURE))
+                .track(new InventoryState(inv, ItemManager.getQuakeGunSlot()))
+                .track(new InvulnerableState(true))
+                .trackAll();
+
+        return roundState;
+    }
+
     /**
      * Start the round immediately
      * @return The runnable ID for the started timer
@@ -122,16 +146,17 @@ public class QuakeRound {
     public int startRound() {
         secondsRemaining = arena.getSecondsInRound();
 
+        SavedPlayerState roundState = getRoundState();
+
         renderScoreboard();
         for (QuakePlayer player : initialPlayersInRound) {
             scoreboard.showToPlayer(player.getPlayer());
             points.put(player, 0);
 
+            roundState.restoreState(player.getPlayer());
+
             PlayerInventory inv = player.getPlayer().getInventory();
-            inv.clear();
             inv.setItem(ItemManager.getQuakeGunSlot(), player.getCurrentGun().buildGun());
-            inv.setItem(ItemManager.getQuakeCompassSlot(), ItemManager.getQuakeCompass());
-            inv.setHeldItemSlot(ItemManager.getQuakeGunSlot());
         }
 
         arena.start();

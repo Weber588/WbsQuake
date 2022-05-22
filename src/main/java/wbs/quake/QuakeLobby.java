@@ -252,7 +252,7 @@ public class QuakeLobby extends WbsMessenger {
                 cancelRunnable();
 
                 Arena chosenArena = getChosenArena();
-                messagePlayers("&h" + chosenArena.getName() + "&r won!");
+                messagePlayers("&h" + chosenArena.getDisplayName() + "&r won!");
                 startCountdown(chosenArena);
                 break;
         }
@@ -359,11 +359,11 @@ public class QuakeLobby extends WbsMessenger {
     }
 
     private void sendArenaPrompt(Arena arena, int id) {
-        String hoverString = "&rClick to vote for &h" + arena.getName() + "&r!";
+        String hoverString = "&rClick to vote for &h" + arena.getDisplayName() + "&r!";
 
         Text hoverText = new Text(plugin.dynamicColourise(hoverString));
 
-        String prompt = plugin.dynamicColourise("&h" + id + ") &r" + arena.getName());
+        String prompt = plugin.dynamicColourise("&h" + id + ") &r" + arena.getDisplayName());
 
         TextComponent fullMessage = new TextComponent(prompt);
         fullMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText));
@@ -422,7 +422,7 @@ public class QuakeLobby extends WbsMessenger {
                     cancel();
 
                     Arena chosenArena = getChosenArena();
-                    messagePlayers("&h" + chosenArena.getName() + "&r won!");
+                    messagePlayers("&h" + chosenArena.getDisplayName() + "&r won!");
                     startCountdown(chosenArena);
                     return;
                 }

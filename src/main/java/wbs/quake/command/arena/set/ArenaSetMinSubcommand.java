@@ -7,6 +7,9 @@ import wbs.quake.ArenaManager;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.plugin.WbsPlugin;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class ArenaSetMinSubcommand extends WbsSubcommand {
     public ArenaSetMinSubcommand(WbsPlugin plugin) {
         super(plugin, "min");
@@ -51,8 +54,17 @@ public class ArenaSetMinSubcommand extends WbsSubcommand {
         }
 
         arena.setMinPlayers(minPlayers);
-        sendMessage("Set min players to " + minPlayers + " for arena &h" + arena.getName(), sender);
+        sendMessage("Set min players to " + minPlayers + " for arena &h" + arena.getDisplayName(), sender);
 
         return true;
+    }
+
+    @Override
+    public List<String> getTabCompletions(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args, int start) {
+        if (args.length == start + 1) {
+            return ArenaManager.getArenaNames();
+        }
+
+        return new LinkedList<>();
     }
 }

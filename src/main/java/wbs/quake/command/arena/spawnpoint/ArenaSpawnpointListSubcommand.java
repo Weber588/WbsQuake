@@ -51,7 +51,7 @@ public class ArenaSpawnpointListSubcommand extends WbsSubcommand {
         List<Location> spawnpoints = arena.getSpawnpoints();
 
         if (spawnpoints.isEmpty()) {
-            sendMessage("No spawnpoints defined for " + arena.getName(), sender);
+            sendMessage("No spawnpoints defined for " + arena.getDisplayName(), sender);
             return true;
         }
 

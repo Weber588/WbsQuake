@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.powerups.ArenaPowerUp;
 import wbs.quake.powerups.PowerUp;
@@ -22,7 +23,10 @@ public class Arena {
     private final List<Location> spawnPoints = new ArrayList<>();
     private final Map<Location, ArenaPowerUp> powerups = new HashMap<>();
 
+    @NotNull
     private final String name;
+    @NotNull
+    private String displayName;
     private String description;
     private int maxPlayers;
     private int minPlayers;
@@ -30,8 +34,9 @@ public class Arena {
     private int secondsInRound = 60 * 5; // 5 minutes
 
 
-    public Arena(String name) {
+    public Arena(@NotNull String name) {
         this.name = name;
+        displayName = name;
         minPlayers = 2;
         maxPlayers = 8;
     }
@@ -40,6 +45,7 @@ public class Arena {
         name = section.getName();
 
         description = section.getString("description");
+        displayName = section.getString("display-name", name);
         minPlayers = section.getInt("min");
         maxPlayers = section.getInt("max");
         killsToWin = section.getInt("kills-to-win");
@@ -139,6 +145,7 @@ public class Arena {
 
     public void writeToConfig(ConfigurationSection section) {
         section.set(name + ".description", description);
+        section.set(name + ".display-name", displayName);
         section.set(name + ".min", minPlayers);
         section.set(name + ".max", maxPlayers);
         section.set(name + ".kills-to-win", killsToWin);
@@ -369,6 +376,11 @@ public class Arena {
         powerups.remove(loc);
     }
 
+    @NotNull
+    public String getDisplayName() {
+        return displayName;
+    }
+    @NotNull
     public String getName() {
         return name;
     }
@@ -446,5 +458,9 @@ public class Arena {
         for (ArenaPowerUp powerUp : powerups.values()) {
             powerUp.removeAndCancel();
         }
+    }
+
+    public void setDisplayName(@NotNull String display) {
+        this.displayName = display;
     }
 }

@@ -25,6 +25,7 @@ public class ArenaInfoSubcommand extends AbstractArenaCommand {
         sendMessage("&m                             ", sender); // line break
 
         sendMessage("Name: &h" + arena.getName(), sender);
+        sendMessage("Display name: &h" + arena.getDisplayName(), sender);
         sendMessage("Kills to win: &h" + arena.getKillsToWin(), sender);
         int secondsInRound = arena.getSecondsInRound();
         String timeString = WbsStringify.toString(Duration.ofSeconds(secondsInRound), true);

@@ -12,5 +12,6 @@ public class ArenaSetOptionSubcommand extends WbsCommandNode {
         addChild(new ArenaSetDescriptionSubcommand(plugin));
         addChild(new ArenaSetKillsSubcommand(plugin));
         addChild(new ArenaSetDurationSubcommand(plugin));
+        addChild(new ArenaSetDisplaySubcommand(plugin));
     }
 }

@@ -7,6 +7,9 @@ import wbs.quake.ArenaManager;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.plugin.WbsPlugin;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class ArenaSetMaxSubcommand extends WbsSubcommand {
     public ArenaSetMaxSubcommand(WbsPlugin plugin) {
         super(plugin, "max");
@@ -46,8 +49,17 @@ public class ArenaSetMaxSubcommand extends WbsSubcommand {
         }
 
         arena.setMaxPlayers(maxPlayers);
-        sendMessage("Set max players to " + maxPlayers + " for arena &h" + arena.getName(), sender);
+        sendMessage("Set max players to " + maxPlayers + " for arena &h" + arena.getDisplayName(), sender);
 
         return true;
+    }
+
+    @Override
+    public List<String> getTabCompletions(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args, int start) {
+        if (args.length == start + 1) {
+            return ArenaManager.getArenaNames();
+        }
+
+        return new LinkedList<>();
     }
 }

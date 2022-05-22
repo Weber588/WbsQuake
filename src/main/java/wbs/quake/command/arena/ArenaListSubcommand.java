@@ -23,7 +23,7 @@ public class ArenaListSubcommand extends WbsSubcommand {
 
         int i = 1;
         for (Arena arena : ArenaManager.getAllArenas()) {
-            WbsMessageBuilder builder = plugin.buildMessage("&6" + i + ") &h" + arena.getName()
+            WbsMessageBuilder builder = plugin.buildMessage("&6" + i + ") &h" + arena.getDisplayName()
                     + " &r(" + arena.getMinPlayers() + "-" + arena.getMaxPlayers() + " players)");
 
             if (canTeleport) {
