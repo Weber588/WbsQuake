@@ -138,8 +138,8 @@ cosmetics:
       type: SPIRAL
       item: STRING
       display: '&b&lSpiral'
-      price: 5000 # How much should this trail cost in the shop?
-      description: # The description appears in lore of the item in the shop
+      price: 5000
+      description:
         - 'A light blue spiral!'
       particle: REDSTONE
       size: 0.6
@@ -148,6 +148,19 @@ cosmetics:
       rotations-per-block: 0.5 # How many twists per block the trail has
       radius: 0.2 # The radius of the spiral
       amount: 1 # How many spirals appear (i.e. 2 is a helix)
+    example-zigzag:
+      type: ZIGZAG
+      item: TRIDENT
+      display: '&e&lZig-Zag'
+      price: 5000
+      description:
+        - 'Lightning trail!'
+      particle: REDSTONE
+      size: 0.6
+      colour: yellow
+      amount-per-block: 10
+      oscillations-per-block: 1.5 # How many zig-zags per block the trail has
+      radius: 0.2 # How far away from the actual shot should the zig-zags extend?
 
   armour:
     to: do

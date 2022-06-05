@@ -3,10 +3,13 @@ package wbs.quake.cosmetics;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
+import wbs.quake.QuakeDB;
 import wbs.quake.QuakeSettings;
 import wbs.quake.WbsQuake;
 import wbs.quake.cosmetics.trails.StandardTrail;
 import wbs.quake.cosmetics.trails.Trail;
+import wbs.quake.player.PlayerManager;
+import wbs.quake.player.QuakePlayer;
 import wbs.utils.exceptions.InvalidConfigurationException;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
@@ -174,6 +177,19 @@ public class CosmeticsStore {
         populateOrdered(unsortedTrails, trails);
 
         trailsEnabled = trails.size() > 1;
+
+        for (QuakePlayer player : QuakeDB.getPlayerManager().getCache().values()) {
+            SelectableCosmetic trail = player.getCosmetics().getCosmetic(CosmeticType.TRAIL);
+
+            String id = trail.getId();
+
+            Trail updated = trails.get(id);
+            if (updated == null) { // Trail was removed
+                player.getCosmetics().setCosmetic(trails.get("default"));
+            } else {
+                player.getCosmetics().setCosmetic(updated);
+            }
+        }
     }
 
     public Collection<Trail> allTrails() {

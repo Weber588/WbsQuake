@@ -22,7 +22,7 @@ import java.util.List;
 public abstract class Trail extends SelectableCosmetic {
 
     public enum TrailType {
-        STANDARD, SPIRAL
+        STANDARD, SPIRAL, ZIGZAG
     }
 
     @Nullable
@@ -40,6 +40,8 @@ public abstract class Trail extends SelectableCosmetic {
                 return new StandardTrail(section, directory);
             case SPIRAL:
                 return new SpiralTrail(section, directory);
+            case ZIGZAG:
+                return new ZigZagTrail(section, directory);
         }
         return null;
     }
