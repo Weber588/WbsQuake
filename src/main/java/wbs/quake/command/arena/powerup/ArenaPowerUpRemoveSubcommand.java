@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.Arena;
 import wbs.quake.ArenaManager;
+import wbs.quake.WbsQuake;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.plugin.WbsPlugin;
 
@@ -12,8 +13,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ArenaPowerUpRemoveSubcommand extends WbsSubcommand {
-    public ArenaPowerUpRemoveSubcommand(WbsPlugin plugin) {
+
+    private final WbsQuake plugin;
+
+    public ArenaPowerUpRemoveSubcommand(WbsQuake plugin) {
         super(plugin, "remove");
+        this.plugin = plugin;
     }
 
     @Override
@@ -53,7 +58,10 @@ public class ArenaPowerUpRemoveSubcommand extends WbsSubcommand {
         boolean removed = arena.removePowerUp(hash);
 
         if (removed) {
-            sendMessage("Powerup removed!", sender);
+            plugin.runAsync(() -> {
+                plugin.settings.saveArenas();
+                sendMessage("Powerup removed!", sender);
+            });
         } else {
             sendMessage("Use &h/" + label + " arena powerup list " + arena.getName() + "&r to auto-use this command.", sender);
         }

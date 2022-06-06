@@ -6,12 +6,17 @@ import org.jetbrains.annotations.NotNull;
 
 import wbs.quake.QuakeLobby;
 
+import wbs.quake.WbsQuake;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.plugin.WbsPlugin;
 
 public class SetLobbySubcommand extends WbsSubcommand {
-    public SetLobbySubcommand(WbsPlugin plugin) {
+
+    private final WbsQuake plugin;
+
+    public SetLobbySubcommand(WbsQuake plugin) {
         super(plugin, "setlobby");
+        this.plugin = plugin;
     }
 
     @Override
@@ -23,7 +28,10 @@ public class SetLobbySubcommand extends WbsSubcommand {
 
         Player player = (Player) sender;
         QuakeLobby.getInstance().setLobbySpawn(player.getLocation());
-        sendMessage("Lobby set to your location!", sender);
+        plugin.runSync(() -> {
+            plugin.settings.saveLobbySpawn();
+            sendMessage("Lobby set to your location!", sender);
+        });
 
         return true;
     }

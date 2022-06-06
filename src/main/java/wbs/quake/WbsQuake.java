@@ -36,8 +36,6 @@ public class WbsQuake extends WbsPlugin {
     @Override
     public void onDisable() {
         QuakeLobby.getInstance().kickAll();
-        settings.saveArenas();
-        settings.saveLobbySpawn();
 
         ArenaManager.getAllArenas().forEach(Arena::finish);
     }

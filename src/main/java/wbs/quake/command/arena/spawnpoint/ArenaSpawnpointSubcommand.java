@@ -1,10 +1,11 @@
 package wbs.quake.command.arena.spawnpoint;
 
+import wbs.quake.WbsQuake;
 import wbs.utils.util.commands.WbsCommandNode;
 import wbs.utils.util.plugin.WbsPlugin;
 
 public class ArenaSpawnpointSubcommand extends WbsCommandNode {
-    public ArenaSpawnpointSubcommand(WbsPlugin plugin) {
+    public ArenaSpawnpointSubcommand(WbsQuake plugin) {
         super(plugin, "spawnpoint");
 
         String perm = getPermission();

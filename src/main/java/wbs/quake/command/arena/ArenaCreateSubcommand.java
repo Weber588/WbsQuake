@@ -4,12 +4,17 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.Arena;
 import wbs.quake.ArenaManager;
+import wbs.quake.WbsQuake;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.plugin.WbsPlugin;
 
 public class ArenaCreateSubcommand extends WbsSubcommand {
-    public ArenaCreateSubcommand(WbsPlugin plugin) {
+
+    private final WbsQuake plugin;
+
+    public ArenaCreateSubcommand(WbsQuake plugin) {
         super(plugin, "create");
+        this.plugin = plugin;
     }
 
     @Override
@@ -23,7 +28,10 @@ public class ArenaCreateSubcommand extends WbsSubcommand {
 
             Arena newArena = new Arena(arenaName);
             ArenaManager.registerArena(newArena);
-            sendMessage("Arena &h" + arenaName + "&r created!", sender);
+            plugin.runAsync(() -> {
+                plugin.settings.saveArenas();
+                sendMessage("Arena &h" + arenaName + "&r created!", sender);
+            });
         } else {
             sendUsage("<name>", sender, label, args);
         }

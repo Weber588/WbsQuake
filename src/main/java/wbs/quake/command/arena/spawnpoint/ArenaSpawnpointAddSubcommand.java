@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.Arena;
 import wbs.quake.ArenaManager;
+import wbs.quake.WbsQuake;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.plugin.WbsPlugin;
 
@@ -12,8 +13,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ArenaSpawnpointAddSubcommand extends WbsSubcommand {
-    public ArenaSpawnpointAddSubcommand(WbsPlugin plugin) {
+
+    private final WbsQuake plugin;
+
+    public ArenaSpawnpointAddSubcommand(WbsQuake plugin) {
         super(plugin, "add");
+        this.plugin = plugin;
     }
 
     @Override
@@ -40,7 +45,10 @@ public class ArenaSpawnpointAddSubcommand extends WbsSubcommand {
         Player player = (Player) sender;
 
         arena.addSpawnPoint(player.getLocation());
-        sendMessage("Spawnpoint created!", sender);
+        plugin.runAsync(() -> {
+            plugin.settings.saveArenas();
+            sendMessage("Spawnpoint created!", sender);
+        });
 
         return true;
     }

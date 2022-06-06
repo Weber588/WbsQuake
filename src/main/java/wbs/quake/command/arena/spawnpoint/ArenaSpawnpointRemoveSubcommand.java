@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.Arena;
 import wbs.quake.ArenaManager;
+import wbs.quake.WbsQuake;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.plugin.WbsPlugin;
 
@@ -12,8 +13,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ArenaSpawnpointRemoveSubcommand extends WbsSubcommand {
-    public ArenaSpawnpointRemoveSubcommand(WbsPlugin plugin) {
+
+    private final WbsQuake plugin;
+
+    public ArenaSpawnpointRemoveSubcommand(WbsQuake plugin) {
         super(plugin, "remove");
+        this.plugin = plugin;
     }
 
     @Override
@@ -53,7 +58,10 @@ public class ArenaSpawnpointRemoveSubcommand extends WbsSubcommand {
         boolean removed = arena.removeSpawnPoint(hash);
 
         if (removed) {
-            sendMessage("Spawnpoint removed!", sender);
+            plugin.runAsync(() -> {
+                plugin.settings.saveArenas();
+                sendMessage("Spawnpoint removed!", sender);
+            });
         } else {
             sendMessage("Use &h/" + label + " arena spawnpoint list " + arena.getName() + "&r to auto-use this command.", sender);
         }

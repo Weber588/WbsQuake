@@ -19,6 +19,7 @@ public class ArenaSubcommand extends WbsCommandNode {
         addChild(new ArenaPowerUpSubcommand(plugin), perm + ".powerup");
         addChild(new ArenaTpSubcommand(plugin), perm + ".tp");
         addChild(new ArenaSetTpSubcommand(plugin), perm + ".settp");
+        addChild(new ArenaMoveCommand(plugin), perm + ".move");
 
         addChild(new ArenaInfoSubcommand(plugin), perm + ".info");
         addChild(new ArenaListSubcommand(plugin), perm + ".list");

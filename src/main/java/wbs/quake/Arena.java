@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.powerups.ArenaPowerUp;
@@ -462,5 +463,30 @@ public class Arena {
 
     public void setDisplayName(@NotNull String display) {
         this.displayName = display;
+    }
+
+    public void move(Location from, Location to) {
+        int diffX = from.getBlockX() - to.getBlockX();
+        int diffY = from.getBlockY() - to.getBlockY();
+        int diffZ = from.getBlockZ() - to.getBlockZ();
+        Vector diff = new Vector(diffX, diffY, diffZ);
+
+        for (Location spawnpoint : spawnPoints) {
+            spawnpoint.subtract(diff);
+            spawnpoint.setWorld(to.getWorld());
+        }
+
+        Map<Location, ArenaPowerUp> newPowerUps = new HashMap<>();
+
+        for (Location powerUpLocation : powerups.keySet()) {
+            Location newLoc = powerUpLocation.clone();
+            newLoc.subtract(diff);
+            newLoc.setWorld(to.getWorld());
+
+            newPowerUps.put(newLoc, powerups.get(powerUpLocation));
+        }
+
+        powerups.clear();
+        powerups.putAll(newPowerUps);
     }
 }
