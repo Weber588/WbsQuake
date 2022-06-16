@@ -113,7 +113,7 @@ public final class PlaceholderManager {
                 case KD:
                     return player.getKills() / (double) player.getDeaths() + "";
                 case MONEY:
-                    return player.getMoney() + "";
+                    return EconomyUtil.formatMoneyFor(player);
             }
 
             return null;

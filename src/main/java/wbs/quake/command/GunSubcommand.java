@@ -19,6 +19,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Debug command
+ */
 public class GunSubcommand extends WbsSubcommand {
     private final WbsQuake plugin;
     public GunSubcommand(WbsQuake plugin) {
@@ -28,7 +31,7 @@ public class GunSubcommand extends WbsSubcommand {
     }
 
     private enum GunArg {
-        BOUNCES, COOLDOWN, SKIN, SHINY, LEAP_COOLDOWN, LEAP_SPEED, SPEED, PIERCING, GET
+        BOUNCES, COOLDOWN, SKIN, SHINY, LEAP_COOLDOWN, LEAP_SPEED, SPEED, PIERCING, GET, MULTISHOT, SCATTERSHOT
     }
 
     private void sendGunUsage(CommandSender sender, String label, String[] args) {
@@ -100,6 +103,12 @@ public class GunSubcommand extends WbsSubcommand {
                     case PIERCING:
                         sendMessage("Speed: " + gun.getPiercingOption().formattedValue(), sender);
                         break;
+                    case MULTISHOT:
+                        sendMessage("Multishot chance: " + gun.getMultishotChance(), sender);
+                        break;
+                    case SCATTERSHOT:
+                        sendMessage("Scattershot: " + gun.getScattershot(), sender);
+                        break;
                     default:
                         sendGunUsage(sender, label, args);
                         break;
@@ -144,6 +153,22 @@ public class GunSubcommand extends WbsSubcommand {
                     case PIERCING:
                         sendMessage("Setting piercing progress to &h"
                                 + (gun.setPiercingProgress(Integer.parseInt(args[2]) - 1) + 1), sender);
+                        break;
+                    case MULTISHOT:
+                        double chance = Double.parseDouble(args[2]);
+
+                        sendMessage("Setting multishot chance to &h"
+                                + chance + "%", sender);
+
+                        gun.setMultishotChance(chance);
+                        break;
+                    case SCATTERSHOT:
+                        int scattershot = Integer.parseInt(args[2]);
+
+                        sendMessage("Setting scattershot to &h"
+                                + scattershot, sender);
+
+                        gun.setScattershot(scattershot);
                         break;
                     default:
                         sendGunUsage(sender, label, args);

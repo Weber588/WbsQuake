@@ -22,6 +22,7 @@ import wbs.quake.player.QuakePlayer;
 import wbs.quake.upgrades.UpgradeableOption;
 import wbs.utils.util.*;
 import wbs.utils.util.database.WbsRecord;
+import wbs.utils.util.entities.WbsEntityUtil;
 import wbs.utils.util.string.WbsStringify;
 import wbs.utils.util.string.WbsStrings;
 
@@ -32,10 +33,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Gun {
 
     public static final NamespacedKey GUN_KEY = new NamespacedKey(WbsQuake.getInstance(), "isGun");
+    public static final double MULTISHOT_ANGLE = 15;
+    public static final double SCATTERSHOT_ANGLE = 10;
 
     @NotNull
     private UpgradeableOption cooldown; // 20
@@ -55,6 +59,7 @@ public class Gun {
 
     private int bounces = 0;
     private double multishotChance = 0f;
+    private int scattershot = 0;
     private double cooldownModifier = 1;
 
     private Material skin = Material.WOODEN_HOE;
@@ -211,6 +216,18 @@ public class Gun {
 
     private List<Material> bounceIgnored = Collections.singletonList(Material.BARRIER);
 
+    private final Predicate<Entity> BASE_PREDICATE = entity -> {
+        if (!(entity instanceof Player)) {
+            return false;
+        }
+        GameMode mode = ((Player) entity).getGameMode();
+        if (mode == GameMode.CREATIVE || mode == GameMode.SPECTATOR) {
+            return false;
+        }
+
+        return QuakeLobby.getInstance().isInRound((Player) entity);
+    };
+
     /**
      * Fire the gun from the given player
      * @param player The player who fired
@@ -229,48 +246,58 @@ public class Gun {
         startXPTimer(player);
 
         Player bukkitPlayer = player.getPlayer();
-        Vector facing = WbsEntities.getFacingVector(bukkitPlayer);
-        World world = bukkitPlayer.getWorld();
+        Vector facing = WbsEntityUtil.getFacingVector(bukkitPlayer);
 
-        RayTraceResult result;
-        Location shootLocation = bukkitPlayer.getEyeLocation();
-        List<Player> ignorePlayers = new LinkedList<>();
+        List<Entity> ignorePlayers = new LinkedList<>();
         ignorePlayers.add(bukkitPlayer);
+
+        boolean fired = false;
+        if (scattershot <= 0) {
+            fired = fireFrom(player, WbsEntityUtil.getFacingVector(bukkitPlayer), ignorePlayers);
+
+            if (WbsMath.chance(multishotChance)) {
+                Vector localUp = WbsEntityUtil.getLocalUp(bukkitPlayer);
+
+                Vector right = WbsMath.rotateVector(facing, localUp, MULTISHOT_ANGLE);
+                fired |= fireFrom(player, right, ignorePlayers);
+
+                Vector left = WbsMath.rotateVector(facing, localUp, -MULTISHOT_ANGLE);
+                fired |= fireFrom(player, left, ignorePlayers);
+            }
+        } else {
+            Vector direction = WbsEntityUtil.getFacingVector(bukkitPlayer);
+            for (int i = 0; i < scattershot; i++) {
+                Vector randomDir = WbsMath.randomVector().crossProduct(direction);
+
+                fired |= fireFrom(player, WbsMath.rotateVector(direction, randomDir, Math.random() * SCATTERSHOT_ANGLE), ignorePlayers);
+            }
+        }
+
+        if (fired) {
+            player.getCosmetics().shootSound.play(bukkitPlayer.getEyeLocation());
+        }
+
+        return fired;
+        /*
+
 
         int bouncesLeft = bounces;
 
-        if (WbsMath.chance(multishotChance)) {
-            // TODO: Set up multishot
-        }
-
-        Predicate<Entity> predicate =
-                e -> {
-                    if (!(e instanceof Player)) {
-                        return false;
-                    }
-                    GameMode mode = ((Player) e).getGameMode();
-                    if (mode == GameMode.CREATIVE || mode == GameMode.SPECTATOR) {
-                        return false;
-                    }
-
-                    if (!QuakeLobby.getInstance().isInRound((Player) e)) {
-                        return false;
-                    }
-
-                    return !ignorePlayers.contains(e);
-                };
+        Predicate<Entity> predicate = BASE_PREDICATE.or(ignorePlayers::contains);
 
         boolean running = true;
         boolean fired = false;
 
         int playersKilled = 0;
 
+        boolean isBounce = false;
+
         while (running) {
             result = world.rayTrace(shootLocation, facing, 300, FluidCollisionMode.NEVER, true, width, predicate);
             if (result != null) {
                 fired = true;
                 Location hitPos = result.getHitPosition().toLocation(world);
-                trail.playShot(shootLocation, hitPos);
+                trail.playShot(shootLocation, hitPos, isBounce);
                 shootLocation = hitPos;
 
                 if (result.getHitBlock() != null) {
@@ -279,6 +306,7 @@ public class Gun {
                             running = false;
                         } else {
                             bouncesLeft--;
+                            isBounce = !isBounce;
 
                             BlockFace blockFace = result.getHitBlockFace();
                             assert blockFace != null;
@@ -318,6 +346,78 @@ public class Gun {
         }
 
         return fired;
+         */
+    }
+
+    private boolean fireFrom(QuakePlayer shooter, Vector direction, List<Entity> ignore) {
+        return fireFrom(shooter,
+                shooter.getPlayer().getEyeLocation(),
+                direction,
+                ignore,
+                bounces,
+                false);
+    }
+
+    /**
+     * Perform the actual shot, handling bouncing, kills, and trails, but not sound.
+     * @param shooter The player shooting
+     * @param shootLocation The position from which to start the shot
+     * @param direction The direction in which the shot should be performed
+     * @param ignore The list of entities (players) already hit
+     * @param bouncesLeft How many times this shot can bounce
+     * @param isBounce Whether or not this shot was a reflected shot, alternating between true and false as the shot bounces
+     *                 (Mostly for use in trail displays)
+     * @return True if a shot was fired, false if there was nothing to hit
+     */
+    private boolean fireFrom(QuakePlayer shooter, Location shootLocation, Vector direction, List<Entity> ignore, int bouncesLeft, boolean isBounce) {
+        Predicate<Entity> predicate = BASE_PREDICATE.and(entity -> !ignore.contains(entity));
+
+        RayTraceResult result = shooter.getPlayer().getWorld().rayTrace(shootLocation, direction, 300, FluidCollisionMode.NEVER, true, width, predicate);
+        if (result == null) {
+            return false;
+        }
+
+        Location hitPos = result.getHitPosition().toLocation(shooter.getPlayer().getWorld());
+        trail.playShot(shootLocation, hitPos, isBounce);
+
+        if (result.getHitBlock() != null) {
+            if (bouncesLeft > 0) {
+                if (bounceIgnored.contains(result.getHitBlock().getType())) {
+                    return true;
+                }
+
+                BlockFace blockFace = result.getHitBlockFace();
+                assert blockFace != null;
+                direction = WbsMath.reflectVector(direction, blockFace.getDirection());
+
+                fireFrom(shooter, hitPos, direction, ignore, bouncesLeft - 1, !isBounce);
+            }
+
+            return true;
+        }
+
+        if (result.getHitEntity() != null) {
+            Player hitPlayer = (Player) result.getHitEntity();
+            ignore.add(hitPlayer);
+
+            QuakePlayer victim = Objects.requireNonNull(QuakeLobby.getInstance().getPlayer(hitPlayer));
+
+            Location hitLoc = result.getHitPosition().toLocation(hitPlayer.getWorld());
+
+            double distanceToEyes = hitLoc.distance(hitPlayer.getEyeLocation());
+            boolean headshot = distanceToEyes < WbsQuake.getInstance().settings.headshotThreshold;
+
+            QuakeRound round = QuakeLobby.getInstance().getCurrentRound();
+            round.registerKill(victim, shooter, headshot);
+        }
+
+        // - 1 to ignore the shooter themselves
+        if ((ignore.size() - 1) >= piercing.intVal()) {
+            return true;
+        }
+
+        fireFrom(shooter, hitPos, direction, ignore, bouncesLeft, isBounce);
+        return true;
     }
 
     private int xpTimerId = -1;
@@ -357,7 +457,7 @@ public class Gun {
         }
         lastLeap = LocalDateTime.now();
 
-        WbsEntities.push(player.getPlayer(), leapSpeed.val());
+        WbsEntityUtil.push(player.getPlayer(), leapSpeed.val());
         leapSound.play(player.getPlayer().getLocation());
     }
 
@@ -376,6 +476,9 @@ public class Gun {
     }
     public void setMultishotChance(double multishotChance) {
         this.multishotChance = multishotChance;
+    }
+    public void setScattershot(int scattershot) {
+        this.scattershot = scattershot;
     }
 
     public void setWidth(double width) {
@@ -396,6 +499,9 @@ public class Gun {
     }
     public double getMultishotChance() {
         return multishotChance;
+    }
+    public int getScattershot() {
+        return scattershot;
     }
 
     public int setCooldownProgress(int progress) {

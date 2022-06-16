@@ -3,22 +3,26 @@ package wbs.quake.cosmetics.trails;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
+import wbs.utils.util.WbsMath;
 import wbs.utils.util.particles.RingParticleEffect;
 
-public class SpiralTrail extends Trail {
+public class RingTrail extends Trail {
 
-    private double rotationsPerBlock = 2;
+    private final double startRadius;
+    private final double endRadius;
+    private final int startAmount;
 
-    public SpiralTrail(ConfigurationSection section, String directory) {
+    public RingTrail(ConfigurationSection section, String directory) {
         super(section, directory);
 
-        rotationsPerBlock = section.getDouble("rotations-per-block", rotationsPerBlock);
-        double radius = section.getDouble("radius", 0.35);
-        int amount = section.getInt("amount", 1);
+        startRadius = section.getDouble("start-radius", 0.35);
+        endRadius = section.getDouble("end-radius", 0.35);
+        startAmount = section.getInt("amount", 7);
 
         effect = new RingParticleEffect()
-                .setRadius(radius)
-                .setAmount(amount);
+                .setRadius(startRadius)
+                .setAmount(startAmount);
+
         configure(section, directory);
     }
 
@@ -33,19 +37,21 @@ public class SpiralTrail extends Trail {
                 .normalize()
                 .multiply(distance / steps);
 
-        double rotationsPerStep = rotationsPerBlock / amountPerBlock;
-        double rotationPerStep = 360 * rotationsPerStep;
         ringEffect.setAbout(direction);
 
-        double currentRotation = Math.random() * 360;
+        double currentRadius = startRadius;
         Location current = pos1.clone();
         for (int i = 0; i < steps; i++) {
+            int amount = (int) (startAmount * currentRadius / startRadius);
+            ringEffect.setAmount(amount);
+            ringEffect.setRadius(currentRadius);
             ringEffect.buildAndPlay(particle, current);
-            ringEffect.setRotation(currentRotation);
-            currentRotation += rotationPerStep;
 
-         //   plugin.logger.info("currentRotation = " + currentRotation);
-
+            if (!isBounce) {
+                currentRadius = WbsMath.lerp(startRadius, endRadius, (double) i / steps);
+            } else {
+                currentRadius = WbsMath.lerp(endRadius, startRadius, (double) i / steps);
+            }
             current.add(direction);
         }
     }

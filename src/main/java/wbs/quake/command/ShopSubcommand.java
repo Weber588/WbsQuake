@@ -4,7 +4,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.QuakeDB;
-import wbs.quake.cosmetics.menus.CosmeticsMenu;
+import wbs.quake.cosmetics.CosmeticsStore;
+import wbs.quake.cosmetics.menus.*;
 import wbs.quake.killperks.KillPerksMenu;
 import wbs.quake.menus.MenuManager;
 import wbs.quake.menus.ShopMenu;
@@ -45,6 +46,25 @@ public class ShopSubcommand extends WbsSubcommand {
                     break;
                 case "cosmetics":
                     menu = MenuManager.getMenu(player, CosmeticsMenu.class);
+                    if (args.length > 2) {
+                        switch (args[2].toLowerCase()) {
+                            case "skins":
+                                menu = MenuManager.getMenu(player, SkinMenu.class);
+                                break;
+                            case "trails":
+                                menu = MenuManager.getMenu(player, TrailMenu.class);
+                                break;
+                            case "kill_messages":
+                                menu = MenuManager.getMenu(player, KillMessageMenu.class);
+                                break;
+                            case "death_sounds":
+                                menu = MenuManager.getMenu(player, DeathSoundsMenu.class);
+                                break;
+                            case "shoot_sounds":
+                                menu = MenuManager.getMenu(player, ShootSoundsMenu.class);
+                                break;
+                        }
+                    }
                     break;
                 case "killperks":
                     menu = MenuManager.getMenu(player, KillPerksMenu.class);
@@ -60,12 +80,22 @@ public class ShopSubcommand extends WbsSubcommand {
     }
 
     @Override
-    protected List<String> getTabCompletions(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+    protected List<String> getTabCompletions(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args, int start) {
         List<String> choices = new LinkedList<>();
 
-        choices.add("upgrades");
-        choices.add("cosmetics");
-        choices.add("killperks");
+        if (args.length == start) {
+            choices.add("upgrades");
+            choices.add("cosmetics");
+            choices.add("killperks");
+        } else if (args.length == start + 1) {
+            if ("cosmetics".equalsIgnoreCase(args[start - 1])) {
+                choices.add("skins");
+                choices.add("trails");
+                choices.add("kill_messages");
+                choices.add("death_sounds");
+                choices.add("shoot_sounds");
+            }
+        }
 
         return choices;
     }

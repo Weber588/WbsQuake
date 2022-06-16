@@ -161,6 +161,20 @@ cosmetics:
       amount-per-block: 10
       oscillations-per-block: 1.5 # How many zig-zags per block the trail has
       radius: 0.2 # How far away from the actual shot should the zig-zags extend?
+    example-rings:
+      type: RINGS
+      item: FIREWORK_STAR
+      display: '&f&lShockwave'
+      price: 2500
+      description:
+        - 'Concentric rings that expand!'
+      particle: REDSTONE
+      size: 0.6
+      colour: white
+      amount-per-block: 2
+      rotations-per-block: 0.5 # How many twists per block the trail has
+      start-radius: 0.2 # The radius of the spiral
+      end-radius: 1.0 # How many spirals appear (i.e. 2 is a helix)
 
   armour:
     to: do

@@ -37,6 +37,8 @@ public abstract class PowerUp {
                 return new ReloadPowerUp(WbsQuake.getInstance(), section, directory);
             case RANDOM:
                 return new RandomPowerUp(WbsQuake.getInstance(), section, directory);
+            case SCATTERSHOT:
+                return new Scattershot(WbsQuake.getInstance(), section, directory);
         }
 
         return null;
@@ -67,7 +69,7 @@ public abstract class PowerUp {
     }
 
     public enum PowerUpType {
-        MULTISHOT, POTION, RAPID_FIRE, BOUNCESHOT, INSTANT_RELOAD, RANDOM
+        MULTISHOT, POTION, RAPID_FIRE, BOUNCESHOT, INSTANT_RELOAD, RANDOM, SCATTERSHOT
     }
 
     protected WbsQuake plugin;
