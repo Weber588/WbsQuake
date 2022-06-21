@@ -13,10 +13,7 @@ import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.database.AbstractDataManager;
 import wbs.utils.util.plugin.WbsPlugin;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MoneyCommand extends WbsSubcommand {
@@ -103,18 +100,28 @@ public class MoneyCommand extends WbsSubcommand {
     }
 
     private void apply(QuakePlayer player, MoneyArg arg, int money, CommandSender sender) {
+        Player bukkitPlayer = player.getPlayer();
         switch (arg) {
             case GIVE:
                 player.giveMoney(money);
                 sendMessage("Gave " + player.getName() + " " + EconomyUtil.formatMoney(money) + ". New total: " + EconomyUtil.formatMoneyFor(player), sender);
+                if (!Objects.equals(bukkitPlayer, sender) && bukkitPlayer.isOnline()) {
+                    sendMessage("You received " + EconomyUtil.formatMoney(money) + "! New total: " + EconomyUtil.formatMoneyFor(player), bukkitPlayer);
+                }
                 break;
             case TAKE:
                 player.giveMoney(-money);
                 sendMessage("Took " + EconomyUtil.formatMoney(money) + " from " + player.getName() + ". New total: " + EconomyUtil.formatMoneyFor(player), sender);
+                if (!Objects.equals(bukkitPlayer, sender) && bukkitPlayer.isOnline()) {
+                    sendMessage("You lost " + EconomyUtil.formatMoney(money) + "! New total: " + EconomyUtil.formatMoneyFor(player), bukkitPlayer);
+                }
                 break;
             case SET:
                 player.setMoney(money);
                 sendMessage("Set " + player.getName() + "'s total to " + EconomyUtil.formatMoney(money) + ".", sender);
+                if (!Objects.equals(bukkitPlayer, sender) && bukkitPlayer.isOnline()) {
+                    sendMessage("Your balance was set to " + EconomyUtil.formatMoneyFor(player) + ".", bukkitPlayer);
+                }
                 break;
             case CHECK:
                 sendMessage(player.getName() + "'s money: " + EconomyUtil.formatMoneyFor(player) + ".", sender);
