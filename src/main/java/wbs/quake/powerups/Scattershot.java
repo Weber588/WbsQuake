@@ -34,8 +34,8 @@ public class Scattershot extends PowerUp {
     @Override
     public void removeFrom(QuakePlayer player) {
         Gun gun = player.getCurrentGun();
-        if (amount == gun.getMultishotChance()) {
-            gun.setMultishotChance(0);
+        if (amount == gun.getScattershot()) {
+            gun.setScattershot(0);
             plugin.sendMessage(getDisplay() + " wears off...", player.getPlayer());
         }
     }
