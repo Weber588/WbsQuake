@@ -3,6 +3,7 @@ package wbs.quake.menus;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.WbsQuake;
+import wbs.quake.cosmetics.menus.CosmeticsMenu;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.menus.MenuSlot;
 
@@ -53,7 +54,7 @@ public final class MenuManager {
         MenuSlot backToCosmeticsSlot = new MenuSlot(getPlugin(), Material.CLOCK, "&bBack to Cosmetics");
 
         backToCosmeticsSlot.setClickAction(inventoryClickEvent ->
-                getMenu(player, ShopMenu.class).showTo(player.getPlayer())
+                getMenu(player, CosmeticsMenu.class).showTo(player.getPlayer())
         );
 
         return backToCosmeticsSlot;
