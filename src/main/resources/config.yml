@@ -89,6 +89,13 @@ power-ups:
     item: crossbow
     cooldown: 600
 
+  scattershot:
+    type: scattershot
+    item: quartz
+    amount: 3 # The amount of shots to fire in a random variation
+    duration: 400
+    cooldown: 600
+
   bounceshot:
     type: bounceshot
     duration: 300
