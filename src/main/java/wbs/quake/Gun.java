@@ -20,7 +20,10 @@ import wbs.quake.cosmetics.CosmeticsStore;
 import wbs.quake.cosmetics.trails.Trail;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.upgrades.UpgradeableOption;
-import wbs.utils.util.*;
+import wbs.utils.util.WbsEnums;
+import wbs.utils.util.WbsMath;
+import wbs.utils.util.WbsSound;
+import wbs.utils.util.WbsTime;
 import wbs.utils.util.database.WbsRecord;
 import wbs.utils.util.entities.WbsEntityUtil;
 import wbs.utils.util.string.WbsStringify;
@@ -33,7 +36,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class Gun {
 
@@ -378,7 +380,7 @@ public class Gun {
         }
 
         Location hitPos = result.getHitPosition().toLocation(shooter.getPlayer().getWorld());
-        trail.playShot(shootLocation, hitPos, isBounce);
+        trail.playShot(shootLocation, hitPos, isBounce, shooter);
 
         if (result.getHitBlock() != null) {
             if (bouncesLeft > 0) {

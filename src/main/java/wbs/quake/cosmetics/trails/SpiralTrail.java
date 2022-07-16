@@ -3,6 +3,7 @@ package wbs.quake.cosmetics.trails;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
+import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.particles.RingParticleEffect;
 
 public class SpiralTrail extends Trail {
@@ -23,7 +24,7 @@ public class SpiralTrail extends Trail {
     }
 
     @Override
-    public void playShot(Location pos1, Location pos2, boolean isBounce) {
+    public void playShot(Location pos1, Location pos2, boolean isBounce, QuakePlayer shooter) {
         RingParticleEffect ringEffect = (RingParticleEffect) effect;
 
         double distance = pos1.distance(pos2);

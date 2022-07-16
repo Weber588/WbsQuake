@@ -5,12 +5,12 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
-import wbs.utils.util.WbsMath;
+import wbs.quake.player.QuakePlayer;
+import wbs.utils.util.entities.WbsEntityUtil;
 import wbs.utils.util.particles.LineParticleEffect;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 public class StandardTrail extends Trail {
 
@@ -71,9 +71,14 @@ public class StandardTrail extends Trail {
     private static final Vector UP_VECTOR = new Vector(0, 1, 0);
 
     @Override
-    public void playShot(Location pos1, Location pos2, boolean isBounce) {
+    public void playShot(Location pos1, Location pos2, boolean isBounce, QuakePlayer shooter) {
         Vector direction = pos2.toVector().subtract(pos1.toVector());
-        Vector perp = direction.getCrossProduct(UP_VECTOR);
+        Vector perp;
+        if (direction.getX() != 0 || direction.getZ() != 0) {
+            perp = direction.getCrossProduct(UP_VECTOR);
+        } else {
+            perp = WbsEntityUtil.getLocalUp(shooter.getPlayer()).getCrossProduct(UP_VECTOR);
+        }
         Vector offsetDir = perp.getCrossProduct(direction);
         for (Vector offset : offsets) {
             Vector thisPerp = perp.clone().normalize().multiply(offset.getX());

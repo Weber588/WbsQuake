@@ -3,6 +3,7 @@ package wbs.quake.cosmetics.trails;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
+import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.WbsMath;
 import wbs.utils.util.particles.LineParticleEffect;
 
@@ -26,7 +27,7 @@ public class ZigZagTrail extends Trail {
     }
 
     @Override
-    public void playShot(Location pos1, Location pos2, boolean isBounce) {
+    public void playShot(Location pos1, Location pos2, boolean isBounce, QuakePlayer shooter) {
         LineParticleEffect lineEffect = (LineParticleEffect) effect;
 
         Vector shootVec = pos2.toVector().subtract(pos1.toVector());

@@ -90,7 +90,7 @@ public abstract class Trail extends SelectableCosmetic {
         }
     }
 
-    public abstract void playShot(Location pos1, Location pos2, boolean isBounce);
+    public abstract void playShot(Location pos1, Location pos2, boolean isBounce, QuakePlayer shooter);
 
     public int getAmountPerBlock() {
         return amountPerBlock;
