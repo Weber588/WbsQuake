@@ -104,27 +104,27 @@ public class MoneyCommand extends WbsSubcommand {
         switch (arg) {
             case GIVE:
                 player.giveMoney(money);
-                sendMessage("Gave " + player.getName() + " " + EconomyUtil.formatMoney(money) + ". New total: " + EconomyUtil.formatMoneyFor(player), sender);
+                sendMessage("Gave &h" + player.getName() + " " + EconomyUtil.formatMoney(money) + "&r. New total: &h" + EconomyUtil.formatMoneyFor(player), sender);
                 if (!Objects.equals(bukkitPlayer, sender) && bukkitPlayer.isOnline()) {
-                    sendMessage("You received " + EconomyUtil.formatMoney(money) + "! New total: " + EconomyUtil.formatMoneyFor(player), bukkitPlayer);
+                    sendMessage("You received &h" + EconomyUtil.formatMoney(money) + "&r! New total: &h" + EconomyUtil.formatMoneyFor(player), bukkitPlayer);
                 }
                 break;
             case TAKE:
                 player.giveMoney(-money);
-                sendMessage("Took " + EconomyUtil.formatMoney(money) + " from " + player.getName() + ". New total: " + EconomyUtil.formatMoneyFor(player), sender);
+                sendMessage("Took &h" + EconomyUtil.formatMoney(money) + "&r from &h" + player.getName() + "&r. New total: &h" + EconomyUtil.formatMoneyFor(player), sender);
                 if (!Objects.equals(bukkitPlayer, sender) && bukkitPlayer.isOnline()) {
-                    sendMessage("You lost " + EconomyUtil.formatMoney(money) + "! New total: " + EconomyUtil.formatMoneyFor(player), bukkitPlayer);
+                    sendMessage("You lost &h" + EconomyUtil.formatMoney(money) + "&r! New total: " + EconomyUtil.formatMoneyFor(player), bukkitPlayer);
                 }
                 break;
             case SET:
                 player.setMoney(money);
-                sendMessage("Set " + player.getName() + "'s total to " + EconomyUtil.formatMoney(money) + ".", sender);
+                sendMessage("Set &h" + player.getName() + "&r's total to &h" + EconomyUtil.formatMoney(money) + "&r.", sender);
                 if (!Objects.equals(bukkitPlayer, sender) && bukkitPlayer.isOnline()) {
-                    sendMessage("Your balance was set to " + EconomyUtil.formatMoneyFor(player) + ".", bukkitPlayer);
+                    sendMessage("Your balance was set to &h" + EconomyUtil.formatMoneyFor(player) + "&r.", bukkitPlayer);
                 }
                 break;
             case CHECK:
-                sendMessage(player.getName() + "'s money: " + EconomyUtil.formatMoneyFor(player) + ".", sender);
+                sendMessage(player.getName() + "'s money: &h" + EconomyUtil.formatMoneyFor(player) + "&r.", sender);
                 break;
         }
 

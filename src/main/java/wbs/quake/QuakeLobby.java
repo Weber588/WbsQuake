@@ -246,10 +246,14 @@ public class QuakeLobby extends WbsMessenger {
             case WAITING_FOR_PLAYERS:
             case PAUSED_BEFORE_VOTING:
                 cancelRunnable();
+                if (players.size() == 1) {
+                    messagePlayers("Only one player in lobby - any map may appear for testing purposes.");
+                }
                 startVoting();
                 break;
             case VOTING:
                 cancelRunnable();
+                messagePlayers("Force starting round!");
 
                 Arena chosenArena = getChosenArena();
                 messagePlayers("&h" + chosenArena.getDisplayName() + "&r won!");

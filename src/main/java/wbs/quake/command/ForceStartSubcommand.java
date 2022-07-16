@@ -19,7 +19,11 @@ public class ForceStartSubcommand extends WbsSubcommand {
             return true;
         }
 
-        QuakeLobby.getInstance().forceStart();
+        if (QuakeLobby.getInstance().isInLobby(((Player) sender))) {
+            QuakeLobby.getInstance().forceStart();
+        } else {
+            sendMessage("&wYou must be in the lobby to use this!", sender);
+        }
 
         return true;
     }

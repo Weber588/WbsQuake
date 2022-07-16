@@ -1,11 +1,12 @@
 package wbs.quake;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
-import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.powerups.ArenaPowerUp;
 import wbs.utils.util.WbsScoreboard;
@@ -33,9 +34,8 @@ public class QuakeRound {
 
     // Scoreboard
     private final WbsScoreboard scoreboard;
-    private final int scoreboardLeaderboardLine = 5;
-    private final int timeLeftLine = 2;
-    private int scoreboardSize = 8;
+    private final int scoreboardLeaderboardLine;
+    private final int timeLeftLine;
 
     private final WbsQuake plugin;
     private final QuakeSettings settings;
@@ -54,22 +54,33 @@ public class QuakeRound {
         scoreboard.addLine("&rMap: &h" + arena.getDisplayName());
         scoreboard.addLine("&rPoints to win: &h" + arena.getKillsToWin());
         scoreboard.addLine("&rTime left: &h");
+        timeLeftLine = scoreboard.size() - 1;
 
+        String blank = "&r";
         // TODO: Find a way to not need this lol
-        scoreboard.addLine("&r");
+        scoreboard.addLine(blank);
 
         if (settings.showLeaderboardInGame) {
-            scoreboard.addLine("&r1: ");
-            scoreboard.addLine("&r2: ");
-            if (playersInRound.size() >= 3) {
-                scoreboard.addLine("&r3: ");
-                scoreboardSize++;
+            for (int i = 0; i < Math.min(playersInRound.size(), 3); i++) {
+                scoreboard.addLine(getBlank(i + 2));
             }
+            scoreboardLeaderboardLine = scoreboard.size() - 1;
+            scoreboard.addLine(getBlank(playersInRound.size() + 2));
+        } else {
+            scoreboardLeaderboardLine = 0;
         }
 
-        scoreboard.addLine("&r&r");
-
         scoreboard.addLine(BORDER + "&r");
+
+        scoreboard.size();
+    }
+
+    private String getBlank(int repeats) {
+        StringBuilder blankLine = new StringBuilder("&r");
+        for (int repeat = 0; repeat < repeats; repeat++) {
+            blankLine.append("&r");
+        }
+        return blankLine.toString();
     }
 
     public void givePoint(QuakePlayer attacker) {
@@ -93,18 +104,18 @@ public class QuakeRound {
         scoreboard.setLine(timeLeftLine, timeLeftString);
 
         if (settings.showLeaderboardInGame) {
-            List<Map.Entry<QuakePlayer, Integer>> leaderboard = getLeaderboard();
+            List<QuakePlayer> leaderboard = getLeaderboard();
 
             int extraWidthNeeded = 0;
 
             char[] colours = {'a', 'e', 'c'};
             for (int i = 0; i < 3; i++) {
                 if (leaderboard.size() > i) {
-                    Map.Entry<QuakePlayer, Integer> entry = leaderboard.get(i);
-                    String playerName = entry.getKey().getName();
+                    QuakePlayer player = leaderboard.get(i);
+                    String playerName = player.getName();
                     scoreboard.setLine(
                             scoreboardLeaderboardLine + i,
-                            "&" + colours[i] + entry.getValue()
+                            "&" + colours[i] + points.get(player)
                                     + " - " + playerName);
 
                     if (playerName.length() > CHARS_NEEDED_TO_EXTEND) {
@@ -119,7 +130,7 @@ public class QuakeRound {
             }
 
             scoreboard.setLine(0, BORDER + extraWidth);
-            scoreboard.setLine(scoreboardSize, BORDER + extraWidth + "&r");
+            scoreboard.setLine(scoreboard.size() - 1, BORDER + extraWidth + "&r");
         }
     }
 
@@ -201,31 +212,56 @@ public class QuakeRound {
             }
         }
 
-        List<Map.Entry<QuakePlayer, Integer>> winners = getLeaderboard();
+        List<QuakePlayer> winners = getLeaderboard();
 
-        int winnerPoints = winners.get(0).getValue();
+        int winnerPoints = points.get(winners.get(0));
+        int currentPoints = winnerPoints;
+        int currentPlace = 0;
 
-        points.forEach((player, points) -> {
+        Multimap<Integer, QuakePlayer> placeMap = HashMultimap.create();
+        for (QuakePlayer player : winners) {
+            int score = points.get(player);
             player.addPlayed();
-            if (points == winnerPoints) {
+            if (score == winnerPoints) {
                 player.addWin();
             }
-        });
 
-        String endMessage =  "&hRound over!&r"
+            if (score != currentPoints) {
+                currentPlace++;
+                currentPoints = score;
+            }
+
+            placeMap.put(currentPlace, player);
+        }
+
+        StringBuilder endMessage = new StringBuilder("&hRound over!&r"
                 + "\n==============================="
                 + "\n"
-                + "\n&a&lWinner - " + winners.get(0).getKey().getName() + " - " + winners.get(0).getValue();
+                + "\n");
 
-        if (winners.size() >= 2) {
-            endMessage += "\n&e&l2nd - " + winners.get(1).getKey().getName() + " - " + winners.get(1).getValue();
+        final String[] placeDisplay = {"&a&lWinner", "&e&l2nd", "&c&l3rd"};
+
+        for (int i = 0; i < placeDisplay.length; i++) {
+            Collection<QuakePlayer> players = placeMap.get(i);
+
+            if (players != null && !players.isEmpty()) {
+                QuakePlayer randomPlayer = players.stream().findAny().get();
+                String display = placeDisplay[i];
+
+                String playerDisplay = players.stream()
+                        .map(QuakePlayer::getName)
+                        .collect(Collectors.joining(" & "));
+
+                endMessage.append("\n")
+                        .append(display)
+                        .append(" - ")
+                        .append(playerDisplay)
+                        .append(" - ")
+                        .append(points.get(randomPlayer));
+            }
         }
 
-        if (winners.size() >= 3) {
-            endMessage += "\n&c&l3rd - " + winners.get(2).getKey().getName() + " - " + winners.get(2).getValue();
-        }
-
-        endMessage += "\n\n&r===============================";
+        endMessage.append("\n\n&r===============================");
 
         scoreboard.clear();
 
@@ -233,21 +269,15 @@ public class QuakeRound {
 
         QuakeDB.getPlayerManager().saveAsync(initialPlayersInRound);
 
-        lobby.roundOver(endMessage);
+        lobby.roundOver(endMessage.toString());
     }
 
-    private List<Map.Entry<QuakePlayer, Integer>> getLeaderboard() {
-        List<Map.Entry<QuakePlayer, Integer>> winners = new ArrayList<>(points.entrySet());
+    private List<QuakePlayer> getLeaderboard() {
+        List<QuakePlayer> winners = new LinkedList<>(points.keySet());
 
-        winners.sort(Comparator.comparingInt(Map.Entry::getValue));
-
-        Collections.reverse(winners);
+        winners.sort(Comparator.comparingInt(points::get));
 
         return winners;
-    }
-
-    private List<QuakePlayer> getPlayerLeaderboard() {
-        return getLeaderboard().stream().map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
     public void registerKill(QuakePlayer victim, QuakePlayer attacker, boolean headshot) {
