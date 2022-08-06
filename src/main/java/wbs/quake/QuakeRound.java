@@ -221,9 +221,13 @@ public class QuakeRound {
         Multimap<Integer, QuakePlayer> placeMap = HashMultimap.create();
         for (QuakePlayer player : winners) {
             int score = points.get(player);
-            player.addPlayed();
-            if (score == winnerPoints) {
-                player.addWin();
+
+            // Only add stats if the highest score is above 0
+            if (winnerPoints > 0) {
+                player.addPlayed();
+                if (score == winnerPoints) {
+                    player.addWin();
+                }
             }
 
             if (score != currentPoints) {
@@ -267,7 +271,7 @@ public class QuakeRound {
 
         arena.finish();
 
-        QuakeDB.getPlayerManager().saveAsync(initialPlayersInRound);
+        QuakeDB.getPlayerManager().saveAsync(winners);
 
         lobby.roundOver(endMessage.toString());
     }
@@ -275,7 +279,7 @@ public class QuakeRound {
     private List<QuakePlayer> getLeaderboard() {
         List<QuakePlayer> winners = new LinkedList<>(points.keySet());
 
-        winners.sort(Comparator.comparingInt(points::get));
+        winners.sort((a, b) -> Integer.compare(points.get(b), points.get(a)));
 
         return winners;
     }
