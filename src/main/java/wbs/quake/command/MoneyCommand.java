@@ -6,14 +6,14 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import wbs.quake.EconomyUtil;
 import wbs.quake.QuakeDB;
-import wbs.quake.player.PlayerManager;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.commands.WbsSubcommand;
-import wbs.utils.util.database.AbstractDataManager;
 import wbs.utils.util.plugin.WbsPlugin;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class MoneyCommand extends WbsSubcommand {
@@ -129,7 +129,7 @@ public class MoneyCommand extends WbsSubcommand {
         }
 
         if (arg != MoneyArg.CHECK) {
-            QuakeDB.getPlayerManager().saveAsync(Collections.singleton(player));
+            player.markToSave();
         }
     }
 

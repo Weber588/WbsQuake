@@ -17,7 +17,7 @@ public class CosmeticSlot<T extends SelectableCosmetic> extends SelectableSlot<T
     }
 
     @Override
-    protected void onSuccessfulSelection(InventoryClickEvent event, T cosmetic) {
+    protected void onSelect(InventoryClickEvent event, T cosmetic) {
         menu.getPlayer().getCosmetics().setCosmetic(cosmetic);
         menu.setCurrent(cosmetic);
 

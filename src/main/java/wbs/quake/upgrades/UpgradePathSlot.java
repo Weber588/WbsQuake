@@ -58,6 +58,8 @@ public class UpgradePathSlot extends MenuSlot {
             if (EconomyUtil.hasMoney(qPlayer, cost)) {
                 EconomyUtil.takeMoney(qPlayer, cost);
 
+                qPlayer.markToSave();
+
                 option.setCurrentProgress(current + 1);
                 menu.update(event.getSlot());
                 menu.update(UpgradesMenu.BAL_SLOT);

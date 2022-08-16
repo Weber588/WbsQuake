@@ -16,7 +16,18 @@ public class KillPerksMenu extends PlayerSelectionMenu<KillPerk> {
         MenuSlot border = new MenuSlot(plugin, Material.RED_STAINED_GLASS_PANE, "&r");
         setOutline(border);
         setColumn(2, border);
-        setSlot(2, 1, border);
+
+        MenuSlot unsetSlot = new MenuSlot(plugin, Material.BARRIER, "&cClear Kill Perk", true);
+
+        unsetSlot.setClickAction(click -> {
+            player.killPerk = null;
+            plugin.sendMessage("Kill Perk removed!", player.getPlayer());
+            player.markToSave();
+            setSlot(1, 1, null);
+            update(1, 1);
+        });
+
+        setSlot(2, 1, unsetSlot);
 
         setSlot(3, 1, MenuManager.getBalSlot());
         setSlot(4, 1, MenuManager.getBackToShopSlot(player));

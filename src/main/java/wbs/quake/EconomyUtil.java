@@ -31,6 +31,7 @@ public final class EconomyUtil {
             return VaultWrapper.takeMoney(player.getPlayer(), amount);
         } else {
             player.giveMoney(-amount);
+            player.markToSave();
         }
 
         return true;
@@ -53,6 +54,7 @@ public final class EconomyUtil {
             VaultWrapper.giveMoney(player.getPlayer(), moneyToGive);
         } else {
             player.giveMoney(moneyToGive);
+            player.markToSave();
         }
     }
 }

@@ -12,6 +12,7 @@ import wbs.quake.upgrades.UpgradePath;
 import wbs.quake.upgrades.UpgradePathType;
 import wbs.quake.upgrades.UpgradeableOption;
 import wbs.utils.exceptions.InvalidConfigurationException;
+import wbs.utils.util.WbsEnums;
 import wbs.utils.util.plugin.WbsSettings;
 
 import java.io.File;
@@ -51,22 +52,30 @@ public class QuakeSettings extends WbsSettings {
         setupShop();
         loadMisc();
 
-
         File arenaFile = new File(plugin.getDataFolder(), arenaFileName);
         if (arenaFile.exists()) {
             arenaConfig = loadConfigSafely(arenaFile);
         } else {
             plugin.logger.info("Arena file missing.");
         }
-        /*
-        File playerFile = new File(plugin.getDataFolder(), playerFileName);
-        if (playerFile.exists()) {
-            playersConfig = loadConfigSafely(playerFile);
-        } else {
-            plugin.logger.info("Player file missing.");
-        }
-         */
 
+        if (config.contains("options.save-mode")) {
+            String saveModeString = config.getString("options.save-mode", SaveManager.SaveMode.ROUND_END.name());
+            SaveManager.SaveMode mode = WbsEnums.getEnumFromString(SaveManager.SaveMode.class, saveModeString);
+            if (mode != null) {
+                SaveManager.saveMode = mode;
+            }
+        }
+        if (SaveManager.saveMode == SaveManager.SaveMode.TIMER && config.contains("options.save-frequency")) {
+            // in seconds
+            int frequency = config.getInt("options.save-frequency", 300);
+            if (frequency < 30) {
+                logError("Save frequency must be greater than 30 seconds.", "config.yml/options/save-frequency");
+            } else {
+                SaveManager.saveFrequency = frequency * 20;
+                SaveManager.startTimer();
+            }
+        }
         if (config.contains("options.furthest-spawnpoint")) {
             findFurthestSpawnpoint = config.getBoolean("options.furthest-spawnpoint", true);
         }

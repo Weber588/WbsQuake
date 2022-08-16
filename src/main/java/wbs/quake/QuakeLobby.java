@@ -52,7 +52,7 @@ public class QuakeLobby extends WbsMessenger {
 
         lobbyState.track(new XPState(0))
                 .track(new GameModeState(GameMode.ADVENTURE))
-                .track(new InventoryState(lobbyInventory, ItemManager.getShopItemSlot()))
+                .track(new InventoryState(lobbyInventory))
                 .track(new InvulnerableState(true))
                 .trackAll();
     }
@@ -515,7 +515,6 @@ public class QuakeLobby extends WbsMessenger {
         cancelRunnable();
         state = GameState.ROUND_OVER;
         playersInRound.clear();
-        StatsManager.recalculateAll();
         round = null;
         messagePlayers(endMessage);
         registerRunnable(new BukkitRunnable() {

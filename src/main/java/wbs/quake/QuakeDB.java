@@ -1,15 +1,7 @@
 package wbs.quake;
 
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import wbs.quake.player.PlayerManager;
-import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.database.*;
-
-import java.nio.Buffer;
-import java.util.*;
-import java.util.function.Consumer;
 
 public final class QuakeDB {
 
@@ -26,8 +18,6 @@ public final class QuakeDB {
     public static PlayerManager getPlayerManager() {
         return playerManager;
     }
-
-    // Player table
 
     public static WbsTable playerTable;
 
@@ -93,7 +83,6 @@ public final class QuakeDB {
             playerManager = new PlayerManager(plugin, playerTable);
         }
     }
-
 
     /**
      * Add new fields added after the initial run.

@@ -30,7 +30,7 @@ public class WbsQuake extends WbsPlugin {
         new QuakeCommand(this, getCommand("wbsquake"));
 
         PlaceholderManager.registerPlaceholders();
-        StatsManager.recalculateAll();
+        StatsManager.recalculateAllAsync();
     }
 
     @Override
@@ -39,6 +39,6 @@ public class WbsQuake extends WbsPlugin {
 
         ArenaManager.getAllArenas().forEach(Arena::finish);
 
-        QuakeDB.getPlayerManager().saveCache();
+        SaveManager.save();
     }
 }

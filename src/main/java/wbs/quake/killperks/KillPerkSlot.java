@@ -43,8 +43,10 @@ public class KillPerkSlot extends SelectableSlot<KillPerk> {
     }
 
     @Override
-    protected void onSuccessfulSelection(InventoryClickEvent event, KillPerk killPerk) {
+    protected void onSelect(InventoryClickEvent event, KillPerk killPerk) {
         menu.getPlayer().killPerk = killPerk;
+        menu.getPlayer().markToSave();
+
         menu.setCurrent(killPerk);
 
         menu.updateSelected(this);

@@ -8,15 +8,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import wbs.quake.EconomyUtil;
-import wbs.quake.QuakeDB;
-import wbs.quake.QuakeLobby;
-import wbs.quake.WbsQuake;
+import wbs.quake.*;
 import wbs.quake.player.QuakePlayer;
 import wbs.utils.util.menus.MenuSlot;
 import wbs.utils.util.pluginhooks.PlaceholderAPIWrapper;
 import wbs.utils.util.pluginhooks.VaultWrapper;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -45,7 +43,7 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
         Player player = (Player) event.getWhoClicked();
 
         if (player.hasPermission(selectable.permission)) {
-            onSuccessfulSelection(event, selectable);
+            select(player, event, selectable);
         } else {
             if (selectable.purchasable) {
                 QuakeDB.getPlayerManager().getAsync(player, qPlayer -> {
@@ -58,7 +56,8 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
 
                         VaultWrapper.givePermission(player, selectable.permission);
 
-                        onSuccessfulSelection(event, selectable);
+                        // Don't need to mark for saving; done in the select method anyway.
+                        select(qPlayer, event, selectable);
                     } else {
                         plugin.sendMessage("Not enough money! Balance: &w"
                                 + EconomyUtil.formatMoneyFor(qPlayer) + "&r. Cost: &h" + EconomyUtil.formatMoney(selectable.price), player);
@@ -113,7 +112,19 @@ public abstract class SelectableSlot<T extends MenuSelectable> extends MenuSlot 
         return item;
     }
 
-    protected void onSuccessfulSelection(InventoryClickEvent event, T selectable) {
+    private void select(Player player, final InventoryClickEvent event, final T selectable) {
+        QuakeDB.getPlayerManager().getAsync(player,
+                quakePlayer -> select(quakePlayer, event, selectable)
+        );
+    }
+
+    private void select(QuakePlayer qPlayer, InventoryClickEvent event, T selectable) {
+        qPlayer.markToSave();
+
+        onSelect(event, selectable);
+    }
+
+    protected void onSelect(InventoryClickEvent event, T selectable) {
 
     }
 

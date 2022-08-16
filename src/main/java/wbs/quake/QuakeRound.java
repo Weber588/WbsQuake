@@ -61,10 +61,13 @@ public class QuakeRound {
         scoreboard.addLine(blank);
 
         if (settings.showLeaderboardInGame) {
+            // Size is fine - guaranteed to have 1 player, and once added to the scoreboard, becomes first score index
+            scoreboardLeaderboardLine = scoreboard.size();
+
             for (int i = 0; i < Math.min(playersInRound.size(), 3); i++) {
                 scoreboard.addLine(getBlank(i + 2));
             }
-            scoreboardLeaderboardLine = scoreboard.size() - 1;
+
             scoreboard.addLine(getBlank(playersInRound.size() + 2));
         } else {
             scoreboardLeaderboardLine = 0;
@@ -271,7 +274,10 @@ public class QuakeRound {
 
         arena.finish();
 
-        QuakeDB.getPlayerManager().saveAsync(winners);
+        SaveManager.markToSave(winners);
+        if (SaveManager.saveMode == SaveManager.SaveMode.ROUND_END) {
+            SaveManager.saveAsync();
+        }
 
         lobby.roundOver(endMessage.toString());
     }

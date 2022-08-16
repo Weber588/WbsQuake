@@ -56,12 +56,15 @@ public final class StatsManager {
 
     private static final Map<TrackedStat, List<QuakePlayer>> stats = new HashMap<>();
 
+    public static void recalculateAllAsync() {
+        WbsQuake.getInstance().runAsync(StatsManager::recalculateAll);
+    }
+
     public static void recalculateAll() {
-        WbsQuake.getInstance().runAsync(() -> {
-            for (TrackedStat stat : TrackedStat.values()) {
-                recalculate(stat);
-            }
-        });
+        for (TrackedStat stat : TrackedStat.values()) {
+            recalculate(stat);
+        }
+        WbsQuake.getInstance().logger.info("Recalculated leaderboards!");
     }
 
     public static int recalculateAsync(TrackedStat stat, Consumer<List<QuakePlayer>> consumer) {

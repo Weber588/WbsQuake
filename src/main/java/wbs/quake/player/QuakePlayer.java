@@ -5,12 +5,8 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-import wbs.quake.Gun;
-import wbs.quake.QuakeDB;
-import wbs.quake.QuakeSettings;
-import wbs.quake.WbsQuake;
+import wbs.quake.*;
 import wbs.quake.killperks.KillPerk;
-import wbs.quake.menus.SelectableSlot;
 import wbs.utils.util.WbsMath;
 import wbs.utils.util.database.RecordProducer;
 import wbs.utils.util.database.WbsRecord;
@@ -209,8 +205,8 @@ public class QuakePlayer implements RecordProducer {
         this.name = player.getName();
     }
 
-    public void upsert() {
-        toRecord().upsert(QuakeDB.playerTable);
+    public void markToSave() {
+        SaveManager.markToSave(this);
     }
 
     @Override
