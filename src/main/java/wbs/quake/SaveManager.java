@@ -1,6 +1,7 @@
 package wbs.quake;
 
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 import wbs.quake.player.QuakePlayer;
 
 import java.util.Collection;
@@ -10,6 +11,7 @@ import java.util.Set;
 public final class SaveManager {
     private SaveManager() {}
 
+    @NotNull
     public static SaveMode saveMode = SaveMode.ROUND_END;
 
     private static Set<QuakePlayer> toSave = new HashSet<>();

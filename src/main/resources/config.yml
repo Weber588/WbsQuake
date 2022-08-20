@@ -15,6 +15,13 @@ error-highlight: '7'
 
 
 options:
+  # What method of saving should be used?
+  # Options are ROUND_END to save at the end of each round, or TIMER to save incrementally.
+  save-mode: ROUND_END
+
+  # How often, in seconds, should stats be saved (when save-mode is TIMER)?
+  save-frequency: 300
+
   # Should the server economy be used, or should money be tracked internally?
   # When true, Vault must be installed.
   # When false, money earnt and spent in Quake will be tracked internally by this plugin as custom currency.
@@ -53,6 +60,24 @@ options:
   # Note that if there are fewer arenas with the correct min/max player counts,
   # there may be fewer than this many arenas shown.
   max-arenas-per-vote: 5
+
+  # Kill scaling changes the amount of kills needed to finish a round dynamically based on
+  # the number of players in that round.
+  kill-scaling:
+    enabled: true
+
+    # How many players need to be in the game before scaling starts?
+    # When there are this many players, the first increment will be applied.
+    min-players: 5
+
+    # How often should the points increment?
+    # For example, if this is 1, then every extra player over min-players will add point-increment.
+    player-increment: 2
+
+    # How many extra kills are needed for every player-increment players in the round?
+    # For example, if player-increment is 1 and this is 3, every player over min-players will
+    # add 3 kills needed to the round.
+    point-increment: 5
 
 power-ups:
   rapid_fire: # You reference these in game to add to arenas

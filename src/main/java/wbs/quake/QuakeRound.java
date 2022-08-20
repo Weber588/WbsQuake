@@ -37,6 +37,8 @@ public class QuakeRound {
     private final int scoreboardLeaderboardLine;
     private final int timeLeftLine;
 
+    private final int killsToWin;
+
     private final WbsQuake plugin;
     private final QuakeSettings settings;
     public QuakeRound(Arena arena, List<QuakePlayer> playersInRound) {
@@ -47,12 +49,14 @@ public class QuakeRound {
 
         this.initialPlayersInRound.addAll(playersInRound);
 
+        killsToWin = arena.getKillsToWin(playersInRound.size());
+
         scoreboard = new WbsScoreboard(plugin, "WbsQuake", "&c&lQuake");
 
         scoreboard.addLine(BORDER);
         scoreboard.addLine("");
         scoreboard.addLine("&rMap: &h" + arena.getDisplayName());
-        scoreboard.addLine("&rPoints to win: &h" + arena.getKillsToWin());
+        scoreboard.addLine("&rPoints to win: &h" + killsToWin);
         scoreboard.addLine("&rTime left: &h");
         timeLeftLine = scoreboard.size() - 1;
 
@@ -93,7 +97,7 @@ public class QuakeRound {
 
         points.put(attacker, current);
 
-        if (current >= arena.getKillsToWin()) {
+        if (current >= killsToWin) {
             roundOver();
         }
     }

@@ -363,6 +363,21 @@ public class Arena {
         return killsToWin;
     }
 
+    public int getKillsToWin(int playersInRound) {
+        QuakeSettings settings = plugin.settings;
+
+        int killsToWin = getKillsToWin();
+
+        if (!settings.doKillScaling) {
+            return killsToWin;
+        }
+
+        int extraPlayers = (playersInRound + settings.killScalingPlayerIncrement) - settings.minPlayersForExtraKills;
+        int incrementsToAdd = Math.max(0, extraPlayers / settings.killScalingPlayerIncrement);
+
+        return killsToWin + incrementsToAdd * settings.killScalingPointIncrement;
+    }
+
     public void addSpawnPoint(Location loc) {
         spawnPoints.add(loc);
     }

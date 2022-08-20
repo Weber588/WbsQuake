@@ -38,11 +38,12 @@ public class QuakeSettings extends WbsSettings {
     private final String arenaFileName = "arenas.yml";
  //   private final String playerFileName = "players.yml";
     private final String miscFileName = "misc.yml";
+    private final String configName = "config.yml";
 
     @Override
     public void reload() {
         errors.clear();
-        config = loadDefaultConfig("config.yml");
+        config = loadDefaultConfig(configName);
         shopConfig = loadConfigSafely(genConfig("shop.yml"));
         miscConfig = loadConfigSafely(genConfig(miscFileName));
 
@@ -59,18 +60,24 @@ public class QuakeSettings extends WbsSettings {
             plugin.logger.info("Arena file missing.");
         }
 
+        String directory = configName + "/options";
+
         if (config.contains("options.save-mode")) {
-            String saveModeString = config.getString("options.save-mode", SaveManager.SaveMode.ROUND_END.name());
+            String saveModeString = config.getString("options.save-mode", SaveManager.saveMode.name());
             SaveManager.SaveMode mode = WbsEnums.getEnumFromString(SaveManager.SaveMode.class, saveModeString);
             if (mode != null) {
                 SaveManager.saveMode = mode;
+            } else {
+                logError("Invalid mode: " + saveModeString + ". Please choose from the following: "
+                        + WbsEnums.joiningPrettyStrings(SaveManager.SaveMode.class, ", "),
+                        directory + "/save-mode");
             }
         }
         if (SaveManager.saveMode == SaveManager.SaveMode.TIMER && config.contains("options.save-frequency")) {
             // in seconds
             int frequency = config.getInt("options.save-frequency", 300);
             if (frequency < 30) {
-                logError("Save frequency must be greater than 30 seconds.", "config.yml/options/save-frequency");
+                logError("Save frequency must be greater than 30 seconds.", directory + "/save-frequency");
             } else {
                 SaveManager.saveFrequency = frequency * 20;
                 SaveManager.startTimer();
@@ -113,6 +120,28 @@ public class QuakeSettings extends WbsSettings {
             economyFormat = config.getString("options.economy-format", economyFormat);
         }
 
+        String killScalingDirectory = directory + "/kill-scaling";
+
+        if (config.contains("options.kill-scaling.enabled")) {
+            doKillScaling = config.getBoolean("options.kill-scaling.enabled", doKillScaling);
+        }
+        if (config.contains("options.kill-scaling.min-players")) {
+            minPlayersForExtraKills = config.getInt("options.kill-scaling.min-players", minPlayersForExtraKills);
+            if (minPlayersForExtraKills < 1) {
+                logError("Min players must be at least 1.", killScalingDirectory + "/min-players");
+            }
+        }
+        if (config.contains("options.kill-scaling.player-increment")) {
+            killScalingPlayerIncrement = config.getInt("options.kill-scaling.player-increment", killScalingPlayerIncrement);
+            if (killScalingPlayerIncrement < 1) {
+                logError("Player increment must be at least 1.", killScalingDirectory + "/player-increment");
+                killScalingPlayerIncrement = 1;
+            }
+        }
+        if (config.contains("options.kill-scaling.point-increment")) {
+            killScalingPointIncrement = config.getInt("options.kill-scaling.point-increment", killScalingPointIncrement);
+        }
+
         ArenaManager.setPlugin(plugin);
         Arena.setPlugin(plugin);
 
@@ -137,6 +166,11 @@ public class QuakeSettings extends WbsSettings {
     public double moneyPerKill = 10;
     public double headshotBonus = 5;
     public int maxArenasPerVote = 5;
+
+    public boolean doKillScaling = true;
+    public int minPlayersForExtraKills = 5;
+    public int killScalingPlayerIncrement = 2;
+    public int killScalingPointIncrement = 5;
 
     public final Map<String, PowerUp> powerUps = new HashMap<>();
 
