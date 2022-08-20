@@ -34,6 +34,7 @@ public class Arena {
     private int killsToWin = 10;
     private int secondsInRound = 60 * 5; // 5 minutes
 
+    private boolean needsSaving = false;
 
     public Arena(@NotNull String name) {
         this.name = name;
@@ -228,9 +229,6 @@ public class Arena {
         return closest;
     }
 
-
-
-
     public boolean respawn(Player player) {
         Location point = getRandomSpawnPoint(player);
         if (point == null) return false;
@@ -381,8 +379,8 @@ public class Arena {
     public void addSpawnPoint(Location loc) {
         spawnPoints.add(loc);
     }
-    public boolean removeSpawnPoint(Location loc) {
-        return spawnPoints.remove(loc);
+    public void removeSpawnPoint(Location loc) {
+        spawnPoints.remove(loc);
     }
 
     public void addPowerUp(Location loc, PowerUp powerUp) {
@@ -503,5 +501,17 @@ public class Arena {
 
         powerups.clear();
         powerups.putAll(newPowerUps);
+    }
+
+    public boolean needsSaving() {
+        return needsSaving;
+    }
+
+    public void unmarkForSaving() {
+        this.needsSaving = false;
+    }
+
+    public void markForSaving() {
+        this.needsSaving = true;
     }
 }

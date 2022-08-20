@@ -49,6 +49,7 @@ public class ArenaSetMaxSubcommand extends WbsSubcommand {
         }
 
         arena.setMaxPlayers(maxPlayers);
+        arena.markForSaving();
         sendMessage("Set max players to " + maxPlayers + " for arena &h" + arena.getDisplayName(), sender);
 
         return true;

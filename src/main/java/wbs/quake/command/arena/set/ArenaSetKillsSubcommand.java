@@ -49,6 +49,7 @@ public class ArenaSetKillsSubcommand extends WbsSubcommand {
         }
 
         arena.setKillsToWin(killsToWin);
+        arena.markForSaving();
         sendMessage("Set kills needed to win to " + killsToWin + " for arena &h" + arena.getDisplayName(), sender);
 
         return true;

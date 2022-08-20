@@ -39,6 +39,7 @@ public class ArenaSetDisplaySubcommand extends WbsSubcommand {
         }
 
         arena.setDisplayName(display);
+        arena.markForSaving();
         sendMessage("Set the display name of &h" + arena.getName() + "&r to &h" + display + "&r.", sender);
 
         return true;

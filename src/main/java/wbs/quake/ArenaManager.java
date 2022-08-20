@@ -26,7 +26,7 @@ public final class ArenaManager {
         arenas.put(newArena.getName(), newArena);
     }
 
-    public static void saveArenas(ConfigurationSection section) {
+    public static void writeArenas(ConfigurationSection section) {
         arenas.values().forEach(arena -> arena.writeToConfig(section));
     }
 
@@ -48,5 +48,22 @@ public final class ArenaManager {
 
     public static List<String> getArenaNames() {
         return arenas.values().stream().map(Arena::getName).collect(Collectors.toList());
+    }
+
+    public static YamlConfiguration saveArenas(YamlConfiguration arenaConfig) {
+        boolean needsSaving = arenas.values().stream().anyMatch(Arena::needsSaving);
+
+        if (needsSaving) {
+            plugin.logger.info("An arena needed saving.");
+            arenas.values().forEach(arena -> {
+                if (arena.needsSaving()) {
+                    plugin.logger.info(arena.getDisplayName() + " needed saving.");
+                }
+            });
+            arenaConfig = plugin.settings.writeArenas();
+            arenas.values().forEach(Arena::unmarkForSaving);
+        }
+
+        return arenaConfig;
     }
 }

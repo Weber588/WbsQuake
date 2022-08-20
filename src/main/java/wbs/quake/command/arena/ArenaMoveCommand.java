@@ -43,10 +43,9 @@ public class ArenaMoveCommand extends AbstractArenaCommand {
             Location to = player.getLocation();
 
             arena.move(from, to);
-            plugin.runAsync(() -> {
-                plugin.settings.saveArenas();
-                sendMessage("Arena moved!", player);
-            });
+            
+            arena.markForSaving();
+            sendMessage("Arena moved!", player);
             arenaMoveInstances.remove(player);
         }
 

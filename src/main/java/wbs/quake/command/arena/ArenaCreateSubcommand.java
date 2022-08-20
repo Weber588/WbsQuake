@@ -6,7 +6,6 @@ import wbs.quake.Arena;
 import wbs.quake.ArenaManager;
 import wbs.quake.WbsQuake;
 import wbs.utils.util.commands.WbsSubcommand;
-import wbs.utils.util.plugin.WbsPlugin;
 
 public class ArenaCreateSubcommand extends WbsSubcommand {
 
@@ -28,10 +27,9 @@ public class ArenaCreateSubcommand extends WbsSubcommand {
 
             Arena newArena = new Arena(arenaName);
             ArenaManager.registerArena(newArena);
-            plugin.runAsync(() -> {
-                plugin.settings.saveArenas();
-                sendMessage("Arena &h" + arenaName + "&r created!", sender);
-            });
+
+            newArena.markForSaving();
+            sendMessage("Arena &h" + arenaName + "&r created!", sender);
         } else {
             sendUsage("<name>", sender, label, args);
         }

@@ -58,10 +58,8 @@ public class ArenaSpawnpointRemoveSubcommand extends WbsSubcommand {
         boolean removed = arena.removeSpawnPoint(hash);
 
         if (removed) {
-            plugin.runAsync(() -> {
-                plugin.settings.saveArenas();
-                sendMessage("Spawnpoint removed!", sender);
-            });
+            arena.markForSaving();
+            sendMessage("Spawnpoint removed!", sender);
         } else {
             sendMessage("Use &h/" + label + " arena spawnpoint list " + arena.getName() + "&r to auto-use this command.", sender);
         }

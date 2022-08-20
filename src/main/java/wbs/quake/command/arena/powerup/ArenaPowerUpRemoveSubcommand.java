@@ -58,10 +58,8 @@ public class ArenaPowerUpRemoveSubcommand extends WbsSubcommand {
         boolean removed = arena.removePowerUp(hash);
 
         if (removed) {
-            plugin.runAsync(() -> {
-                plugin.settings.saveArenas();
-                sendMessage("Powerup removed!", sender);
-            });
+            arena.markForSaving();
+            sendMessage("Powerup removed!", sender);
         } else {
             sendMessage("Use &h/" + label + " arena powerup list " + arena.getName() + "&r to auto-use this command.", sender);
         }

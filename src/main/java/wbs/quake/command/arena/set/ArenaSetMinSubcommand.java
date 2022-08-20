@@ -54,6 +54,7 @@ public class ArenaSetMinSubcommand extends WbsSubcommand {
         }
 
         arena.setMinPlayers(minPlayers);
+        arena.markForSaving();
         sendMessage("Set min players to " + minPlayers + " for arena &h" + arena.getDisplayName(), sender);
 
         return true;

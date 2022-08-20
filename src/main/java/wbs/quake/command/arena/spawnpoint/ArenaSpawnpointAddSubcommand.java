@@ -45,10 +45,8 @@ public class ArenaSpawnpointAddSubcommand extends WbsSubcommand {
         Player player = (Player) sender;
 
         arena.addSpawnPoint(player.getLocation());
-        plugin.runAsync(() -> {
-            plugin.settings.saveArenas();
-            sendMessage("Spawnpoint created!", sender);
-        });
+        arena.markForSaving();
+        sendMessage("Spawnpoint created!", sender);
 
         return true;
     }

@@ -59,10 +59,8 @@ public class ArenaPowerUpAddSubcommand extends WbsSubcommand {
         Player player = (Player) sender;
 
         arena.addPowerUp(player.getLocation().add(0, 1, 0), powerUp);
-        plugin.runAsync(() -> {
-            plugin.settings.saveArenas();
-            sendMessage("Powerup created!", sender);
-        });
+        arena.markForSaving();
+        sendMessage("Powerup created!", sender);
 
         return true;
     }

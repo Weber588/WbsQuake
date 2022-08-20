@@ -54,6 +54,7 @@ public class ArenaSetDurationSubcommand extends WbsSubcommand {
         }
 
         arena.setSecondsInRound(secondsInRound);
+        arena.markForSaving();
         sendMessage("Set max round duration to " + secondsInRound + " for arena &h" + arena.getDisplayName(), sender);
 
         return true;

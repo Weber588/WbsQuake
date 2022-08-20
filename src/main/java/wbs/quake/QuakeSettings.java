@@ -21,8 +21,6 @@ import java.util.*;
 public class QuakeSettings extends WbsSettings {
 
     private final WbsQuake plugin;
-    public double headshotThreshold = 0.65;
-    public boolean headshotsGiveBonusPoints = false;
 
     public QuakeSettings(WbsQuake plugin) {
         super(plugin);
@@ -36,7 +34,6 @@ public class QuakeSettings extends WbsSettings {
     private YamlConfiguration miscConfig = null;
 
     private final String arenaFileName = "arenas.yml";
- //   private final String playerFileName = "players.yml";
     private final String miscFileName = "misc.yml";
     private final String configName = "config.yml";
 
@@ -145,6 +142,9 @@ public class QuakeSettings extends WbsSettings {
         ArenaManager.setPlugin(plugin);
         Arena.setPlugin(plugin);
 
+        // Save arenas before reloading - this will only override config changes if changes were made in game first.
+        saveArenas();
+
         loadArenas();
     }
 
@@ -166,6 +166,9 @@ public class QuakeSettings extends WbsSettings {
     public double moneyPerKill = 10;
     public double headshotBonus = 5;
     public int maxArenasPerVote = 5;
+
+    public double headshotThreshold = 0.65;
+    public boolean headshotsGiveBonusPoints = false;
 
     public boolean doKillScaling = true;
     public int minPlayersForExtraKills = 5;
@@ -419,6 +422,10 @@ public class QuakeSettings extends WbsSettings {
     }
 
     public void saveArenas() {
-        arenaConfig = saveYamlData(arenaConfig, arenaFileName, "arena", ArenaManager::saveArenas);
+        arenaConfig = ArenaManager.saveArenas(arenaConfig);
+    }
+
+    public YamlConfiguration writeArenas() {
+        return saveYamlData(arenaConfig, arenaFileName, "arena", ArenaManager::writeArenas);
     }
 }
