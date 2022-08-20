@@ -27,7 +27,8 @@ public class QuakeRound {
     private final Arena arena;
     private final QuakeLobby lobby;
 
-    private final List<QuakePlayer> initialPlayersInRound = new LinkedList<>();
+    private final List<QuakePlayer> activePlayers = new LinkedList<>();
+    // TODO: Also add spectatingPlayers that receive messages but aren't affected by anything in game.
 
     // Round info
     private int secondsRemaining;
@@ -41,15 +42,15 @@ public class QuakeRound {
 
     private final WbsQuake plugin;
     private final QuakeSettings settings;
-    public QuakeRound(Arena arena, List<QuakePlayer> playersInRound) {
+    public QuakeRound(Arena arena, Collection<QuakePlayer> activePlayers) {
         this.arena = arena;
         lobby = QuakeLobby.getInstance();
         plugin = WbsQuake.getInstance();
         settings = plugin.settings;
 
-        this.initialPlayersInRound.addAll(playersInRound);
+        this.activePlayers.addAll(activePlayers);
 
-        killsToWin = arena.getKillsToWin(playersInRound.size());
+        killsToWin = arena.getKillsToWin(activePlayers.size());
 
         scoreboard = new WbsScoreboard(plugin, "WbsQuake", "&c&lQuake");
 
@@ -68,11 +69,11 @@ public class QuakeRound {
             // Size is fine - guaranteed to have 1 player, and once added to the scoreboard, becomes first score index
             scoreboardLeaderboardLine = scoreboard.size();
 
-            for (int i = 0; i < Math.min(playersInRound.size(), 3); i++) {
+            for (int i = 0; i < Math.min(activePlayers.size(), 3); i++) {
                 scoreboard.addLine(getBlank(i + 2));
             }
 
-            scoreboard.addLine(getBlank(playersInRound.size() + 2));
+            scoreboard.addLine(getBlank(activePlayers.size() + 2));
         } else {
             scoreboardLeaderboardLine = 0;
         }
@@ -167,7 +168,7 @@ public class QuakeRound {
         SavedPlayerState roundState = getRoundState();
 
         renderScoreboard();
-        for (QuakePlayer player : initialPlayersInRound) {
+        for (QuakePlayer player : activePlayers) {
             scoreboard.showToPlayer(player.getPlayer());
             points.put(player, 0);
 
@@ -177,7 +178,7 @@ public class QuakeRound {
             inv.setItem(ItemManager.getQuakeGunSlot(), player.getCurrentGun().buildGun());
         }
 
-        arena.start();
+        arena.start(this);
 
         @SuppressWarnings("inline")
         int roundRunnableId = new BukkitRunnable() {
@@ -187,7 +188,7 @@ public class QuakeRound {
 
                 renderScoreboard();
 
-                for (QuakePlayer player : lobby.getPlayersInRound()) {
+                for (QuakePlayer player : activePlayers) {
                     Player bukkitPlayer = player.getPlayer();
                     bukkitPlayer.setSaturation(1);
                     QuakePlayer closest = arena.getClosestPlayer(player);
@@ -212,11 +213,11 @@ public class QuakeRound {
     }
 
     public void roundOver() {
-        for (ArenaPowerUp powerUp : arena.getPowerUps().values()) {
-            for (QuakePlayer player : lobby.getPlayersInRound()) {
+        for (QuakePlayer player : activePlayers) {
+            for (ArenaPowerUp powerUp : arena.getPowerUps().values()) {
                 powerUp.remove(player);
-                player.getCurrentGun().clearCooldownModifier();
             }
+            player.getCurrentGun().clearCooldownModifier();
         }
 
         List<QuakePlayer> winners = getLeaderboard();
@@ -321,7 +322,7 @@ public class QuakeRound {
             format = attacker.getCosmetics().killMessage.format(attacker, victim);
         }
 
-        lobby.getPlayersInRound().forEach(player -> plugin.sendMessageNoPrefix(format, player.getPlayer()));
+        activePlayers.forEach(player -> plugin.sendMessageNoPrefix(format, player.getPlayer()));
 
         givePoint(attacker);
         arena.respawn(victim);
@@ -329,5 +330,9 @@ public class QuakeRound {
         // Run kill perk after respawning to ensure "closest" target can work
         if (attacker.killPerk != null)
             attacker.killPerk.apply(attacker);
+    }
+
+    public List<QuakePlayer> getActivePlayers() {
+        return new LinkedList<>(activePlayers);
     }
 }

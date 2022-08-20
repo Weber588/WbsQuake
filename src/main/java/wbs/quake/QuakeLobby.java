@@ -120,7 +120,7 @@ public class QuakeLobby extends WbsMessenger {
         scoreboard.showToPlayer(player.getPlayer());
         scoreboards.put(player, scoreboard);
 
-        sendMessage("Joined the lobby!", player.getPlayer());
+        sendMessage("Joined the lobby! &h(" + (players.size()) + ")", player.getPlayer());
 
         if (players.size() >= PLAYERS_TO_START) {
             if (state == GameState.WAITING_FOR_PLAYERS) {
@@ -447,9 +447,10 @@ public class QuakeLobby extends WbsMessenger {
 
     @Nullable
     private QuakeRound round;
-    private final List<QuakePlayer> playersInRound = new LinkedList<>();
+
     public boolean isInRound(Player player) {
-        for (QuakePlayer playerInRound : playersInRound) {
+        if (round == null) return false;
+        for (QuakePlayer playerInRound : round.getActivePlayers()) {
             if (playerInRound.getPlayer().equals(player)) {
                 return true;
             }
@@ -457,16 +458,11 @@ public class QuakeLobby extends WbsMessenger {
         return false;
     }
 
-    public List<QuakePlayer> getPlayersInRound() {
-        return new LinkedList<>(playersInRound);
-    }
-
     private void startCountdown(Arena chosenArena) {
         state = GameState.COUNTDOWN;
 
-        playersInRound.addAll(players.values());
-        round = new QuakeRound(chosenArena, playersInRound);
-        for (QuakePlayer player : playersInRound) {
+        round = new QuakeRound(chosenArena, players.values());
+        for (QuakePlayer player : round.getActivePlayers()) {
             chosenArena.respawn(player);
         }
 
@@ -492,12 +488,13 @@ public class QuakeLobby extends WbsMessenger {
     }
 
     private void cancelCountdown() {
-        cancelRunnable();
+        if (round != null) {
+            cancelRunnable();
 
-        messagePlayers("Not enough players! Returning to lobby.");
-        waitForPlayers();
-        playersInRound.clear();
-        round = null;
+            messagePlayers("Not enough players! Returning to lobby.");
+            waitForPlayers();
+            round = null;
+        }
     }
 
     // Gameplay
@@ -514,7 +511,7 @@ public class QuakeLobby extends WbsMessenger {
         forceStarted = false;
         cancelRunnable();
         state = GameState.ROUND_OVER;
-        playersInRound.clear();
+
         round = null;
         messagePlayers(endMessage);
         registerRunnable(new BukkitRunnable() {

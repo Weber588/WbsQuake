@@ -14,9 +14,7 @@ import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
 import wbs.utils.util.string.WbsStrings;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 public class PotionPowerUp extends PowerUp {
     public PotionPowerUp(WbsQuake plugin, ConfigurationSection section, String directory) {
@@ -65,7 +63,7 @@ public class PotionPowerUp extends PowerUp {
 
     @Override
     public void apply(QuakePlayer player) {
-        for (QuakePlayer target : PlayerTargeter.getTargets(player, targetType)) {
+        for (QuakePlayer target : PlayerTargeter.getTargets(player, targetType, QuakeLobby.getInstance().getCurrentRound().getActivePlayers())) {
             target.getPlayer().addPotionEffect(effect);
         }
     }

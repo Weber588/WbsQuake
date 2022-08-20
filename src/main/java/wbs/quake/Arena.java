@@ -7,6 +7,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import wbs.quake.player.QuakePlayer;
 import wbs.quake.powerups.ArenaPowerUp;
 import wbs.quake.powerups.PowerUp;
@@ -16,6 +17,7 @@ import java.util.*;
 public class Arena {
 
     private static WbsQuake plugin;
+
     public static void setPlugin(WbsQuake plugin) {
         Arena.plugin = plugin;
     }
@@ -35,6 +37,8 @@ public class Arena {
     private int secondsInRound = 60 * 5; // 5 minutes
 
     private boolean needsSaving = false;
+    @Nullable
+    private QuakeRound currentRound;
 
     public Arena(@NotNull String name) {
         this.name = name;
@@ -187,7 +191,11 @@ public class Arena {
     private double getDistanceToClosestPlayer(Location loc) {
         double distance = Double.MAX_VALUE;
 
-        for (QuakePlayer player : QuakeLobby.getInstance().getPlayers()) {
+        if (currentRound == null) {
+            return distance;
+        }
+
+        for (QuakePlayer player : currentRound.getActivePlayers()) {
             if (!player.getPlayer().getWorld().equals(loc.getWorld())) continue;
             distance = Math.min(distance, player.getPlayer().getLocation().distanceSquared(loc));
         }
@@ -196,9 +204,13 @@ public class Arena {
     }
 
     public QuakePlayer getClosestPlayer(QuakePlayer quakePlayer) {
+        if (currentRound == null) {
+            return null;
+        }
+
         double distance = Double.MAX_VALUE;
         QuakePlayer closest = null;
-        for (QuakePlayer player : QuakeLobby.getInstance().getPlayers()) {
+        for (QuakePlayer player : currentRound.getActivePlayers()) {
             if (player == quakePlayer) continue;
             if (!player.getPlayer().getWorld().equals(quakePlayer.getPlayer().getWorld())) continue;
 
@@ -214,9 +226,13 @@ public class Arena {
     }
 
     private QuakePlayer getClosestPlayer(Location location) {
+        if (currentRound == null) {
+            return null;
+        }
+
         double distance = Double.MAX_VALUE;
         QuakePlayer closest = null;
-        for (QuakePlayer player : QuakeLobby.getInstance().getPlayers()) {
+        for (QuakePlayer player : currentRound.getActivePlayers()) {
             if (!player.getPlayer().getWorld().equals(location.getWorld())) continue;
             double thisDistance = player.getPlayer().getLocation().distanceSquared(location);
 
@@ -245,8 +261,8 @@ public class Arena {
         if (spawnPoints.size() == 0) return null;
 
         Location chosen = null;
-        if (plugin.settings.findFurthestSpawnpoint) {
-            if (QuakeLobby.getInstance().getPlayers().size() > 2) {
+        if (plugin.settings.findFurthestSpawnpoint && currentRound != null) {
+            if (currentRound.getActivePlayers().size() > 2) {
                 chosen = getFurthestSpawnpoint();
             } else {
                 chosen = getNotClosestSpawnpoint(player);
@@ -313,10 +329,14 @@ public class Arena {
     }
 
     public void distributePlayers() {
-        List<QuakePlayer> playersToDistribute = QuakeLobby.getInstance().getPlayers();
+        if (currentRound == null) {
+            throw new IllegalStateException("Current round must be defined when distributing players.");
+        }
+
         List<Location> unusedSpawnpoints = new LinkedList<>(spawnPoints);
         Collections.shuffle(unusedSpawnpoints);
 
+        List<QuakePlayer> playersToDistribute = currentRound.getActivePlayers();
         while (!playersToDistribute.isEmpty()) {
             QuakePlayer player = playersToDistribute.get(0);
             Location spawnPoint = unusedSpawnpoints.get(0);
@@ -460,7 +480,8 @@ public class Arena {
         return null;
     }
 
-    public void start() {
+    public void start(QuakeRound currentRound) {
+        this.currentRound = currentRound;
         for (ArenaPowerUp powerUp : powerups.values()) {
             powerUp.spawn();
         }
