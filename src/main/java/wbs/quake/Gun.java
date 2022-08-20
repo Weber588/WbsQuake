@@ -237,15 +237,15 @@ public class Gun {
     public boolean fire(QuakePlayer player) {
         if (QuakeLobby.getInstance().getState() != QuakeLobby.GameState.GAMEPLAY) return false;
 
+        boolean freeReload = false;
         if (freeReloads <= 0) {
             if (!offCooldown()) return false;
         } else {
             freeReloads--;
+            freeReload = true;
         }
 
         lastShot = LocalDateTime.now();
-
-        startXPTimer(player);
 
         Player bukkitPlayer = player.getPlayer();
         Vector facing = WbsEntityUtil.getFacingVector(bukkitPlayer);
@@ -276,79 +276,13 @@ public class Gun {
         }
 
         if (fired) {
+            if (!freeReload) {
+                startXPTimer(player);
+            }
             player.getCosmetics().shootSound.play(bukkitPlayer.getEyeLocation());
         }
 
         return fired;
-        /*
-
-
-        int bouncesLeft = bounces;
-
-        Predicate<Entity> predicate = BASE_PREDICATE.or(ignorePlayers::contains);
-
-        boolean running = true;
-        boolean fired = false;
-
-        int playersKilled = 0;
-
-        boolean isBounce = false;
-
-        while (running) {
-            result = world.rayTrace(shootLocation, facing, 300, FluidCollisionMode.NEVER, true, width, predicate);
-            if (result != null) {
-                fired = true;
-                Location hitPos = result.getHitPosition().toLocation(world);
-                trail.playShot(shootLocation, hitPos, isBounce);
-                shootLocation = hitPos;
-
-                if (result.getHitBlock() != null) {
-                    if (bouncesLeft > 0) {
-                        if (bounceIgnored.contains(result.getHitBlock().getType())) {
-                            running = false;
-                        } else {
-                            bouncesLeft--;
-                            isBounce = !isBounce;
-
-                            BlockFace blockFace = result.getHitBlockFace();
-                            assert blockFace != null;
-                            facing = WbsMath.reflectVector(facing, blockFace.getDirection());
-                        }
-                    } else {
-                        running = false;
-                    }
-                }
-                if (result.getHitEntity() != null) {
-                    Player hitPlayer = (Player) result.getHitEntity();
-                    ignorePlayers.add(hitPlayer);
-
-                    QuakePlayer victim = Objects.requireNonNull(QuakeLobby.getInstance().getPlayer(hitPlayer));
-
-                    Location hitLoc = result.getHitPosition().toLocation(hitPlayer.getWorld());
-
-                    double distanceToEyes = hitLoc.distance(hitPlayer.getEyeLocation());
-                    boolean headshot = distanceToEyes < WbsQuake.getInstance().settings.headshotThreshold;
-
-                    QuakeRound round = QuakeLobby.getInstance().getCurrentRound();
-                    round.registerKill(victim, player, headshot);
-
-                    playersKilled++;
-                }
-            } else {
-                running = false;
-            }
-
-            if (playersKilled >= piercing.intVal()) {
-                running = false;
-            }
-        }
-
-        if (fired) {
-            player.getCosmetics().shootSound.play(bukkitPlayer.getEyeLocation());
-        }
-
-        return fired;
-         */
     }
 
     private boolean fireFrom(QuakePlayer shooter, Vector direction, List<Entity> ignore) {
